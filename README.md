@@ -19,10 +19,11 @@ directly below that:
           fastcgi_pass   127.0.0.1:9001;
           fastcgi_index  index.np;
           fastcgi_param  SCRIPT_FILENAME  /srv/www/htdocs/$host$fastcgi_script_name;
-//                                        ^ change this to wherever your docs are served from,
-//                                          if in doubt, just copy the same line from PHP config
           include        fastcgi_params;
       }
+
+Important: change "/srv/www/htdocs/$host$fastcgi_script_name" to wherever your docs are served from. If in doubt, just copy the 
+same line from your existing PHP config.
 
 3) locate your "index" directive and add "index.np" to that. Afterwards, it should look similar (but not necessarily identical) 
 to this:
