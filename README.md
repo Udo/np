@@ -19,8 +19,8 @@ directly below that:
           fastcgi_pass   127.0.0.1:9001;
           fastcgi_index  index.np;
           fastcgi_param  SCRIPT_FILENAME  /srv/www/htdocs/$host$fastcgi_script_name;
-#                                         ^ change this to wherever your docs are served from,
-#                                           if in doubt, just copy the same line from PHP config
+//                                        ^ change this to wherever your docs are served from,
+//                                          if in doubt, just copy the same line from PHP config
           include        fastcgi_params;
       }
 
