@@ -198,17 +198,25 @@ public class LibNP
 	
 	public RTObject assign(Interpreter itp, RTObject objectContext, CallContext cc, ClastNode node) throws InterpreterException
 	{
-		RTObject target = cc.argPop(itp);
+		// skip the first param for now, we'll need it later
+		cc.argPopNOP(itp); 
+		// evaluate the "right side" first
 		RTObject source = cc.argPop(itp);
-		if(target.name != null && !target.name.equals("null"))
+		
+		/*if(target.name != null && !target.name.equals("null"))
 			objectContext.add(target.name, source);
 		else
-			objectContext.add(cc.firstArgNode.content, source);
+			objectContext.add(cc.firstArgNode.content, source);*/
+
+		// todo change the context s
+		RTObject result = cc.firstArgNode.evaluate(itp, objectContext, cc);
+		
 		itp.debugTrace.append("assign "+cc.firstArgNode.content+"="+source.value.getClass().getName()+"\n");
-		if(source.isExecutable())
+		
+		if(result.isExecutable())
 			return new RTObject();
 		else
-			return source;
+			return result;
 	}
 
 	// -------------------------- arithmetics --------------------------------------
@@ -322,7 +330,7 @@ public class LibNP
 				else
 					throw new InterpreterException("function expected", cc.currentArgNode.token);
 			}
-			cc.argPopNOP(itp, objectContext);
+			cc.argPopNOP(itp);
 		}		
 		return new RTObject();
 	}

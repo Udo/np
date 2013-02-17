@@ -1,1 +1,1 @@
-java -DFCGI_PORT=9001 npfcgi
+java -DFCGI_PORT=9001 TinyFCGI

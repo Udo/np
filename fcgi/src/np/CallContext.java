@@ -107,7 +107,7 @@ public class CallContext
 		}
 	}
 
-	public RTObject argPopNOP(Interpreter itp, RTObject objectContext) throws InterpreterException
+	public RTObject argPopNOP(Interpreter itp) throws InterpreterException
 	{
 		if(currentArgNode != null)
 			currentArgNode = currentArgNode.next;
