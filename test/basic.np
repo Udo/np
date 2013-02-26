@@ -1,0 +1,68 @@
+request.header 'content-type':'text/plain';
+
+request.config #debugDump:false;
+
+println "np automated tests";
+println "------------------------";
+println; 
+
+passCount = 0;
+failCount = 0;
+
+expect = { n f ex |
+  println n;
+  if(f == ex) { def.passCount++ } { println n " failed (" f "!=" ex ")."; def.failCount++ }
+  };
+  
+expect "number equality" { return 1 == 1 } true;
+expect "number inequality" { return 1 == 2 } false;
+expect "string equality" { return "1" == "1" } true;
+expect "null equality" { return abc == null } true;
+
+expect "basic variables" {
+  thingsThatAreAwesome = 'cats';
+  magicNumber = 40 + 2;  
+  return (cat magicNumber ' ' thingsThatAreAwesome);
+  } '42 cats';
+
+expect "basic functions" {
+  myFunction = { n |
+    n*n
+    };
+  return (cat "fair and square: " (myFunction 2));
+  } 'fair and square: 4';
+
+expect "basic scope" {
+  a = 1;
+  f = { import #a; pop + a };
+  return (f 1);
+  } 2;
+
+expect "basic scope limit" {
+  f = { import #a; a = pop };
+  f 1;
+  return a;
+  } null;
+
+expect "named parameters" {
+  f = { 
+    return (cat
+      _name ' And I have ' 
+      argcount ' unnamed param '
+      'containing ' pop ', too.');
+    };  
+  return (f 
+    3.1415 
+    #name:"I'm using a named param!");
+  } "I'm using a named param! And I have 1 unnamed param containing 3.1415, too.";
+
+expect "list definition" {
+  return (cat(list 1 2 3 3:3));
+  } "(list '1' '2' '3' '3':'3')";
+  
+
+
+println;
+println "------------------------";
+println passCount ' tests passed';
+println failCount ' tests failed';

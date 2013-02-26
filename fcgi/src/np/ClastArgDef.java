@@ -8,40 +8,26 @@ public class ClastArgDef extends ClastNode
 	public ClastArgDef(Token t)
     {
 	    super(t);
-	    // TODO Auto-generated constructor stub
     }
 	
-	public RTObject evaluate(Interpreter itp, RTObject objectContext, CallContext cc) throws InterpreterException
+	/*
+	 * evaluates the argument definition header of a function. pretty straight-forward
+	 * todo: mechanism for declaring named variables
+	 * @see np.ClastNode#run(np.CoreObject)
+	 */
+	public CoreObject run(CoreObject obj) throws InterpreterException
 	{
-		ClastNode current = child;
-		
-		while(current != null)
+		ClastNode arg = this.child;
+		CoreCall cc = (CoreCall) obj;
+		while(arg != null)
 		{
-			if(current.getClass() == ClastIdentifier.class)
-			{
-				// pop unnamed argument and fill it into this variable
-				if(objectContext.members.get(current.token.value) == null)
-				{
-					RTObject argVal = cc.argPop(itp);
-					//itp.debugTrace.append("call argument "+current.token.value + "=" + argVal.value.toString()+"\n");
-					objectContext.addLocal(current.token.value, argVal);
-				}
-				else
-					throw new InterpreterException("can't overwrite reserved variable '"+ current.token.value +"'", current.token);
-			}
-			else if(current.getClass() == ClastString.class)
-			{
-				// string argument
-			}
-			else
-			{
-				throw new InterpreterException("identifier expected", current.token);
-			}
-			
-			current = current.next;
+			if(arg.getClass() != ClastIdentifier.class)
+				throw new InterpreterException("identifier expected in function arguments", arg.token);
+			cc.members.put(arg.token.value, cc.argPop());
+			//Interpreter.instance.debugTrace.append("arg def "+arg.token.value+"="+cc.members.get(arg.token.value)+"\n");
+			arg = arg.next;
 		}
-		
-		return new RTObject();
+		return null;
 	}
-
+	
 }

@@ -1,5 +1,9 @@
 package np;
 
+/*
+ * A TreeItem object is nothing else but an encapsulation of a Token object
+ * to allow for a tree-like structure.
+ */
 public class TreeItem {
 	Token token;
 	TreeItem next;

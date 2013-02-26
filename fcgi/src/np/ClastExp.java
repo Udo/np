@@ -2,6 +2,12 @@ package np;
 
 import np.Interpreter.InterpreterException;
 
+/*
+ * the expression node invokes functions, both built-in and in native code,
+ * here the first parameter is always the function name and the following ones
+ * (optional) represent the arguments to that function call. as always, function
+ * and variable names are resolved from inner to outer environments.
+ */
 public class ClastExp extends ClastNode
 {
 
@@ -10,29 +16,30 @@ public class ClastExp extends ClastNode
 	    super(t);
     }
 	
-	public boolean isNamedVariable()
+	public CoreObject invoke(CoreObject objectContext, ClastNode method, ClastNode args) throws InterpreterException
 	{
-		return child != null && child.getClass() == ClastIdentifier.class && child.content.equals(":");
-	}
+		CoreObject methodObject = method.run(objectContext);
 
-	public RTObject evaluate(Interpreter itp, RTObject objectContext, CallContext cc) throws InterpreterException
-	{
-		if(child == null) return new RTObject();
+		if(methodObject == null)
+			return new CoreObject();
+		
+		if(methodObject.getClass() == CoreFunction.class)
+			return ((CoreFunction) methodObject).execute(new CoreCall(objectContext, methodObject, args));
+		
+		if(methodObject.getClass() == CoreBuiltin.class)
+			return ((CoreBuiltin) methodObject).execute(new CoreCall(objectContext, methodObject, args));
 
-		RTObject callable = child.evaluate(itp, objectContext, cc);
-
-		//itp.debugTrace.append("exp "+this.getClass().getName()+" "+callable.value.getClass().getName()+"\n");
-
-		if(callable.isExecutable() && child.getClass() != ClastFunction.class)
-		{
-			return callable.invoke(itp, objectContext, cc.call(itp, objectContext, child.next), this.child);
-		}
-		if(child.next != null)
-		{
-			throw new InterpreterException("function identifier expected", child.token);
-		}
-		return callable;
+		return methodObject;
+		
+		//throw new InterpreterException("function identifier expected ('"+method.token.toString()+"' found)", token);
 	}
 	
-
+	public CoreObject run(CoreObject objectContext) throws InterpreterException
+	{
+		if(child == null)
+			return new CoreObject();
+			
+		return invoke(objectContext, child, child.next);
+	}
+	
 }

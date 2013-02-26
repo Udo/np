@@ -1,5 +1,8 @@
 package np;
 
+/*
+ * encapsulates a runtime error message (mostly used within InterpreterExceptions)
+ */
 public class RTErrorMessage
 {
 	public Token token;

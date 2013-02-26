@@ -6,13 +6,23 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Parser
+import np.Interpreter.InterpreterException;
+
+/*
+ * The Parser takes in the flat token list spewed out by the Lexer and turns
+ * that into a tree representation. The parser contains rules that tell it where
+ * to descend deeper into the AST and it's also the first stage of the compilation
+ * process that actually yields error messages. Almost all of the complexity of
+ * the Parser comes from the convenience parsing of operators, which are internally
+ * represented as functions, and which have to adhere to a specific operator 
+ * precedence the user expects. 
+ */
+public class Parser 
 {
 	public TreeItem root;
 	public ArrayList<Token> tokens;
 	public int tokenIndex;
 	public Token currentToken;
-	public RTErrorMessage fatalError = null;
 	public HashMap<String, String> tokenNameToChar = new HashMap<String, String>();
 	
 	public class OperatorOptions 
@@ -22,6 +32,9 @@ public class Parser
 		Boolean uniLeft = false;
 	}
 	
+	/*
+	 * these are the rules for operator recognition and parsing
+	 */
 	private final Set<String> OP_UNI0 = new HashSet<String>(Arrays.asList(
 		     new String[] {"#", "@", "$"}
 		));	
@@ -52,6 +65,9 @@ public class Parser
 	
 	public Parser()
 	{
+		/*
+		 * translate some of the punctuation tokens into named ones
+		 */
 		tokenNameToChar.put("ParenStart", "(");
 		tokenNameToChar.put("ParenEnd", ")");
 		tokenNameToChar.put("FnStart", "{");
@@ -73,17 +89,14 @@ public class Parser
 		return result;
 	}
 	
-	public void FatalError(String msg, Token tk)
+	public void FatalError(String msg, Token tk) throws InterpreterException
 	{
-		if(fatalError == null)
-		{
-			fatalError = new RTErrorMessage(msg, tk);
-			currentToken = null;
-			tokenIndex = tokens.size();
-		}
+		currentToken = null;
+		tokenIndex = tokens.size();
+		throw new Interpreter.InterpreterException(msg, tk);
 	}
 	
-	public TreeItem parseParens()
+	public TreeItem parseParens() throws InterpreterException 
 	{
 		next(); 
 		TreeItem result = parseLevel("ParenEnd");
@@ -91,7 +104,7 @@ public class Parser
 		return result;
 	}
 	
-	public TreeItem parseList()
+	public TreeItem parseList() throws InterpreterException
 	{
 		next(); 
 		TreeItem result = parseLevel("ListEnd");
@@ -99,14 +112,14 @@ public class Parser
 		return result;
 	}
 	
-	public TreeItem parseFunction()
+	public TreeItem parseFunction() throws InterpreterException
 	{
 		TreeItem result = new TreeItem(new Token("Function", ""));
 		result.token.pos = currentToken.pos;
 		TreeItem current = result;
 		next(); // consume FnStart
 		
-		while (current != null && !currentToken.type.equals("FnEnd"))
+		while (current != null && currentToken != null && !currentToken.type.equals("FnEnd"))
 		{
 			TreeItem newItem = parseLevel("StEnd"); 
 			
@@ -130,7 +143,7 @@ public class Parser
 		return result;
 	}
 	
-	public TreeItem parseLevel(String limitedByTokenType)
+	public TreeItem parseLevel(String limitedByTokenType) throws InterpreterException
 	{
 		if(currentToken == null)
 			return(null);
@@ -141,7 +154,7 @@ public class Parser
 		TreeItem current = null;
 		TreeItem newItem = null;
 
-		while (currentToken != null && !currentToken.type.equals(limitedByTokenType))
+		while (currentToken != null && currentToken != null && !currentToken.type.equals(limitedByTokenType))
 		{
 			if(currentToken.type.equals("ParenStart"))
 				newItem = parseParens();
@@ -168,7 +181,13 @@ public class Parser
 		return(result);
 	}
 	
-	public void applyOpExp(TreeItem node, Set<String> opType, OperatorOptions opt)
+	/*
+	 * this is the place where different types of operators leed to different types of
+	 * AST transformations, depending on where the operator and its operands need to be
+	 * inserted. it's long, but really simple because it does nothing besides swapping
+	 * pointers around.
+	 */
+	public void applyOpExp(TreeItem node, Set<String> opType, OperatorOptions opt) throws InterpreterException
 	{
 		TreeItem lastNode = null;
 		while (node != null)
@@ -178,10 +197,8 @@ public class Parser
 				if(opt.uniLeft)
 				{
 					if(lastNode == null)
-					{
 						FatalError("missing operand", node.token);
-						return;
-					}
+
 					TreeItem op1 = new TreeItem();
 					op1.child = lastNode.child;
 					op1.token = lastNode.token;
@@ -267,7 +284,7 @@ public class Parser
 		}
 	}
 	
-	public void applyOp(TreeItem node, Set<String> opType, OperatorOptions opt)
+	public void applyOp(TreeItem node, Set<String> opType, OperatorOptions opt) throws InterpreterException
 	{
 		while (node != null)
 		{
@@ -281,7 +298,14 @@ public class Parser
 		}
 	}
 	
-	public void applyOperators()
+	/*
+	 * This is how operator precedence is defined, you can guess the precedence order
+	 * by looking at the sequence of applyOp() calls here. The inefficient part is of
+	 * course that the AST needs to be traversed once for every category, but on the 
+	 * upside this doesn't take very long and it's a paradigm that produces easy-to-
+	 * understand code (at least for my taste).
+	 */
+	public void applyOperators() throws InterpreterException
 	{
 		applyOp(root, OP_UNI0, new OperatorOptions() {{ uniRight = true; }});
 		applyOp(root, OP_DOT, new OperatorOptions() {{ }});
@@ -293,7 +317,7 @@ public class Parser
 		applyOp(root, OP_ASSIGN, new OperatorOptions() {{ gobbleRightSide = true; }});
 	}
 	
-	public void checkForErrors(TreeItem node)
+	public void checkForErrors(TreeItem node) throws InterpreterException
 	{
 		while(node != null)
 		{
@@ -307,7 +331,7 @@ public class Parser
 		}
 	}
 	
-	public void parse(ArrayList<Token> tk, String moduleName)
+	public void parse(ArrayList<Token> tk, String moduleName) throws InterpreterException
 	{
 		tokens = tk;
 		tokenIndex = 0;

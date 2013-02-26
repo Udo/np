@@ -5,19 +5,31 @@ import np.Interpreter.InterpreterException;
 public class ClastModule extends ClastNode
 {
 
+	public long fileMTime = 0;
+	
 	public ClastModule(Token t)
     {
 	    super(t);
-	    // TODO Auto-generated constructor stub
     }
 	
-	public RTObject evaluate(Interpreter itp, RTObject objectContext, CallContext cc) throws InterpreterException
+	/*
+	 * the run method of a module does little, except handing flow
+	 * over to the first expression contained within itself. Of 
+	 * course, a typical program contains a long list of expressions,
+	 * so we need to loop through them.
+	 * @see np.ClastNode#run()
+	 */
+	public CoreObject run(CoreObject objectContext) throws InterpreterException
 	{
-		itp.debugTrace.append("module start "+this.getClass().getName()+" ("+content+") \n");
-		if(child != null)
-			itp.evaluateTree(child, objectContext, cc);
-		return new RTObject();
+		Interpreter.instance.debugTrace.append("module context "+objectContext+"\n");
+		CoreObject result = null;
+		ClastNode current = child;
+		while(current != null)
+		{
+			result = current.run(objectContext);
+			current = current.next;
+		}
+		return result;
 	}
 	
-
 }

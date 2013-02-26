@@ -9,12 +9,10 @@ public class ClastFunction extends ClastNode
     {
 	    super(t);
     }
-
-	public RTObject evaluate(Interpreter itp, RTObject objectContext, CallContext cc) throws InterpreterException
+	
+	public CoreObject run(CoreObject objectContext)
 	{
-		//itp.debugTrace.append("function declared "+this.getClass().getName()+" (" + content + ") \n");
-		
-		return new RTObject(this, objectContext);
+		return new CoreFunction(this);
 	}
-		
+	
 }

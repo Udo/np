@@ -11,10 +11,13 @@ public class ClastString extends ClastNode
 	    // TODO Auto-generated constructor stub
     }
 
-	public RTObject evaluate(Interpreter itp, RTObject objectContext, CallContext cc) throws InterpreterException
+	/*
+	 * returns a CoreString from a ClastString
+	 * @see np.ClastNode#run()
+	 */
+	public CoreObject run(CoreObject objectContext)
 	{
-		//itp.debugTrace.append("string "+this.getClass().getName()+" (" + content + ") \n");
-		return new RTObject(content);
+		return new CoreString(token.value);
 	}
-
+		
 }

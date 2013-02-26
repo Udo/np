@@ -1,1 +1,1 @@
-java -DFCGI_PORT=9001 TinyFCGI
+java -classpath ".:../lib/*" -DFCGI_PORT=9001 npfcgi

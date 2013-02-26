@@ -1,0 +1,53 @@
+<html>
+<body>
+
+<style>
+  body {
+    font-family: Trebuchet MS, Arial, Helvetica;
+    line-height: 150%;
+  }
+  
+  small {
+    color: #888;
+  }
+
+  pre {
+    padding: 6px;
+    border: 1px solid #ccc;
+    background: #cfc;
+    margin: 0;
+  }
+  
+  textarea {
+    font-family: Consolas, Courier, Courier New, Monospace;
+    font-size: 14px;
+    padding: 6px;
+    background: #ffc;
+    border: 1px solid #ccc;
+    line-height: 150%;
+  }
+  
+  h1 {
+    color: #333;
+    font-size: 110%;
+  }
+</style>
+
+<h1>::Sandbox</h1>
+
+<form action="?" method="post">
+  <small>Source Code:</small>
+  <textarea name="code" style="width: 100%; height: 200px;"><?np print request::code #default:' '; ?></textarea>
+  <input type="submit" value="Run!"/>
+</form>
+
+<small>Your Output:</small>
+<pre><?np
+  
+    if (request.post::code)
+      { print (eval request.post::code).output #default:"(no output)"; }
+  
+?></pre>
+
+</body>
+</html>

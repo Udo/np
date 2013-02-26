@@ -1,9 +1,15 @@
 package np;
 
+import java.io.File;
+import java.util.HashMap;
+
 import np.Interpreter.InterpreterException;
 
 public class ClastFactory
 {
+
+	public static HashMap<String, ClastModule> cache = new HashMap<String, ClastModule>();
+	
 	private static ClastNode TI2ClastLevel(TreeItem node) throws InterpreterException
 	{
 		ClastNode result = null;
@@ -37,8 +43,6 @@ public class ClastFactory
 			result = new ClastFunction(node.token);
 		else if(node.token.type.equals("Identifier"))
 			result = new ClastIdentifier(node.token);
-		else if(node.token.type.equals("List"))
-			result = new ClastList(node.token);
 		else if(node.token.type.equals("Module"))
 			result = new ClastModule(node.token);
 		else if(node.token.type.equals("Number"))
@@ -54,8 +58,28 @@ public class ClastFactory
 		return result;
 	}
 	
-	public static ClastNode makeClastFromTree(TreeItem fromRootItem) throws InterpreterException
+	public static ClastNode getClastFromCache(String moduleName) throws InterpreterException
 	{
-		return TI2ClastNode(fromRootItem);
+		File fle = new File(moduleName);
+		ClastNode n = cache.get(moduleName);
+		if(n != null)
+		{
+			if(((ClastModule) n).fileMTime != fle.lastModified())
+				return null;
+			else
+				return n;
+		}
+		return null;
+	}
+	
+	public static ClastNode makeClastFromTree(TreeItem fromRootItem, RTFile moduleFile) throws InterpreterException
+	{
+		ClastModule result = (ClastModule) TI2ClastNode(fromRootItem);
+		if(moduleFile != null)
+		{
+			result.fileMTime = moduleFile.mTime;
+			cache.put(moduleFile.fileName, result);
+		}
+		return result;
 	}
 }

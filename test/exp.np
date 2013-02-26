@@ -1,0 +1,4 @@
+f = { a b |
+  println "my variable a = " a b _1;
+  };
+f 1 '1':'dskf' 2;

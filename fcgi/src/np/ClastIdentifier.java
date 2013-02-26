@@ -13,24 +13,32 @@ public class ClastIdentifier extends ClastNode
 	    // TODO Auto-generated constructor stub
     }
 	
-	public RTObject evaluate(Interpreter itp, RTObject objectContext, CallContext cc) throws InterpreterException
+	/*
+	 * identifier objects are interesting. they point to an
+	 * object that must be visible within the current call
+	 * context and those often need to be resolved deeper into
+	 * the tree.
+	 * @see np.ClastNode#run()
+	 */
+	public CoreObject run(CoreObject objectContext) throws InterpreterException
 	{
-		Method builtinMethod = itp.builtin.resolveMethod(content);
-		if(builtinMethod != null)
-		{
-			//itp.debugTrace.append("identifier built-in (" + content + ") \n");
-			return new RTObject(builtinMethod, itp.builtin);
-		}
-		else
-		{
-			//itp.debugTrace.append("identifier resolve (" + content + ") \n");
-			RTObject result = objectContext.resolve(content);
-			if(result != null)
-				return result;
-			else 
-				return new RTObject();
-		}
-	}
+		/*
+		 * first step, look this identifier up within the current environment
+		 */
+		CoreObject result = objectContext.getMember(token.value);
+		if(result != null)
+			return result;
 
+		result = CoreBuiltin.lookUp(token.value);
+		if(result != null)
+			return result;
+		
+		result = new CoreObject();
+
+		if(Interpreter.instance.assignmentMode)
+			new AssignmentTag(result, objectContext, token.value);
+
+		return result;
+	}
 	
 }

@@ -2,12 +2,16 @@ package np;
 
 import java.util.ArrayList;
 
+/*
+ * the lexer is long, but very straight-forward. all it does is hack a string of
+ * source code into a flat token list.
+ */
 public class Lexer
 {
-
 	public static final int PARSERMODE_CODE = 0;
 	public static final int PARSERMODE_STRING_LITERAL = 1;
 	public static final int PARSERMODE_LINECOMMENT = 2;
+	public static final int PARSERMODE_PRINTSTRING = 3;
 
 	int idx, codeLength, currentMode;
 	public ArrayList<Integer> lineBreakDictionary = new ArrayList<Integer>();
@@ -124,14 +128,38 @@ public class Lexer
 		idx = idx - 1;
 		Character currentDigit = sourceText.charAt(idx); 
 		Boolean dotProcessed = false;
-		while(Character.isDigit(currentDigit) || (currentDigit.equals('.') && !dotProcessed))
+		while(idx < codeLength && (Character.isDigit(currentDigit) || (currentDigit.equals('.') && !dotProcessed)))
 		{
 			if(currentDigit.equals('.')) dotProcessed = true;
 			addToCurrentValue(currentDigit.toString());
 			idx++;
-			currentDigit = sourceText.charAt(idx);
+			if(idx < codeLength)
+				currentDigit = sourceText.charAt(idx);
 		}
 		commitToken("Number", currentTokenString);
+	}
+	
+	public void consumePrintString(int advanceIndex)
+	{
+		idx += advanceIndex;
+		currentMode = PARSERMODE_CODE;
+		int endStrPos = sourceText.indexOf("<?np", idx);
+		String printString;
+		if(endStrPos == -1)
+		{
+			printString = sourceText.substring(idx);
+			idx = codeLength;
+		}
+		else
+		{
+			printString = sourceText.substring(idx, endStrPos);
+			idx = endStrPos+4;
+		}
+		commitToken("ParenStart", "");
+		commitToken("Identifier", "unsafeprint");
+		commitToken("String", printString);
+		commitToken("ParenEnd", "");
+		commitToken("StEnd", "");
 	}
 	
 	public void updateLineCounter()
@@ -167,6 +195,9 @@ public class Lexer
 	public ArrayList<Token> readText(String src)
 	{
 		init(src);
+		
+		if(sourceText.charAt(0) == '<')
+			consumePrintString(0);
 		
 		while (idx < codeLength)
 		{
@@ -229,6 +260,12 @@ public class Lexer
 					else if (currentItem.equals("/"))
 					{
 						if (lookAhead.equals("/")) beginLineComment(1);
+						else
+							commitToken("Op", currentItem);
+					}
+					else if (currentItem.equals("?"))
+					{
+						if (lookAhead.equals(">")) consumePrintString(1);
 						else
 							commitToken("Op", currentItem);
 					}

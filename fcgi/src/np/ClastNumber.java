@@ -11,10 +11,13 @@ public class ClastNumber extends ClastNode
 	    // TODO Auto-generated constructor stub
     }
 	
-	public RTObject evaluate(Interpreter itp, RTObject objectContext, CallContext cc) throws InterpreterException
+	/*
+	 * returns a CoreNumber from a ClastNumber
+	 * @see np.ClastNode#run()
+	 */
+	public CoreObject run(CoreObject objectContext)
 	{
-		//itp.debugTrace.append("number "+this.getClass().getName()+" (" + content + ") \n");
-		return new RTObject(Double.parseDouble(content));
+		return new CoreNumber(token.value);
 	}
-
+	
 }
