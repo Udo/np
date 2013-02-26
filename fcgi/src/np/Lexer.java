@@ -238,8 +238,8 @@ public class Lexer
 					}
 					else if (currentItem.equals("(")) commitToken("ParenStart", "");
 					else if (currentItem.equals(")")) commitToken("ParenEnd", "");
-					else if (currentItem.equals("[")) commitToken("ListStart", "");
-					else if (currentItem.equals("]")) commitToken("ListEnd", "");
+					else if (currentItem.equals("[")) commitToken("IdentExprStart", "");
+					else if (currentItem.equals("]")) commitToken("IdentExprEnd", "");
 					else if (currentItem.equals("$")) buildIdentifier(currentItem);
 					else if (currentItem.equals("@")) buildIdentifier(currentItem);
 					else if (currentItem.equals(".")) commitToken("Op", ".");

@@ -16,7 +16,7 @@ public class ClastExp extends ClastNode
 	    super(t);
     }
 	
-	public CoreObject invoke(CoreObject objectContext, ClastNode method, ClastNode args) throws InterpreterException
+	public static CoreObject invoke(CoreObject objectContext, ClastNode method, ClastNode args) throws InterpreterException
 	{
 		CoreObject methodObject = method.run(objectContext);
 

@@ -60,21 +60,21 @@ public class Parser
 		     new String[] {".", ":", "::"}
 		));	
 	private final Set<String> UNEXPECTED_TOKENS = new HashSet<String>(Arrays.asList(
-		     new String[] {"ParenStart", "ParenEnd", "FnStart", "FnEnd", "StEnd", "ListStart", "ListEnd"}
+		     new String[] {"ParenStart", "ParenEnd", "FnStart", "FnEnd", "StEnd", "IdentExprStart", "IdentExprEnd"}
 		));	
 	
 	public Parser()
 	{
 		/*
-		 * translate some of the punctuation tokens into named ones
+		 * translate some of the named punctuation tokens back into symbol ones
 		 */
 		tokenNameToChar.put("ParenStart", "(");
 		tokenNameToChar.put("ParenEnd", ")");
 		tokenNameToChar.put("FnStart", "{");
 		tokenNameToChar.put("FnEnd", "}");
 		tokenNameToChar.put("StEnd", ";");
-		tokenNameToChar.put("ListStart", "[");
-		tokenNameToChar.put("ListEnd", "]");
+		tokenNameToChar.put("IdentExprStart", "[");
+		tokenNameToChar.put("IdentExprEnd", "]");
 	}
 
 	public Token next()
@@ -104,11 +104,11 @@ public class Parser
 		return result;
 	}
 	
-	public TreeItem parseList() throws InterpreterException
+	public TreeItem parseIdentExpr() throws InterpreterException
 	{
 		next(); 
-		TreeItem result = parseLevel("ListEnd");
-		result.token.type = "List";
+		TreeItem result = parseLevel("IdentExprEnd");
+		result.token.type = "IdentExpr";
 		return result;
 	}
 	
@@ -160,8 +160,8 @@ public class Parser
 				newItem = parseParens();
 			else if(currentToken.type.equals("FnStart"))
 				newItem = parseFunction();
-			else if(currentToken.type.equals("ListStart"))
-				newItem = parseList();
+			else if(currentToken.type.equals("IdentExprStart"))
+				newItem = parseIdentExpr();
 			else
 				newItem = new TreeItem(currentToken);
 

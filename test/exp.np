@@ -1,9 +1,10 @@
-bs = 123;
+['bs'] = 123;
 
 f = { 
   local bs;
   bs = 1234;
   println bs;
   };
+  
 f 1 '1':'dskf' 2;
 println bs;

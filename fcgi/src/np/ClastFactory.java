@@ -49,6 +49,8 @@ public class ClastFactory
 			result = new ClastNumber(node.token);
 		else if(node.token.type.equals("String"))
 			result = new ClastString(node.token);
+		else if(node.token.type.equals("IdentExpr"))
+			result = new ClastIdentExpr(node.token);
 		else
 			throw new InterpreterException("unexpected token '"+node.token.value+"'", node.token);
 		

@@ -47,6 +47,7 @@ public class LibNP
 		methods.put("-", findMethod("b_minus"));
 		methods.put("/", findMethod("b_divide"));
 		methods.put("*", findMethod("b_multiply"));
+		//methods.put("list", findMethod("b_list"));
 		instance = this;
 	}
 	

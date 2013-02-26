@@ -12,6 +12,27 @@ public class ClastIdentifier extends ClastNode
 	    super(t);
 	    // TODO Auto-generated constructor stub
     }
+
+	public static CoreObject iEval(ClastNode node, String identifier, CoreObject objectContext) throws InterpreterException
+	{
+		CoreObject result = null;
+		// resolve reserved words
+		if(node.token.value.equals("outer") && objectContext.outer != null)
+			return objectContext.outer;
+		// resolve builtins
+		result = CoreBuiltin.lookUp(identifier);
+		if(result != null)
+			return result;
+		// resolve within current context (hierarchical)
+		result = objectContext.getMember(identifier);
+		if(result == null)
+			result = new CoreObject();
+
+		if(Interpreter.instance.assignmentMode)
+			new AssignmentTag(result, objectContext, identifier);
+
+		return result;
+	}
 	
 	/*
 	 * identifier objects are interesting. they point to an
@@ -22,23 +43,7 @@ public class ClastIdentifier extends ClastNode
 	 */
 	public CoreObject run(CoreObject objectContext) throws InterpreterException
 	{
-		/*
-		 * first step, look this identifier up within the current environment
-		 */
-		CoreObject result = objectContext.getMember(token.value);
-		if(result != null)
-			return result;
-
-		result = CoreBuiltin.lookUp(token.value);
-		if(result != null)
-			return result;
-		
-		result = new CoreObject();
-
-		if(Interpreter.instance.assignmentMode)
-			new AssignmentTag(result, objectContext, token.value);
-
-		return result;
+		return iEval(this, token.value, objectContext);
 	}
 	
 }
