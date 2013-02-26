@@ -47,4 +47,16 @@ public class CoreObject
 		return result;
 	}
 	
+	public Double toDouble()
+	{
+		try
+		{
+			return Double.parseDouble(value.toString());
+		}
+		catch (Exception e)
+		{
+			return new Double(0);
+		}
+	}
+	
 }

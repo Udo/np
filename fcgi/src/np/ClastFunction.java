@@ -12,7 +12,7 @@ public class ClastFunction extends ClastNode
 	
 	public CoreObject run(CoreObject objectContext)
 	{
-		return new CoreFunction(this);
+		return new CoreFunction(this, objectContext);
 	}
 	
 }

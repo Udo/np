@@ -32,4 +32,9 @@ public class CoreNumber extends CoreObject
 			return v.toString();
 	}
 	
+	public Double toDouble()
+	{
+		return (Double) value;
+	}
+	
 }

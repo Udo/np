@@ -9,9 +9,10 @@ import np.Interpreter.InterpreterException;
 public class CoreFunction extends CoreObject
 {
 
-	public CoreFunction(ClastNode fnode)
+	public CoreFunction(ClastNode fnode, CoreObject objectContext)
 	{
 		value = fnode;
+		outer = objectContext;
 	}
 		
 	public boolean isExecutable()

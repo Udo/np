@@ -38,9 +38,14 @@ public class LibNP
 	public LibNP() throws InterpreterException
 	{
 		methods.put("println", findMethod("b_println"));
-		methods.put("print", findMethod("b_print"));
+		methods.put("println", findMethod("b_println"));
+		methods.put("cat", findMethod("b_cat"));
 		methods.put("=", findMethod("b_assign"));
 		methods.put(":", findMethod("b_named"));
+		methods.put("+", findMethod("b_plus"));
+		methods.put("-", findMethod("b_minus"));
+		methods.put("/", findMethod("b_divide"));
+		methods.put("*", findMethod("b_multiply"));
 		instance = this;
 	}
 	
@@ -112,14 +117,23 @@ public class LibNP
 		return source;
 	}
 	
-	public CoreObject b_print(CoreCall cc) throws InterpreterException
+	public CoreObject b_cat(CoreCall cc) throws InterpreterException
 	{
-		CoreObject ca = cc.argPop();
+		CoreObject separateBy = cc.members.get("_sep");
+		StringBuilder r = new StringBuilder();
 		for(int i = 0; i < cc.argCount; i++)
 		{
-			Interpreter.instance.output.append(ca.toString());
-			ca = cc.argPop();
+			CoreObject ca = cc.argPop();
+			if(i > 0 && separateBy != null)
+				r.append(separateBy.toString());
+			r.append(ca.toString());
 		}
+		return new CoreString(r.toString());
+	}
+
+	public CoreObject b_print(CoreCall cc) throws InterpreterException
+	{
+		Interpreter.instance.output.append(b_cat(cc).toString());
 		return new CoreObject();
 	}
 
@@ -130,5 +144,67 @@ public class LibNP
 		return result;
 	}
 	
+	/*
+	 * adds all of its operands and returns the result
+	 */
+	public CoreObject b_plus(CoreCall cc) throws InterpreterException
+	{
+		Double result = new Double(0);
+		
+		for(int i = 0; i < cc.argCount; i++)
+		{
+			Double opnd = cc.argPop().toDouble();
+			result += opnd;
+		}
+		
+		return new CoreNumber(result);
+	}
+
+	/*
+	 * subtracts all of its operands and returns the result
+	 */
+	public CoreObject b_minus(CoreCall cc) throws InterpreterException
+	{
+		Double result = cc.argPop().toDouble();
+		
+		for(int i = 1; i < cc.argCount; i++)
+		{
+			Double opnd = cc.argPop().toDouble();
+			result -= opnd;
+		}
+		
+		return new CoreNumber(result);
+	}
 	
+	/*
+	 * divides all of its operands and returns the result
+	 */
+	public CoreObject b_divide(CoreCall cc) throws InterpreterException
+	{
+		Double result = cc.argPop().toDouble();
+		
+		for(int i = 1; i < cc.argCount; i++)
+		{
+			Double opnd = cc.argPop().toDouble();
+			result /= opnd;
+		}
+		
+		return new CoreNumber(result);
+	}
+
+	/*
+	 * multiplies all of its operands and returns the result
+	 */
+	public CoreObject b_multiply(CoreCall cc) throws InterpreterException
+	{
+		Double result = cc.argPop().toDouble();
+		
+		for(int i = 1; i < cc.argCount; i++)
+		{
+			Double opnd = cc.argPop().toDouble();
+			result *= opnd;
+		}
+		
+		return new CoreNumber(result);
+	}
 }
