@@ -1,4 +1,9 @@
-f = { a b |
-  println "my variable a = " (a/2) b _1 #sep:' ';
+bs = 123;
+
+f = { 
+  local bs;
+  bs = 1234;
+  println bs;
   };
 f 1 '1':'dskf' 2;
+println bs;

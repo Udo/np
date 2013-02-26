@@ -40,6 +40,7 @@ public class LibNP
 		methods.put("println", findMethod("b_println"));
 		methods.put("println", findMethod("b_println"));
 		methods.put("cat", findMethod("b_cat"));
+		methods.put("local", findMethod("b_local"));
 		methods.put("=", findMethod("b_assign"));
 		methods.put(":", findMethod("b_named"));
 		methods.put("+", findMethod("b_plus"));
@@ -207,4 +208,28 @@ public class LibNP
 		
 		return new CoreNumber(result);
 	}
+
+	/*
+	 * creates variables within the local context, overshadowing potentially identical
+	 * variable names in the outer context for the duration of the call
+	 */
+	public CoreObject b_local(CoreCall cc) throws InterpreterException
+	{
+		ClastNode co = cc.firstArgNode;
+		
+		while (co != null)
+		{
+			if(co.token.type.equals("Identifier") || co.token.type.equals("String"))
+				cc.callerContext.members.put(co.token.value, new CoreObject());
+			else
+			{
+				CoreObject nmd = co.run(cc.callerContext);
+				cc.callerContext.members.put(nmd.name, nmd);
+			}
+			co = co.next;
+		}
+		
+		return new CoreObject();
+	}
+
 }
