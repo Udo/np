@@ -1,10 +1,6 @@
-['bs'] = 123;
+l = list 1 2 3 4;
+l.test = "test";
+bla = 23487;
+l.f = { println (parent.item) };
 
-f = { 
-  local bs;
-  bs = 1234;
-  println bs;
-  };
-  
-f 1 '1':'dskf' 2;
-println bs;
+(l.f);

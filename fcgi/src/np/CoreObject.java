@@ -2,6 +2,8 @@ package np;
 
 import java.util.HashMap;
 
+import np.Interpreter.InterpreterException;
+
 /*
  * CoreObject is the basic atomic runtime unit of np. Everything
  * evaluates to some subclass of CoreObject. Its main purpose is
@@ -47,6 +49,11 @@ public class CoreObject
 		return result;
 	}
 	
+	public String getType()
+	{
+		return("NullObject");
+	}
+	
 	public Double toDouble()
 	{
 		try
@@ -58,5 +65,29 @@ public class CoreObject
 			return new Double(0);
 		}
 	}
+
+	public CoreObject init() throws InterpreterException
+	{
+		return null;
+	}
 	
+	protected CoreObject getGlobalCoreClass(String typeIdentifier)
+	{
+		return Interpreter.instance.rootContext.getMember(typeIdentifier);
+	}
+	
+	protected CoreObject setGlobalCoreClass(String typeIdentifier, CoreObject o)
+	{
+		Interpreter.instance.rootContext.members.put(typeIdentifier, o);
+		return o;
+	}
+	
+	protected CoreObject getOuterCore() throws InterpreterException
+	{
+		CoreObject o = getGlobalCoreClass(getType());		
+		if(o == null)
+			o = setGlobalCoreClass(getType(), init());
+		return o;
+	}
+
 }

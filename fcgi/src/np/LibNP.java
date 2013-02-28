@@ -1,6 +1,7 @@
 package np;
 
 import java.lang.reflect.Method;
+import java.util.Currency;
 import java.util.HashMap;
 import np.Interpreter.InterpreterException;
 
@@ -41,13 +42,16 @@ public class LibNP
 		methods.put("println", findMethod("b_println"));
 		methods.put("cat", findMethod("b_cat"));
 		methods.put("local", findMethod("b_local"));
-		methods.put("=", findMethod("b_assign"));
-		methods.put(":", findMethod("b_named"));
-		methods.put("+", findMethod("b_plus"));
+		methods.put("getmembers", findMethod("b_getmembers"));
+		methods.put("=", findMethod("b_assign")); methods.put("assign", findMethod("b_assign"));
+		methods.put("::", findMethod("b_named")); methods.put("setname", findMethod("b_named"));
+		methods.put(":", findMethod("b_arrayscope")); methods.put("getitem", findMethod("b_arrayscope"));
+		methods.put(".", findMethod("b_objectscope")); methods.put("member", findMethod("b_objectscope"));
+		methods.put("+", findMethod("b_plus")); methods.put("add", findMethod("b_plus"));
 		methods.put("-", findMethod("b_minus"));
-		methods.put("/", findMethod("b_divide"));
-		methods.put("*", findMethod("b_multiply"));
-		//methods.put("list", findMethod("b_list"));
+		methods.put("/", findMethod("b_divide")); methods.put("divide", findMethod("b_minus"));
+		methods.put("*", findMethod("b_multiply")); methods.put("multiply", findMethod("b_multiply"));
+		methods.put("list", findMethod("b_list"));
 		instance = this;
 	}
 	
@@ -63,18 +67,36 @@ public class LibNP
 	/*
 	 * general execution wrapper for all built-in functions
 	 */
-	public CoreObject execute(Method m, CoreCall cc) throws InterpreterException
+	public CoreObject execute(Object o, Method m, CoreCall cc) throws InterpreterException
 	{
 		try
 		{
-			return (CoreObject) m.invoke(this, cc);
+			return (CoreObject) m.invoke(o, cc);
 		}
 		catch (Exception e)
 		{
-			throw new InterpreterException(e.getCause().toString()+"\n"+stackTraceToString(e.getCause()), ((ClastNode) cc.value).token);
+			Throwable cause = e.getCause();
+			if(cause.getClass() == InterpreterException.class)
+				throw (InterpreterException) cause;
+			else
+				throw new InterpreterException(cause.toString()+"\n"+stackTraceToString(e.getCause()), ((ClastNode) cc.value).token);
 		}
 	}
 
+	public CoreObject b_getmembers(CoreCall cc) throws InterpreterException
+	{
+		StringBuilder sb = new StringBuilder();
+		CoreObject curc = cc.callerContext;
+		int i = 0;
+		while(curc != null)
+		{
+			sb.append(curc.hashCode()+" "+curc.getClass().getName()+": "+curc.members.toString()+"\n");
+			curc = curc.outer;
+			i++;
+		}
+		return new CoreString(sb.toString());
+	}
+	
 	/*
 	 * built-in operation to give objects a name, takes two runtime arguments: name and source
 	 */
@@ -84,6 +106,60 @@ public class LibNP
 		CoreObject source = cc.argPop();
 		source.name = name.toString();
 		return source;
+	}
+	
+	public CoreObject b_objectscope(CoreCall cc) throws InterpreterException
+	{
+		CoreObject currentObject = null;
+		CoreObject previousObject = cc.argPop();
+		for(int i = 1; i < cc.argCount; i++)
+		{
+			currentObject = cc.argPopCtx(previousObject);
+
+			if(Interpreter.instance.assignmentMode)
+			{
+				AssignmentTag at = Interpreter.instance.assignmentList.get(currentObject);
+				/*
+				 * if the referenced object doesn't exist, create it since we're going to be assigning a value to it
+				 */
+				if(previousObject.members.get(at.name) == null)
+				{
+					previousObject.members.put(at.name, currentObject);
+					at = new AssignmentTag(currentObject, previousObject, at.name);
+				}
+				
+				at.initMembers();
+				at.members.put("parent", previousObject);
+				
+				Interpreter.instance.debugTrace.append("dotscope parent="+previousObject.hashCode()+" current="+currentObject.hashCode()+"\n");
+			}
+			
+			previousObject = currentObject;
+		}
+		return currentObject;
+	}
+
+	public CoreObject b_arrayscope(CoreCall cc) throws InterpreterException
+	{
+		CoreObject name = cc.argPop();
+		CoreObject source = cc.argPop();
+		if(name.getClass() == CoreList.class)
+		{
+			CoreList list = (CoreList) name;
+			int idx = source.toDouble().intValue();
+			CoreObject result = list.item(idx);
+			
+			Interpreter.instance.debugTrace.append("named scope list="+list.hashCode()+" item#="+idx+" content="+result.toString()+"\n");
+			
+			if(Interpreter.instance.assignmentMode)
+				new AssignmentTag(result, list, idx);
+
+			return result;
+		}
+		else
+		{
+			throw new InterpreterException("list or map expected", cc.firstArgNode.next.token);
+		}
 	}
 
 	/*
@@ -97,19 +173,10 @@ public class LibNP
 		Interpreter.instance.beginAssignmentMode();
 		CoreObject destination = cc.argPop();
 		AssignmentTag destinationLocation = Interpreter.instance.endAssignmentMode(destination);
-		/*
-		 * this is important: if the object doesn't exist down the context chain, AssignmentTag
-		 * will return our current call context. which we don't want (we want our outer context
-		 * in that case)
-		 */
-		if(destinationLocation.container.equals(cc))
-			destinationLocation.container = cc.outer;
 		
-		/*
-		 * now, execute the second argument in order to get the source for the assignment
-		 */
 		CoreObject source = cc.argPop();
-		destinationLocation.container.members.put(destinationLocation.name, source);
+
+		destinationLocation.doAssignment(cc, source);
 		
 		Interpreter.instance.debugTrace.append("assign "+destinationLocation.container+" "+destinationLocation.name+"="+source+"\n");
 		
@@ -233,4 +300,23 @@ public class LibNP
 		return new CoreObject();
 	}
 
+	/*
+	 * makes a list
+	 */
+	public CoreObject b_list(CoreCall cc) throws InterpreterException
+	{
+		CoreList result = new CoreList();
+		
+		ClastNode co = cc.firstArgNode;
+		
+		while (co != null)
+		{
+			CoreObject nmd = co.run(cc.callerContext);
+			result.add(nmd);
+			co = co.next;
+		}
+		
+		return result;
+	}
+	
 }

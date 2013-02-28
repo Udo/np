@@ -32,6 +32,6 @@ public class ClastNode
 	
 	public boolean isNamed()
 	{
-		return (token.type.equals("Exp") && child != null && child.token.type.equals("Identifier") && child.token.value.equals(":"));
+		return (token.type.equals("Exp") && child != null && child.token.type.equals("Identifier") && child.token.value.equals("::"));
 	}
 }

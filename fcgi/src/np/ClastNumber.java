@@ -15,7 +15,7 @@ public class ClastNumber extends ClastNode
 	 * returns a CoreNumber from a ClastNumber
 	 * @see np.ClastNode#run()
 	 */
-	public CoreObject run(CoreObject objectContext)
+	public CoreObject run(CoreObject objectContext) throws InterpreterException
 	{
 		return new CoreNumber(token.value);
 	}

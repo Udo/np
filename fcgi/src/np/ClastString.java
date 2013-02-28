@@ -15,7 +15,7 @@ public class ClastString extends ClastNode
 	 * returns a CoreString from a ClastString
 	 * @see np.ClastNode#run()
 	 */
-	public CoreObject run(CoreObject objectContext)
+	public CoreObject run(CoreObject objectContext) throws InterpreterException
 	{
 		return new CoreString(token.value);
 	}

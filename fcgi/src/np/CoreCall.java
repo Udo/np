@@ -58,18 +58,28 @@ public class CoreCall extends CoreObject
 		return result;
 	}
 	
-	public CoreObject argPop() throws InterpreterException
+	public CoreObject argPopCtx(CoreObject ctx) throws InterpreterException
 	{
 		if(currentArgNode == null)
 			return new CoreObject();
 		
 		CoreObject result = null;
-		Interpreter.instance.debugTrace.append("pop "+currentArgNode.toString()+"\n");
-		result = currentArgNode.run(callerContext);
+		Interpreter.instance.debugTrace.append("ctx pop "+currentArgNode.toString()+"\n");
+		result = currentArgNode.run(ctx);
 		currentArgNode = currentArgNode.next;
 		skipNamedParam();
 
 		return result;
 	}
 		
+	public CoreObject argPop() throws InterpreterException
+	{
+		return argPopCtx(callerContext);
+	}
+		
+	public String getType()
+	{
+		return("Call");
+	}
+	
 }

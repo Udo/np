@@ -33,5 +33,12 @@ public class CoreFunction extends CoreObject
 		
 		return result;
 	}
+	
+	public String getType()
+	{
+		return("Function");
+	}
+	
+
 
 }

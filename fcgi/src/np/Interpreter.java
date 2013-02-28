@@ -23,8 +23,10 @@ public class Interpreter
 	public StringBuilder output = new StringBuilder();
 	public StringBuilder debugTrace = new StringBuilder();
 	public RTErrorMessage fatalError = null;
+	public CoreObject rootContext = new CoreObject();
 	
 	public HashMap<CoreObject, AssignmentTag> assignmentList = new HashMap<CoreObject, AssignmentTag>();
+	public HashMap<CoreObject, String> assignmentNameHints = new HashMap<CoreObject, String>();
 	public boolean assignmentMode = false;
 	
 	public Interpreter(FCGIRequest r) 
@@ -43,6 +45,7 @@ public class Interpreter
 	{
 		AssignmentTag result = assignmentList.get(o);
 		assignmentList.clear();
+		assignmentNameHints.clear();
 		assignmentMode = false;
 		return result;
 	}
@@ -69,7 +72,7 @@ public class Interpreter
 	public void run(ClastNode node) throws InterpreterException
 	{
 		new LibNP();
-		node.run(new CoreCall(new CoreObject(), new CoreObject(), null));
+		node.run(new CoreCall(new CoreObject(), rootContext, null));
 	}
 	
 	public void load(String fileName)
