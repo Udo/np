@@ -35,6 +35,15 @@ public class CoreCall extends CoreObject
 			currentArgNode = currentArgNode.next;
 	}
 
+	public String getMemberDefaultString(String memberName, String defaultValue)
+	{
+		CoreObject m = members.get("_"+memberName);
+		Interpreter.instance.debugTrace.append("get default for "+memberName+" "+m+"\n");
+		if(m == null)
+			return defaultValue;
+		return m.toString();
+	}
+	
 	/*
 	 * parse function arguments that have just been passed. here, two things are being done:
 	 * first, counting the number of unnamed arguments. second, named arguments are evaluated
@@ -55,6 +64,7 @@ public class CoreCall extends CoreObject
 			}
 			crn = crn.next;
 		}
+		Interpreter.instance.debugTrace.append("parse args "+members.toString()+"\n");
 		return result;
 	}
 	

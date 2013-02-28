@@ -38,19 +38,19 @@ public class LibNP
 	 */
 	public LibNP() throws InterpreterException
 	{
-		methods.put("println", findMethod("b_println"));
+		methods.put("print", findMethod("b_print"));
 		methods.put("println", findMethod("b_println"));
 		methods.put("cat", findMethod("b_cat"));
 		methods.put("local", findMethod("b_local"));
 		methods.put("getmembers", findMethod("b_getmembers"));
-		methods.put("=", findMethod("b_assign")); methods.put("assign", findMethod("b_assign"));
-		methods.put("::", findMethod("b_named")); methods.put("setname", findMethod("b_named"));
-		methods.put(":", findMethod("b_arrayscope")); methods.put("getitem", findMethod("b_arrayscope"));
-		methods.put(".", findMethod("b_objectscope")); methods.put("member", findMethod("b_objectscope"));
-		methods.put("+", findMethod("b_plus")); methods.put("add", findMethod("b_plus"));
+		methods.put("=", findMethod("b_assign")); 
+		methods.put("::", findMethod("b_named")); 
+		methods.put(":", findMethod("b_arrayscope")); 
+		methods.put(".", findMethod("b_objectscope")); 
+		methods.put("+", findMethod("b_plus")); 
 		methods.put("-", findMethod("b_minus"));
-		methods.put("/", findMethod("b_divide")); methods.put("divide", findMethod("b_minus"));
-		methods.put("*", findMethod("b_multiply")); methods.put("multiply", findMethod("b_multiply"));
+		methods.put("/", findMethod("b_divide")); 
+		methods.put("*", findMethod("b_multiply")); 
 		methods.put("list", findMethod("b_list"));
 		instance = this;
 	}

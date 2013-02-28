@@ -29,9 +29,10 @@ public class ClastExp extends ClastNode
 		if(methodObject.getClass() == CoreBuiltin.class)
 			return ((CoreBuiltin) methodObject).execute(new CoreCall(objectContext, methodObject, args));
 
-		return methodObject;
+		if(args == null)
+			return methodObject;
 		
-		//throw new InterpreterException("function identifier expected ('"+method.token.toString()+"' found)", token);
+		throw new InterpreterException("function identifier expected ('"+method.token.toString()+"' found)", method.token);
 	}
 	
 	public CoreObject run(CoreObject objectContext) throws InterpreterException

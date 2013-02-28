@@ -49,7 +49,7 @@ public class AssignmentTag
 		
 		if(listIndex > 0)
 		{
-			((CoreList) container).add(listIndex, source);
+			((CoreList) container).set(listIndex, source);
 		}
 		else
 		{

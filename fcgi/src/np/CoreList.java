@@ -1,6 +1,8 @@
 package np;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import np.Interpreter.InterpreterException;
 
@@ -20,12 +22,85 @@ public class CoreList extends CoreObject
 		CoreObject ir = new CoreObject();
 		// todo add core class methods
 		ir.members.put("item", new CoreBuiltin("xItem", this));
+		ir.members.put("add", new CoreBuiltin("xAdd", this));
+		ir.members.put("count", new CoreBuiltin("xCount", this));
+		ir.members.put("popFirst", new CoreBuiltin("xPopFirst", this));
+		ir.members.put("popLast", new CoreBuiltin("xPopLast", this));
+		ir.members.put("remove", new CoreBuiltin("xRemove", this));
+		ir.members.put("removeObject", new CoreBuiltin("xRemoveObject", this));
+		ir.members.put("set", new CoreBuiltin("xSet", this));
+		ir.members.put("insert", new CoreBuiltin("xInsert", this));
+		ir.members.put("sort", new CoreBuiltin("xSort", this));
 		return ir;
 	}
 	
-	public CoreObject xItem(CoreCall cc) throws InterpreterException
+	public CoreObject xItem(CoreCall cc) throws InterpreterException { return item(cc.argPop().toDouble().intValue()); }
+	
+	public CoreObject xAdd(CoreCall cc) throws InterpreterException	{ return add(cc.argPop()); }
+	
+	public CoreObject xCount(CoreCall cc) throws InterpreterException { return new CoreNumber(items.size()); }
+	
+	public CoreObject xPopFirst(CoreCall cc) throws InterpreterException { return popFirst(); }
+
+	public CoreObject xPopLast(CoreCall cc) throws InterpreterException { return popLast(); }
+
+	public CoreObject xRemove(CoreCall cc) throws InterpreterException { return removeByIdx(cc.argPop().toDouble().intValue()); }
+
+	public CoreObject xRemoveObject(CoreCall cc) throws InterpreterException { return removeByObject(cc.argPop()); }
+
+	public CoreObject xSet(CoreCall cc) throws InterpreterException	{ return set(cc.argPop().toDouble().intValue(), cc.argPop()); }
+	
+	public CoreObject xInsert(CoreCall cc) throws InterpreterException	{ return insert(cc.argPop().toDouble().intValue(), cc.argPop()); }
+
+	public CoreObject xSort(CoreCall cc) throws InterpreterException	{ return sort(cc); }
+	
+	private class NumComp implements Comparator<CoreObject> {
+		public String dir;
+		public NumComp(String direction)
+		{
+			super();
+			dir = direction;
+		}
+		public int compare(CoreObject o1, CoreObject o2)
+		{
+			if(dir.equals("asc"))
+				return o1.toDouble().intValue() - o2.toDouble().intValue();
+			else
+				return o2.toDouble().intValue() - o1.toDouble().intValue();
+		}		
+	}
+	
+	private class AlphaComp implements Comparator<CoreObject> {
+		public String dir;
+		public AlphaComp(String direction)
+		{
+			super();
+			dir = direction;
+		}
+		public int compare(CoreObject o1, CoreObject o2)
+		{
+			if(dir.equals("asc"))
+			  	return o1.toString().compareToIgnoreCase(o2.toString());
+			else
+				return o2.toString().compareToIgnoreCase(o1.toString());
+		}		
+	}
+	
+	public CoreObject sort(CoreCall cc)
 	{
-		return new CoreNumber(1);
+		String sortMode = cc.getMemberDefaultString("mode", "alpha");
+		String sortDirection = cc.getMemberDefaultString("dir", "asc");
+		if(sortMode.equals("alpha"))
+			Collections.sort(items, new AlphaComp(sortDirection));
+		else if(sortMode.equals("numeric"))
+			Collections.sort(items, new NumComp(sortDirection));
+		return this;
+	}
+	
+	public CoreObject insert(int atIndex, CoreObject ni)
+	{
+		items.add(atIndex, ni);
+		return ni;
 	}
 	
 	public CoreObject add(CoreObject ni)
@@ -34,7 +109,7 @@ public class CoreList extends CoreObject
 		return ni;
 	}
 	
-	public CoreObject add(int atIndex, CoreObject ni)
+	public CoreObject set(int atIndex, CoreObject ni)
 	{
 		try
 		{

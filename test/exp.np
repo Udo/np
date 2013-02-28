@@ -1,6 +1,8 @@
-l = list 1 2 3 4;
-l.test = "test";
-bla = 23487;
-l.f = { println (parent.item) };
+l = list 5 2 55 4;
 
-(l.f);
+println l;
+
+l.add 0;
+l.sort #dir:#desc;
+
+println l;
