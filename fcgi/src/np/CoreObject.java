@@ -89,5 +89,10 @@ public class CoreObject
 			o = setGlobalCoreClass(getType(), init());
 		return o;
 	}
+	
+	public String toString()
+	{
+		return "";
+	}
 
 }

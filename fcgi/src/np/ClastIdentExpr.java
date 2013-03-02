@@ -18,7 +18,10 @@ public class ClastIdentExpr extends ClastNode
 			
 		CoreObject xres = ClastExp.invoke(objectContext, child, child.next);
 		
-		return ClastIdentifier.iEval(this, xres.toString(), objectContext);
+		//Interpreter.instance.debugTrace.append("-- ident expr "+xres.toString()+"\n");
+		
+		//return ClastIdentifier.iEval(this, xres.toString(), objectContext);
+		return xres;
 	}
 
 }

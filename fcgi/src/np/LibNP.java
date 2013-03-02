@@ -38,20 +38,22 @@ public class LibNP
 	 */
 	public LibNP() throws InterpreterException
 	{
+		methods.put("unsafeprint", findMethod("b_unsafeprint"));
 		methods.put("print", findMethod("b_print"));
 		methods.put("println", findMethod("b_println"));
 		methods.put("cat", findMethod("b_cat"));
 		methods.put("local", findMethod("b_local"));
 		methods.put("getmembers", findMethod("b_getmembers"));
 		methods.put("=", findMethod("b_assign")); 
-		methods.put("::", findMethod("b_named")); 
-		methods.put(":", findMethod("b_arrayscope")); 
+		methods.put(":", findMethod("b_named")); 
+		methods.put("::", findMethod("b_arrayscope")); 
 		methods.put(".", findMethod("b_objectscope")); 
 		methods.put("+", findMethod("b_plus")); 
 		methods.put("-", findMethod("b_minus"));
 		methods.put("/", findMethod("b_divide")); 
 		methods.put("*", findMethod("b_multiply")); 
 		methods.put("list", findMethod("b_list"));
+		methods.put("map", findMethod("b_map"));
 		instance = this;
 	}
 	
@@ -149,7 +151,22 @@ public class LibNP
 			int idx = source.toDouble().intValue();
 			CoreObject result = list.item(idx);
 			
-			Interpreter.instance.debugTrace.append("named scope list="+list.hashCode()+" item#="+idx+" content="+result.toString()+"\n");
+			Interpreter.instance.debugTrace.append("array scope list="+list.hashCode()+" item#="+
+			  idx+" content="+result.toString()+" source="+source.toString()+"\n");
+			
+			if(Interpreter.instance.assignmentMode)
+				new AssignmentTag(result, list, idx);
+
+			return result;
+		}
+		else if(name.getClass() == CoreMap.class)
+		{
+			CoreMap list = (CoreMap) name;
+			String idx = source.toString();
+			CoreObject result = list.item(idx);
+			
+			Interpreter.instance.debugTrace.append("array scope map="+list.hashCode()+" item#="+
+			  idx+" content="+result.toString()+" source="+source.toString()+"\n");
 			
 			if(Interpreter.instance.assignmentMode)
 				new AssignmentTag(result, list, idx);
@@ -198,6 +215,12 @@ public class LibNP
 			r.append(ca.toString());
 		}
 		return new CoreString(r.toString());
+	}
+
+	public CoreObject b_unsafeprint(CoreCall cc) throws InterpreterException
+	{
+		Interpreter.instance.output.append(b_cat(cc).toString());
+		return new CoreObject();
 	}
 
 	public CoreObject b_print(CoreCall cc) throws InterpreterException
@@ -306,6 +329,25 @@ public class LibNP
 	public CoreObject b_list(CoreCall cc) throws InterpreterException
 	{
 		CoreList result = new CoreList();
+		
+		ClastNode co = cc.firstArgNode;
+		
+		while (co != null)
+		{
+			CoreObject nmd = co.run(cc.callerContext);
+			result.add(nmd);
+			co = co.next;
+		}
+		
+		return result;
+	}
+	
+	/*
+	 * makes a list
+	 */
+	public CoreObject b_map(CoreCall cc) throws InterpreterException
+	{
+		CoreMap result = new CoreMap();
 		
 		ClastNode co = cc.firstArgNode;
 		

@@ -10,9 +10,10 @@ import np.Interpreter.InterpreterException;
 
 public class HttpTools
 {
-	/*public static RTObjectList getQueryParameters(RTObjectList commonList, String query, Interpreter itp) throws InterpreterException  
+	
+	public static CoreMap getQueryParameters(CoreMap commonList, String query, Interpreter itp) throws InterpreterException  
 	{  
-		RTObjectList result = new RTObjectList();
+		CoreMap result = new CoreMap();
 
 		query = query.replaceAll("\\+", "%2B");
 		
@@ -20,27 +21,26 @@ public class HttpTools
 		for(int i = 0; i < postPairs.size(); i++)
 		{
 			NameValuePair nv = postPairs.get(i);
-			RTObject paramValue = RTObjectFactory.newObject(nv.getValue(), itp);
-			result.addWithKey(nv.getName(), paramValue);
-			commonList.addWithKey(nv.getName(), paramValue);
+			result.addWithKey(nv.getName(), new CoreString(nv.getValue()));
+			commonList.addWithKey(nv.getName(), new CoreString(nv.getValue()));
 		}
 		
 	    return result;  
 	}  
 	
-	public static RTObjectList getPostParameters(RTObjectList commonList, String rawInput, Interpreter itp) throws InterpreterException  
+	public static CoreMap getPostParameters(CoreMap commonList, String rawInput, Interpreter itp) throws InterpreterException  
 	{  
-		RTObjectList result = new RTObjectList();
+		CoreMap result = new CoreMap();
 
 		List<NameValuePair> postPairs = URLEncodedUtils.parse(rawInput, Charset.forName("UTF-8"));
 		for(int i = 0; i < postPairs.size(); i++)
 		{
 			NameValuePair nv = postPairs.get(i);
-			RTObject paramValue = RTObjectFactory.newObject(nv.getValue(), itp);
-			result.addWithKey(nv.getName(), paramValue);
-			commonList.addWithKey(nv.getName(), paramValue);
+			result.addWithKey(nv.getName(), new CoreString(nv.getValue()));
+			commonList.addWithKey(nv.getName(), new CoreString(nv.getValue()));
 		}
 		
 	    return result;  
-	}  */
+	}  
+	
 }

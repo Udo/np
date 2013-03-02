@@ -1,8 +1,2 @@
-l = list 5 2 55 4;
-
-println l;
-
-l.add 0;
-l.sort #dir:#desc;
-
-println l;
+m = map #a:1 #b:2;
+println get::q;

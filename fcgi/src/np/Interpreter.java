@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
 
+import com.fastcgi.FCGIInterface;
 import com.fastcgi.FCGIRequest;
 
 /*
@@ -72,6 +73,11 @@ public class Interpreter
 	public void run(ClastNode node) throws InterpreterException
 	{
 		new LibNP();
+		CoreMap req = new CoreMap();
+		CoreMap env = new CoreMap(FCGIInterface.request.params);
+		rootContext.members.put("env", env);
+		rootContext.members.put("get", HttpTools.getQueryParameters(req, env.item("QUERY_STRING").toString(), this));
+		//rootContext.members.put("post", HttpTools.getPostParameters(req, rawInput, itp));
 		node.run(new CoreCall(new CoreObject(), rootContext, null));
 	}
 	

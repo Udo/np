@@ -38,7 +38,7 @@ public class CoreCall extends CoreObject
 	public String getMemberDefaultString(String memberName, String defaultValue)
 	{
 		CoreObject m = members.get("_"+memberName);
-		Interpreter.instance.debugTrace.append("get default for "+memberName+" "+m+"\n");
+		//Interpreter.instance.debugTrace.append("get default for "+memberName+" "+m+"\n");
 		if(m == null)
 			return defaultValue;
 		return m.toString();
@@ -64,7 +64,7 @@ public class CoreCall extends CoreObject
 			}
 			crn = crn.next;
 		}
-		Interpreter.instance.debugTrace.append("parse args "+members.toString()+"\n");
+		//Interpreter.instance.debugTrace.append("parse args "+members.toString()+"\n");
 		return result;
 	}
 	
@@ -74,11 +74,14 @@ public class CoreCall extends CoreObject
 			return new CoreObject();
 		
 		CoreObject result = null;
-		Interpreter.instance.debugTrace.append("ctx pop "+currentArgNode.toString()+"\n");
+		//Interpreter.instance.debugTrace.append("ctx pop "+currentArgNode.toString()+"\n");
 		result = currentArgNode.run(ctx);
+
+		//Interpreter.instance.debugTrace.append("pop "+currentArgNode.token.value+" arg="+result.toString()+"\n");
+		
 		currentArgNode = currentArgNode.next;
 		skipNamedParam();
-
+		
 		return result;
 	}
 		
