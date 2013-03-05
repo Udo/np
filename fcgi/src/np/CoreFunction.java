@@ -20,16 +20,26 @@ public class CoreFunction extends CoreObject
 		return true;
 	}
 
+	public CoreObject init() throws InterpreterException
+	{
+		CoreObject ir = new CoreObject();
+		// todo add core class methods
+		return ir;
+	}
+	
 	public CoreObject execute(CoreCall cc) throws InterpreterException
 	{
 		CoreObject result = null;
 		
 		ClastNode current = ((ClastNode) value).child;
-		while (current != null)
+		while (current != null && cc.returnValue == null)
 		{
 			result = current.run(cc);
 			current = current.next;
 		}
+		
+		if(cc.returnValue != null)
+			result = cc.returnValue;
 		
 		return result;
 	}

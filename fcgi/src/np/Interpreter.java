@@ -32,8 +32,6 @@ public class Interpreter
 	
 	public Interpreter(FCGIRequest r) 
 	{
-		// to-do: this has to go *sigh*
-		Interpreter.instance = this;
 		req = r;
 	}
 	
@@ -70,7 +68,7 @@ public class Interpreter
 		return sw.toString();
 	}
 
-	public void run(ClastNode node) throws InterpreterException
+	public CoreObject run(ClastNode node) throws InterpreterException
 	{
 		new LibNP();
 		CoreMap req = new CoreMap();
@@ -81,7 +79,7 @@ public class Interpreter
 		rootContext.members.put("request", req);
 		rootContext.members.put("false", new CoreBoolean(false));
 		rootContext.members.put("true", new CoreBoolean(true));
-		node.run(new CoreCall(new CoreObject(), rootContext, null));
+		return node.run(new CoreCall(new CoreObject(), rootContext, null));
 	}
 	
 	public void load(String fileName)
@@ -111,20 +109,23 @@ public class Interpreter
 		}
 	}
 	
-	public void eval(String src)
+	public CoreObject eval(String src) throws InterpreterException
 	{
+		CoreObject result = new CoreObject();
 		try
 		{
 			lexer.readText(src);
 			tree.parse(lexer.tokens, "(eval)");
 			ClastNode cnode = ClastFactory.makeClastFromTree(tree.root, null);
-			run(cnode);
+			result.members.put("result", run(cnode));
 		}
 		catch (InterpreterException e)
 		{
 			fatalError = new RTErrorMessage(e.msg, e.token);
 			output.append("Error: "+fatalError);
 		}
+		result.members.put("output", new CoreString(output.toString()));
+		return result;
 	}
 
 }

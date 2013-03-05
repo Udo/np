@@ -63,7 +63,7 @@ public class AssignmentTag
 			{
 				String key = i.next();
 				source.members.put(key, members.get(key));
-				Interpreter.instance.debugTrace.append("at put member "+key+"="+members.get(key)+" to="+source.hashCode()+" "+source.getClass().getName()+" \n");
+				//Interpreter.instance.debugTrace.append("at put member "+key+"="+members.get(key)+" to="+source.hashCode()+" "+source.getClass().getName()+" \n");
 			}
 		}
 	}

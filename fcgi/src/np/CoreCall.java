@@ -13,6 +13,7 @@ public class CoreCall extends CoreObject
 	public ClastNode currentArgNode = null;
 	public ClastNode firstArgNode = null;
 	public CoreObject callerContext = null;
+	public CoreObject returnValue = null;
 	public int argCount = 0;
 	
 	public CoreCall(CoreObject callerCtx, CoreObject functionContext, ClastNode args) throws InterpreterException
@@ -26,7 +27,24 @@ public class CoreCall extends CoreObject
 		firstArgNode = args;
 		argCount = preParseArgs();
 		skipNamedParam();
+		if(callerCtx != functionContext)
+		{
+			members.put("return", new CoreBuiltin("xReturn", this));
+			members.put("pop", new CoreBuiltin("xPop", this));
+			members.put("argcount", new CoreNumber(argCount));
+		}
 		//Interpreter.instance.debugTrace.append("new call context="+this+" outer="+outer+"\n");
+	}
+	
+	public CoreObject xReturn(CoreCall cc) throws InterpreterException 
+	{ 
+		returnValue = cc.argPop();
+		return returnValue;
+	}
+	
+	public CoreObject xPop(CoreCall cc) throws InterpreterException 
+	{ 
+		return argPop();
 	}
 	
 	public void skipNamedParam()

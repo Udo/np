@@ -11,6 +11,7 @@ public class CoreString extends CoreObject
 	{
 		value = s;
 		outer = getOuterCore();
+		members.put("value", this);
 	}
 
 	public CoreString()
@@ -27,6 +28,11 @@ public class CoreString extends CoreObject
 	public String toString()
 	{
 		return value.toString();
+	}
+	
+	public boolean toBoolean()
+	{
+		return !((String) value).isEmpty();
 	}
 	
 	public String getType()

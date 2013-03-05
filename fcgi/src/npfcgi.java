@@ -31,6 +31,7 @@ class npfcgi
 		try
 		{
 			Interpreter interp = new Interpreter(req);
+			Interpreter.instance = interp;
 			interp.load(System.getProperty("SCRIPT_FILENAME"));
 
 			System.out.println(interp.response.headers.get("content-type"));

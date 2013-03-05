@@ -12,18 +12,21 @@ public class CoreNumber extends CoreObject
 	{
 		value = n;
 		outer = getOuterCore();
+		members.put("value", this);
 	}
 
 	public CoreNumber(int i) throws InterpreterException
 	{
 		value = new Double(i);
 		outer = getOuterCore();
+		members.put("value", this);
 	}
 	
 	public CoreNumber(String s) throws InterpreterException
 	{
 		value = Double.parseDouble(s);
 		outer = getOuterCore();
+		members.put("value", this);
 	}
 
 	public CoreObject init()

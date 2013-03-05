@@ -2,6 +2,8 @@ package np;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Random;
+
 import np.Interpreter.InterpreterException;
 
 /*
@@ -12,6 +14,7 @@ import np.Interpreter.InterpreterException;
 public class LibNP
 {
 	public HashMap<String, Method> methods = new HashMap<String, Method>();
+	private Random randomizr = new Random();
 	
 	public static LibNP instance;
 	
@@ -43,6 +46,9 @@ public class LibNP
 		methods.put("println", findMethod("b_println"));
 		methods.put("cat", findMethod("b_cat"));
 		methods.put("local", findMethod("b_local"));
+		methods.put("eval", findMethod("b_eval"));
+		// misc
+		methods.put("random", findMethod("b_random"));
 		// logic 
 		methods.put("==", findMethod("b_equal"));
 		methods.put("!=", findMethod("b_notequal"));
@@ -146,7 +152,7 @@ public class LibNP
 				at.initMembers();
 				at.members.put("parent", previousObject);
 				
-				Interpreter.instance.debugTrace.append("dotscope parent="+previousObject.hashCode()+" current="+currentObject.hashCode()+"\n");
+				//Interpreter.instance.debugTrace.append("dotscope parent="+previousObject.hashCode()+" current="+currentObject.hashCode()+"\n");
 			}
 			
 			previousObject = currentObject;
@@ -188,7 +194,7 @@ public class LibNP
 		}
 		else
 		{
-			throw new InterpreterException("list or map expected", cc.firstArgNode.next.token);
+			throw new InterpreterException("(array scope) list or map expected", cc.firstArgNode.token);
 		}
 	}
 
@@ -307,11 +313,11 @@ public class LibNP
 		{
 			Interpreter.instance.debugTrace.append("   stage "+i+"\n");
 			if(cc.argPop().toBoolean() == true)
-				return cc.argPop().execute(cc);
+				return cc.argPop().execute((CoreCall) cc.callerContext);
 			cc.argNOP();
 		}
 		if(cc.currentArgNode != null)
-			return cc.argPop().execute(cc);
+			return cc.argPop().execute((CoreCall) cc.callerContext);
 		return new CoreObject();
 	}
 
@@ -420,6 +426,24 @@ public class LibNP
 		
 		return new CoreObject();
 	}
+	
+	public CoreObject b_eval(CoreCall cc) throws InterpreterException
+	{
+		String src = cc.argPop().toString();
+		Interpreter i2 = new Interpreter(Interpreter.instance.req);
+		return i2.eval(src);
+	}
+
+	public CoreObject b_random(CoreCall cc) throws InterpreterException
+	{
+		int fromValue = cc.argPop().toDouble().intValue();
+		int toValue = cc.argPop().toDouble().intValue();
+		int totalSpan = toValue - fromValue;
+		if (totalSpan < 0) totalSpan = -totalSpan;
+		int result = randomizr.nextInt(totalSpan+1) + fromValue;
+		return new CoreNumber(result);
+	}
+
 
 	/*
 	 * makes a list

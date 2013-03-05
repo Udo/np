@@ -3,6 +3,7 @@ package np;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 
 import np.Interpreter.InterpreterException;
 
@@ -31,6 +32,7 @@ public class CoreList extends CoreObject
 		ir.members.put("set", new CoreBuiltin("xSet", this));
 		ir.members.put("insert", new CoreBuiltin("xInsert", this));
 		ir.members.put("sort", new CoreBuiltin("xSort", this));
+		ir.members.put("each", new CoreBuiltin("xEach", this));
 		return ir;
 	}
 	
@@ -54,6 +56,21 @@ public class CoreList extends CoreObject
 
 	public CoreObject xSort(CoreCall cc) throws InterpreterException	{ return sort(cc); }
 	
+	public CoreObject xEach(CoreCall cc) throws InterpreterException	
+	{ 
+		Iterator<CoreObject> i = items.iterator();
+		int idx = -1;
+		CoreObject yieldFunction = cc.argPop();
+		while(i.hasNext())
+		{
+			idx++;
+			ClastCapsule args = new ClastCapsule(new Token(), i.next());
+			args.next = new ClastCapsule(new Token(), new CoreNumber(idx));
+			yieldFunction.execute(new CoreCall(cc.callerContext, this, args));
+		}
+		return this;
+	}
+
 	private class NumComp implements Comparator<CoreObject> {
 		public String dir;
 		public NumComp(String direction)
