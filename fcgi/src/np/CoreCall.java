@@ -85,6 +85,16 @@ public class CoreCall extends CoreObject
 		return result;
 	}
 		
+	public void argNOP() throws InterpreterException
+	{
+		if(currentArgNode == null) return;
+		
+		currentArgNode = currentArgNode.next;
+		skipNamedParam();
+		
+		return;
+	}
+		
 	public CoreObject argPop() throws InterpreterException
 	{
 		return argPopCtx(callerContext);

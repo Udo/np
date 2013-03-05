@@ -1,7 +1,5 @@
 package np;
 
-import np.Interpreter.InterpreterException;
-
 public class ClastFunction extends ClastNode
 {
 

@@ -1,7 +1,5 @@
 package np;
 
-import java.lang.reflect.Method;
-
 import np.Interpreter.InterpreterException;
 
 public class ClastIdentifier extends ClastNode

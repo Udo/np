@@ -1,5 +1,6 @@
 package np;
 
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.List;
 
@@ -10,6 +11,12 @@ import np.Interpreter.InterpreterException;
 
 public class HttpTools
 {
+	
+	public static String inputStreamToString(InputStream is)
+	{
+	    java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+	    return s.hasNext() ? s.next() : "";
+	}
 	
 	public static CoreMap getQueryParameters(CoreMap commonList, String query, Interpreter itp) throws InterpreterException  
 	{  

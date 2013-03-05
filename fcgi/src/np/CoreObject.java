@@ -33,6 +33,11 @@ public class CoreObject
 		return false;
 	}
 
+	public CoreObject execute(CoreCall cc) throws InterpreterException
+	{
+	   return(this);	
+	}
+	
 	public CoreObject getMember(String identifier)
 	{
 		CoreObject result = members.get(identifier);
@@ -64,6 +69,12 @@ public class CoreObject
 		{
 			return new Double(0);
 		}
+	}
+	
+	public boolean toBoolean()
+	{
+		if(value == null) return false;
+		return !(value.toString().equals("0") || value.toString().isEmpty() || members.size() == 0);
 	}
 
 	public CoreObject init() throws InterpreterException

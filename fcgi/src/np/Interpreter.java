@@ -77,7 +77,10 @@ public class Interpreter
 		CoreMap env = new CoreMap(FCGIInterface.request.params);
 		rootContext.members.put("env", env);
 		rootContext.members.put("get", HttpTools.getQueryParameters(req, env.item("QUERY_STRING").toString(), this));
-		//rootContext.members.put("post", HttpTools.getPostParameters(req, rawInput, itp));
+		rootContext.members.put("post", HttpTools.getPostParameters(req, HttpTools.inputStreamToString(this.req.inStream), this));
+		rootContext.members.put("request", req);
+		rootContext.members.put("false", new CoreBoolean(false));
+		rootContext.members.put("true", new CoreBoolean(true));
 		node.run(new CoreCall(new CoreObject(), rootContext, null));
 	}
 	

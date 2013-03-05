@@ -1,7 +1,6 @@
 package np;
 
 import java.lang.reflect.Method;
-import java.util.Currency;
 import java.util.HashMap;
 import np.Interpreter.InterpreterException;
 
@@ -38,20 +37,36 @@ public class LibNP
 	 */
 	public LibNP() throws InterpreterException
 	{
+		// basic
 		methods.put("unsafeprint", findMethod("b_unsafeprint"));
 		methods.put("print", findMethod("b_print"));
 		methods.put("println", findMethod("b_println"));
 		methods.put("cat", findMethod("b_cat"));
 		methods.put("local", findMethod("b_local"));
-		methods.put("getmembers", findMethod("b_getmembers"));
+		// logic 
+		methods.put("==", findMethod("b_equal"));
+		methods.put("!=", findMethod("b_notequal"));
+		methods.put(">", findMethod("b_greater"));
+		methods.put(">=", findMethod("b_greaterorequal"));
+		methods.put("<", findMethod("b_smaller"));
+		methods.put("<=", findMethod("b_smallerorequal"));
+		methods.put("!", findMethod("b_negate"));
+		methods.put("&&", findMethod("b_and"));
+		methods.put("||", findMethod("b_or"));
+		// flow control
+		methods.put("if", findMethod("b_if"));
+		// assignment
 		methods.put("=", findMethod("b_assign")); 
+		// scope and accessors
 		methods.put(":", findMethod("b_named")); 
 		methods.put("::", findMethod("b_arrayscope")); 
 		methods.put(".", findMethod("b_objectscope")); 
+		// math
 		methods.put("+", findMethod("b_plus")); 
 		methods.put("-", findMethod("b_minus"));
 		methods.put("/", findMethod("b_divide")); 
 		methods.put("*", findMethod("b_multiply")); 
+		// constructor calls
 		methods.put("list", findMethod("b_list"));
 		methods.put("map", findMethod("b_map"));
 		instance = this;
@@ -89,12 +104,10 @@ public class LibNP
 	{
 		StringBuilder sb = new StringBuilder();
 		CoreObject curc = cc.callerContext;
-		int i = 0;
 		while(curc != null)
 		{
 			sb.append(curc.hashCode()+" "+curc.getClass().getName()+": "+curc.members.toString()+"\n");
 			curc = curc.outer;
-			i++;
 		}
 		return new CoreString(sb.toString());
 	}
@@ -215,6 +228,91 @@ public class LibNP
 			r.append(ca.toString());
 		}
 		return new CoreString(r.toString());
+	}
+
+	public CoreObject b_equal(CoreCall cc) throws InterpreterException
+	{
+		CoreObject opnd1 = cc.argPop();
+		CoreObject opnd2 = cc.argPop();
+		
+		if(opnd1 == opnd2) 
+			return new CoreBoolean(true);
+
+		if(opnd1.getClass() == CoreNumber.class)
+			return new CoreBoolean(opnd1.toDouble().equals(opnd2.toDouble()));
+
+		return new CoreBoolean(opnd1.toString().equals(opnd2.toString()));
+	}
+	
+	public CoreObject b_notequal(CoreCall cc) throws InterpreterException
+	{
+		CoreBoolean result = (CoreBoolean) b_equal(cc);
+		result.value = ((Boolean) result.value);
+		return result;
+	}
+
+	private CoreObject b_compare(CoreCall cc, int opType) throws InterpreterException
+	{
+		boolean result = false;
+		
+		Double opnd1 = cc.argPop().toDouble();
+		Double opnd2 = cc.argPop().toDouble();
+		switch (opType)
+		{
+			case 0: // >
+				result = opnd1 > opnd2;
+				break;
+			case 1: // >=
+				result = opnd1 >= opnd2;
+				break;
+			case 2: // <
+				result = opnd1 < opnd2;
+				break;
+			case 3: // <=
+				result = opnd1 <= opnd2;
+				break;
+		}
+		return new CoreBoolean(result);
+	}
+
+	public CoreObject b_greater(CoreCall cc) throws InterpreterException { return b_compare(cc, 0); }
+	public CoreObject b_greaterorequal(CoreCall cc) throws InterpreterException { return b_compare(cc, 1); }
+	public CoreObject b_smaller(CoreCall cc) throws InterpreterException { return b_compare(cc, 2); }
+	public CoreObject b_smallerorequal(CoreCall cc) throws InterpreterException { return b_compare(cc, 3); }
+	
+	public CoreObject b_and(CoreCall cc) throws InterpreterException
+	{
+		CoreObject opnd1 = cc.argPop();
+		CoreObject opnd2 = cc.argPop();
+		return new CoreBoolean(opnd1.toBoolean() && opnd2.toBoolean());
+	}
+
+	public CoreObject b_or(CoreCall cc) throws InterpreterException
+	{
+		CoreObject opnd1 = cc.argPop();
+		if(opnd1.toBoolean()) return new CoreBoolean(true);
+		CoreObject opnd2 = cc.argPop();
+		return new CoreBoolean(opnd2.toBoolean());
+	}
+	
+	public CoreObject b_negate(CoreCall cc) throws InterpreterException
+	{
+		return new CoreBoolean(!cc.argPop().toBoolean());
+	}
+	
+	public CoreObject b_if(CoreCall cc) throws InterpreterException
+	{
+		Interpreter.instance.debugTrace.append("if "+cc.argCount+" args\n");
+		for(int i = 0; i < cc.argCount-1; i += 2)
+		{
+			Interpreter.instance.debugTrace.append("   stage "+i+"\n");
+			if(cc.argPop().toBoolean() == true)
+				return cc.argPop().execute(cc);
+			cc.argNOP();
+		}
+		if(cc.currentArgNode != null)
+			return cc.argPop().execute(cc);
+		return new CoreObject();
 	}
 
 	public CoreObject b_unsafeprint(CoreCall cc) throws InterpreterException
