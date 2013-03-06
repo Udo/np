@@ -12,7 +12,8 @@ public class CoreFunction extends CoreObject
 	public CoreFunction(ClastNode fnode, CoreObject objectContext)
 	{
 		value = fnode;
-		outer = objectContext;
+		outer = null;//objectContext;
+		putMember("this", this, true);
 	}
 		
 	public boolean isExecutable()
@@ -49,6 +50,9 @@ public class CoreFunction extends CoreObject
 		return("Function");
 	}
 	
-
+	public String toString()
+	{
+		return "Function";
+	}
 
 }

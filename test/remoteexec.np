@@ -49,8 +49,8 @@
 <small>Your Output:</small>
 <pre><?np
 
-    if (post::#code)
-      { println (eval post::#code).output #default:"(no output)"; }
+    if (request.post::#code)
+      { println (eval request.post::#code).output #default:"(no output)"; }
   
 ?></pre>
 

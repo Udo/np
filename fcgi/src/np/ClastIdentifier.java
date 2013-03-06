@@ -17,6 +17,10 @@ public class ClastIdentifier extends ClastNode
 		// resolve reserved words
 		if(node.token.value.equals("outer") && objectContext.outer != null)
 			return objectContext.outer;
+		if(node.token.value.equals("true"))
+			return new CoreBoolean(true);
+		if(node.token.value.equals("false"))
+			return new CoreBoolean(false);
 		// resolve builtins
 		result = CoreBuiltin.lookUp(identifier);
 		if(result != null)

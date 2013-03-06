@@ -29,11 +29,16 @@ public class CoreCall extends CoreObject
 		skipNamedParam();
 		if(callerCtx != functionContext)
 		{
-			members.put("return", new CoreBuiltin("xReturn", this));
-			members.put("pop", new CoreBuiltin("xPop", this));
-			members.put("argcount", new CoreNumber(argCount));
+			putMember("return", new CoreBuiltin("xReturn", this), true);
+			putMember("pop", new CoreBuiltin("xPop", this), true);
+			putMember("argcount", new CoreNumber(argCount), true);
 		}
 		//Interpreter.instance.debugTrace.append("new call context="+this+" outer="+outer+"\n");
+	}
+	
+	public CoreCall flatCall()
+	{
+		return (CoreCall) callerContext;
 	}
 	
 	public CoreObject xReturn(CoreCall cc) throws InterpreterException 

@@ -17,6 +17,7 @@ public class CoreObject
 	 * as long as they are CoreObjects as well
 	 */
 	public HashMap<String, CoreObject> members = new HashMap<String, CoreObject>();
+	//public HashMap<String, Boolean> publicMembers = new HashMap<String, Boolean>();
 	/*
 	 * the actual storage unit for primitive types is here inside the
 	 * value field. in value, Java native objects are stored, such
@@ -25,7 +26,6 @@ public class CoreObject
 	 */
 	public Object value = null;
 	public String name = null;
-
 	public CoreObject outer = null;
 	
 	public boolean isExecutable()
@@ -40,8 +40,13 @@ public class CoreObject
 	
 	public CoreObject getMember(String identifier)
 	{
-		CoreObject result = members.get(identifier);
+		return getMember(identifier, false);
+	}
 
+	public CoreObject getMember(String identifier, boolean lookForPublicOnly)
+	{
+		CoreObject result = members.get(identifier);
+		
 		if(Interpreter.instance.assignmentMode && result != null)
 			new AssignmentTag(result, this, identifier);
 
@@ -49,9 +54,18 @@ public class CoreObject
 		//	Interpreter.instance.debugTrace.append("object "+this+".getMember("+identifier+") result="+result+"\n");
 		
 		if(result == null && outer != null)
-			return outer.getMember(identifier);
+			return outer.getMember(identifier, true);
 		
 		return result;
+	}
+	
+	public void putMember(String identifier, CoreObject member, boolean pblic)
+	{
+		members.put(identifier, member);
+		/*if(pblic)
+			publicMembers.put(identifier, true);
+		else
+			publicMembers.remove(identifier);*/
 	}
 	
 	public String getType()
@@ -103,7 +117,11 @@ public class CoreObject
 	
 	public String toString()
 	{
-		return "";
+		if(value != null)
+			return value.toString();
+		if(members.size() == 0)
+			return "";
+		return "Object";
 	}
 
 }

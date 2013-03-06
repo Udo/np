@@ -22,17 +22,17 @@ public class CoreList extends CoreObject
 	{
 		CoreObject ir = new CoreObject();
 		// todo add core class methods
-		ir.members.put("item", new CoreBuiltin("xItem", this));
-		ir.members.put("add", new CoreBuiltin("xAdd", this));
-		ir.members.put("count", new CoreBuiltin("xCount", this));
-		ir.members.put("popFirst", new CoreBuiltin("xPopFirst", this));
-		ir.members.put("popLast", new CoreBuiltin("xPopLast", this));
-		ir.members.put("remove", new CoreBuiltin("xRemove", this));
-		ir.members.put("removeObject", new CoreBuiltin("xRemoveObject", this));
-		ir.members.put("set", new CoreBuiltin("xSet", this));
-		ir.members.put("insert", new CoreBuiltin("xInsert", this));
-		ir.members.put("sort", new CoreBuiltin("xSort", this));
-		ir.members.put("each", new CoreBuiltin("xEach", this));
+		ir.putMember("item", new CoreBuiltin("xItem", this), true);
+		ir.putMember("add", new CoreBuiltin("xAdd", this), true);
+		ir.putMember("count", new CoreBuiltin("xCount", this), true);
+		ir.putMember("popFirst", new CoreBuiltin("xPopFirst", this), true);
+		ir.putMember("popLast", new CoreBuiltin("xPopLast", this), true);
+		ir.putMember("remove", new CoreBuiltin("xRemove", this), true);
+		ir.putMember("removeObject", new CoreBuiltin("xRemoveObject", this), true);
+		ir.putMember("set", new CoreBuiltin("xSet", this), true);
+		ir.putMember("insert", new CoreBuiltin("xInsert", this), true);
+		ir.putMember("sort", new CoreBuiltin("xSort", this), true);
+		ir.putMember("each", new CoreBuiltin("xEach", this), true);
 		return ir;
 	}
 	
@@ -155,7 +155,8 @@ public class CoreList extends CoreObject
 		try
 		{
 			result = items.get(idx);
-			items.remove(idx);
+			if(del)
+				items.remove(idx);
 		}
 		catch (Exception e)
 		{

@@ -50,5 +50,9 @@ public class CoreBuiltin extends CoreObject
 		return("Builtin");
 	}
 	
+	public String toString()
+	{
+		return("Function");
+	}
 
 }

@@ -45,7 +45,7 @@ public class LibNP
 		methods.put("print", findMethod("b_print"));
 		methods.put("println", findMethod("b_println"));
 		methods.put("cat", findMethod("b_cat"));
-		methods.put("local", findMethod("b_local"));
+		//methods.put("local", findMethod("b_local"));
 		methods.put("eval", findMethod("b_eval"));
 		// misc
 		methods.put("random", findMethod("b_random"));
@@ -313,11 +313,11 @@ public class LibNP
 		{
 			Interpreter.instance.debugTrace.append("   stage "+i+"\n");
 			if(cc.argPop().toBoolean() == true)
-				return cc.argPop().execute((CoreCall) cc.callerContext);
+				return cc.argPop().execute(cc.flatCall());
 			cc.argNOP();
 		}
 		if(cc.currentArgNode != null)
-			return cc.argPop().execute((CoreCall) cc.callerContext);
+			return cc.argPop().execute(cc.flatCall());
 		return new CoreObject();
 	}
 

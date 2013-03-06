@@ -71,14 +71,16 @@ public class Interpreter
 	public CoreObject run(ClastNode node) throws InterpreterException
 	{
 		new LibNP();
-		CoreMap req = new CoreMap();
+		
+		CoreMap param = new CoreMap();
 		CoreMap env = new CoreMap(FCGIInterface.request.params);
-		rootContext.members.put("env", env);
-		rootContext.members.put("get", HttpTools.getQueryParameters(req, env.item("QUERY_STRING").toString(), this));
-		rootContext.members.put("post", HttpTools.getPostParameters(req, HttpTools.inputStreamToString(this.req.inStream), this));
-		rootContext.members.put("request", req);
-		rootContext.members.put("false", new CoreBoolean(false));
-		rootContext.members.put("true", new CoreBoolean(true));
+		CoreMap get = HttpTools.getQueryParameters(param, env.item("QUERY_STRING").toString(), this);
+		CoreMap post = HttpTools.getPostParameters(param, HttpTools.inputStreamToString(this.req.inStream), this);
+		param.putMember("env", env, false);
+		param.putMember("get", get, false);
+		param.putMember("post", post, false);
+		rootContext.putMember("request", param, true);
+		
 		return node.run(new CoreCall(new CoreObject(), rootContext, null));
 	}
 	

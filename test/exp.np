@@ -1,5 +1,5 @@
 v = 4;
 v.somestring = '!!!';
-v.f = { return super };
+v.f = { return this.parent };
 
-println (v.f);
+println (v.f); 
