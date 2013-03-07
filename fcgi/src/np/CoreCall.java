@@ -16,7 +16,7 @@ public class CoreCall extends CoreObject
 	public CoreObject returnValue = null;
 	public int argCount = 0;
 	
-	public CoreCall(CoreObject callerCtx, CoreObject functionObject, ClastNode args) throws InterpreterException
+	public CoreCall(CoreObject callerCtx, CoreObject functionObject, CoreObject containerObject, ClastNode args) throws InterpreterException
 	{
 		Interpreter.instance.checkForTimeout();
 		if(args == null)
@@ -36,10 +36,9 @@ public class CoreCall extends CoreObject
 			putMember("argcount", new CoreNumber(argCount), true);
 		}
 		if(functionObject != null)
-		{
 			putMember("this", functionObject, true);
-			putMember("container", functionObject.members.get("container"), true);
-		}
+		if(containerObject != null)
+			putMember("container", containerObject, true);
 	}
 	
 	/*
@@ -57,7 +56,7 @@ public class CoreCall extends CoreObject
 			Interpreter.instance.checkForTimeout();
 			return (CoreCall) callerContext;
 		}
-		CoreCall newCall = new CoreCall(this, null, args);
+		CoreCall newCall = new CoreCall(this, null, members.get("container"), args);
 		newCall.members = callerContext.members;
 		return newCall;
 	}
@@ -103,7 +102,7 @@ public class CoreCall extends CoreObject
 				result++;
 			else
 			{
-				CoreObject co = crn.run(callerContext);
+				CoreObject co = crn.run(callerContext, null);
 				members.put("_"+co.name, co);
 			}
 			crn = crn.next;
@@ -122,14 +121,14 @@ public class CoreCall extends CoreObject
 		return result;
 	}
 	
-	public CoreObject argPopCtx(CoreObject ctx) throws InterpreterException
+	public CoreObject argPopCtx(CoreObject ctx, CoreObject lookupCtx) throws InterpreterException
 	{
 		if(currentArgNode == null)
 			return new CoreObject();
 		
 		CoreObject result = null;
 		//Interpreter.instance.debugTrace.append("ctx pop "+currentArgNode.toString()+"\n");
-		result = currentArgNode.run(ctx);
+		result = currentArgNode.run(ctx, lookupCtx);
 
 		//Interpreter.instance.debugTrace.append("pop "+currentArgNode.token.value+" arg="+result.toString()+"\n");
 		
@@ -151,7 +150,7 @@ public class CoreCall extends CoreObject
 		
 	public CoreObject argPop() throws InterpreterException
 	{
-		return argPopCtx(callerContext);
+		return argPopCtx(callerContext, null);
 	}
 		
 	public String getType()

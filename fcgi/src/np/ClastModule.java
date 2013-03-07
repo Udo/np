@@ -19,14 +19,14 @@ public class ClastModule extends ClastNode
 	 * so we need to loop through them.
 	 * @see np.ClastNode#run()
 	 */
-	public CoreObject run(CoreObject objectContext) throws InterpreterException
+	public CoreObject run(CoreObject objectContext, CoreObject lookupContainer) throws InterpreterException
 	{
 		Interpreter.instance.debugTrace.append("module context "+objectContext+"\n");
 		CoreObject result = null;
 		ClastNode current = child;
 		while(current != null)
 		{
-			result = current.run(objectContext);
+			result = current.run(objectContext, null);
 			current = current.next;
 		}
 		return result;

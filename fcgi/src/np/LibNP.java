@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Random;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import np.Interpreter.InterpreterException;
 
 /*
@@ -125,7 +127,7 @@ public class LibNP
 		CoreObject previousObject = cc.argPop();
 		for(int i = 1; i < cc.argCount; i++)
 		{
-			currentObject = cc.argPopCtx(previousObject);
+			currentObject = cc.argPopCtx(cc.callerContext, previousObject);
 
 			if(Interpreter.instance.assignmentMode)
 			{
@@ -216,7 +218,7 @@ public class LibNP
 		return source;
 	}
 	
-	public CoreObject b_cat(CoreCall cc) throws InterpreterException
+	private String s_cat(CoreCall cc) throws InterpreterException
 	{
 		CoreObject separateBy = cc.members.get("_sep");
 		StringBuilder r = new StringBuilder();
@@ -227,9 +229,36 @@ public class LibNP
 				r.append(separateBy.toString());
 			r.append(ca.toString());
 		}
-		return new CoreString(r.toString());
+		return r.toString();
 	}
 
+	
+	public CoreObject b_cat(CoreCall cc) throws InterpreterException
+	{
+		return new CoreString(s_cat(cc));
+	}
+
+	public CoreObject b_unsafeprint(CoreCall cc) throws InterpreterException
+	{
+		String result = s_cat(cc);
+		Interpreter.instance.output.append(result);
+		return new CoreString(result);
+	}
+
+	public CoreObject b_print(CoreCall cc) throws InterpreterException
+	{
+		String result = StringEscapeUtils.escapeHtml4(s_cat(cc));
+		Interpreter.instance.output.append(result);
+		return new CoreString(result);
+	}
+
+	public CoreObject b_println(CoreCall cc) throws InterpreterException
+	{
+		String result = StringEscapeUtils.escapeHtml4(s_cat(cc));
+		Interpreter.instance.output.append(result+"\n");
+		return new CoreString(result);
+	}
+	
 	public CoreObject b_equal(CoreCall cc) throws InterpreterException
 	{
 		CoreObject opnd1 = cc.argPop();
@@ -336,7 +365,7 @@ public class LibNP
 		CoreObject result = null;
 		ClastNode condition = cc.argPopExpr();
 		CoreObject yieldFunction = cc.argPop();
-		while( condition.run(cc.callerContext).toBoolean() == true )
+		while( condition.run(cc.callerContext, null).toBoolean() == true )
 		{
 			result = yieldFunction.execute(cc.flatCall());
 		}
@@ -345,25 +374,6 @@ public class LibNP
 		return result;
 	}
 
-	public CoreObject b_unsafeprint(CoreCall cc) throws InterpreterException
-	{
-		Interpreter.instance.output.append(b_cat(cc).toString());
-		return new CoreObject();
-	}
-
-	public CoreObject b_print(CoreCall cc) throws InterpreterException
-	{
-		Interpreter.instance.output.append(b_cat(cc).toString());
-		return new CoreObject();
-	}
-
-	public CoreObject b_println(CoreCall cc) throws InterpreterException
-	{
-		CoreObject result = b_print(cc);
-		Interpreter.instance.output.append("\n");
-		return result;
-	}
-	
 	/*
 	 * adds all of its operands and returns the result
 	 */
@@ -442,7 +452,7 @@ public class LibNP
 				cc.callerContext.members.put(co.token.value, new CoreObject());
 			else
 			{
-				CoreObject nmd = co.run(cc.callerContext);
+				CoreObject nmd = co.run(cc.callerContext, null);
 				cc.callerContext.members.put(nmd.name, nmd);
 			}
 			co = co.next;
@@ -484,7 +494,7 @@ public class LibNP
 		
 		while (co != null)
 		{
-			CoreObject nmd = co.run(cc.callerContext);
+			CoreObject nmd = co.run(cc.callerContext, null);
 			result.add(nmd);
 			co = co.next;
 		}
@@ -503,7 +513,7 @@ public class LibNP
 		
 		while (co != null)
 		{
-			CoreObject nmd = co.run(cc.callerContext);
+			CoreObject nmd = co.run(cc.callerContext, null);
 			result.add(nmd);
 			co = co.next;
 		}

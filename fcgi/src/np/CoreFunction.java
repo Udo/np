@@ -33,7 +33,7 @@ public class CoreFunction extends CoreObject
 		ClastNode current = ((ClastNode) value).child;
 		while (current != null && cc.returnValue == null)
 		{
-			result = current.run(cc);
+			result = current.run(cc, null);
 			current = current.next;
 		}
 		

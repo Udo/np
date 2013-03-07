@@ -25,7 +25,7 @@ public class ClastNode
 	 * whatever individual nodes can see, and it is forked whenever
 	 * an executable runtime object is created.
 	 */
-	public CoreObject run(CoreObject objectContext)	throws InterpreterException					
+	public CoreObject run(CoreObject objectContext, CoreObject lookupContainer)	throws InterpreterException					
 	{
 		return new CoreObject();
 	}

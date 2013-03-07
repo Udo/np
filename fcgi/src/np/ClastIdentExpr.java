@@ -11,12 +11,12 @@ public class ClastIdentExpr extends ClastNode
 	    // TODO Auto-generated constructor stub
     }
 	
-	public CoreObject run(CoreObject objectContext) throws InterpreterException
+	public CoreObject run(CoreObject objectContext, CoreObject lookupContainer) throws InterpreterException
 	{
 		if(child == null)
 			return new CoreObject();
 			
-		CoreObject xres = ClastExp.invoke(objectContext, child, child.next);
+		CoreObject xres = ClastExp.invoke(objectContext, lookupContainer, child, child.next);
 		
 		//Interpreter.instance.debugTrace.append("-- ident expr "+xres.toString()+"\n");
 		

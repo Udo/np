@@ -12,7 +12,7 @@ public class ClastCapsule extends ClastNode
 	    payload = pl;
     }
 	
-	public CoreObject run(CoreObject objectContext) throws InterpreterException
+	public CoreObject run(CoreObject objectContext, CoreObject lookupContainer) throws InterpreterException
 	{
 		return payload;
 	}

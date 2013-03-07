@@ -8,7 +8,7 @@ public class ClastFunction extends ClastNode
 	    super(t);
     }
 	
-	public CoreObject run(CoreObject objectContext)
+	public CoreObject run(CoreObject objectContext, CoreObject lookupContainer)
 	{
 		return new CoreFunction(this, objectContext);
 	}

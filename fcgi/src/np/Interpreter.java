@@ -100,7 +100,7 @@ public class Interpreter
 		rootContext.putMember("request", param, true);
 		rootContext.putMember("global", new CoreObject(), true);
 		
-		return node.run(new CoreCall(new CoreObject(), new CoreObject(), null));
+		return node.run(new CoreCall(new CoreObject(), new CoreObject(), null, null), null);
 	}
 	
 	public void load(String fileName)

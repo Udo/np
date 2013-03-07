@@ -71,7 +71,7 @@ public class CoreList extends CoreObject
 			idx++;
 			ClastCapsule args = new ClastCapsule(new Token(), i.next());
 			args.next = new ClastCapsule(new Token(), new CoreNumber(idx));
-			yieldFunction.execute(new CoreCall(cc.callerContext, getCurrentObject(cc), args));
+			yieldFunction.execute(new CoreCall(cc.callerContext, yieldFunction, getCurrentObject(cc), args));
 		}
 		return this;
 	}

@@ -15,7 +15,7 @@ public class ClastArgDef extends ClastNode
 	 * todo: mechanism for declaring named variables
 	 * @see np.ClastNode#run(np.CoreObject)
 	 */
-	public CoreObject run(CoreObject obj) throws InterpreterException
+	public CoreObject run(CoreObject obj, CoreObject lookupContainer) throws InterpreterException
 	{
 		ClastNode arg = this.child;
 		CoreCall cc = (CoreCall) obj;

@@ -16,18 +16,18 @@ public class ClastExp extends ClastNode
 	    super(t);
     }
 	
-	public static CoreObject invoke(CoreObject objectContext, ClastNode method, ClastNode args) throws InterpreterException
+	public static CoreObject invoke(CoreObject objectContext, CoreObject lookupContainer, ClastNode method, ClastNode args) throws InterpreterException
 	{
-		CoreObject methodObject = method.run(objectContext);
+		CoreObject methodObject = method.run(objectContext, lookupContainer);
 
 		if(methodObject == null)
 			return new CoreObject();
 		
 		if(methodObject.getClass() == CoreFunction.class)
-			return ((CoreFunction) methodObject).execute(new CoreCall(objectContext, methodObject, args));
+			return ((CoreFunction) methodObject).execute(new CoreCall(objectContext, methodObject, methodObject.members.get("container"), args));
 		
 		if(methodObject.getClass() == CoreBuiltin.class)
-			return ((CoreBuiltin) methodObject).execute(new CoreCall(objectContext, methodObject, args));
+			return ((CoreBuiltin) methodObject).execute(new CoreCall(objectContext, methodObject, methodObject.members.get("container"), args));
 
 		if(args == null)
 			return methodObject;
@@ -35,12 +35,12 @@ public class ClastExp extends ClastNode
 		throw new InterpreterException("function identifier expected ('"+method.token.toString()+"' found)", method.token);
 	}
 	
-	public CoreObject run(CoreObject objectContext) throws InterpreterException
+	public CoreObject run(CoreObject objectContext, CoreObject lookupContainer) throws InterpreterException
 	{
 		if(child == null)
 			return new CoreObject();
 			
-		return invoke(objectContext, child, child.next);
+		return invoke(objectContext, lookupContainer, child, child.next);
 	}
 	
 }

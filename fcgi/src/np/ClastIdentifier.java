@@ -41,9 +41,13 @@ public class ClastIdentifier extends ClastNode
 	 * the tree.
 	 * @see np.ClastNode#run()
 	 */
-	public CoreObject run(CoreObject objectContext) throws InterpreterException
+	public CoreObject run(CoreObject objectContext, CoreObject lookupContainer) throws InterpreterException
 	{
-		return iEval(this, token.value, objectContext);
+		if(lookupContainer == null)
+			return iEval(this, token.value, objectContext);
+		CoreObject result = iEval(this, token.value, lookupContainer);
+		result.putMember("container", lookupContainer, true);
+		return result;
 	}
 	
 }

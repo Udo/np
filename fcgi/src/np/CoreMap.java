@@ -79,7 +79,7 @@ public class CoreMap extends CoreObject {
 			ClastCapsule args = new ClastCapsule(new Token(), new CoreString(identifier));
 			args.next = new ClastCapsule(new Token(), getCurrentObject(cc).items.get(identifier));
 			args.next.next = new ClastCapsule(new Token(), new CoreNumber(idx));
-			yieldFunction.execute(new CoreCall(cc.callerContext, getCurrentObject(cc), args));
+			yieldFunction.execute(new CoreCall(cc.callerContext, yieldFunction, getCurrentObject(cc), args));
 		}
 		return this;
 	}
