@@ -27,11 +27,14 @@ public class CoreBuiltin extends CoreObject
 		forObject = o;
 	}
 	
-	public static CoreBuiltin lookUp(String identifier) throws InterpreterException
+	public static CoreObject lookUp(String identifier) throws InterpreterException
 	{
 		Method m = LibNP.instance.methods.get(identifier);
 		if(m == null)
-			return null;
+		{
+			CoreObject globalObject = Interpreter.instance.rootContext.members.get(identifier);
+			return globalObject;
+		}
 		return new CoreBuiltin(m, LibNP.instance);
 	}
 	

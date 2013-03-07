@@ -16,24 +16,26 @@ public class CoreCall extends CoreObject
 	public CoreObject returnValue = null;
 	public int argCount = 0;
 	
-	public CoreCall(CoreObject callerCtx, CoreObject functionContext, ClastNode args) throws InterpreterException
+	public CoreCall(CoreObject callerCtx, CoreObject functionObject, ClastNode args) throws InterpreterException
 	{
 		if(args == null)
 			args = new ClastNode(new Token());
+
 		value = args;
-		callerContext = callerCtx;
-		outer = functionContext;
 		currentArgNode = args;
 		firstArgNode = args;
 		argCount = preParseArgs();
 		skipNamedParam();
-		if(callerCtx != functionContext)
+		
+		callerContext = callerCtx;
+		if(callerCtx != functionObject)
 		{
 			putMember("return", new CoreBuiltin("xReturn", this), true);
 			putMember("pop", new CoreBuiltin("xPop", this), true);
 			putMember("argcount", new CoreNumber(argCount), true);
 		}
-		//Interpreter.instance.debugTrace.append("new call context="+this+" outer="+outer+"\n");
+		putMember("this", functionObject, true);
+		putMember("container", functionObject.members.get("container"), true);
 	}
 	
 	public CoreCall flatCall()

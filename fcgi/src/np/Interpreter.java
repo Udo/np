@@ -80,8 +80,9 @@ public class Interpreter
 		param.putMember("get", get, false);
 		param.putMember("post", post, false);
 		rootContext.putMember("request", param, true);
+		rootContext.putMember("global", new CoreObject(), true);
 		
-		return node.run(new CoreCall(new CoreObject(), rootContext, null));
+		return node.run(new CoreCall(new CoreObject(), new CoreObject(), null));
 	}
 	
 	public void load(String fileName)

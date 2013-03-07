@@ -13,13 +13,13 @@ public class CoreMap extends CoreObject {
 	public CoreMap() throws InterpreterException
 	{
 		value = items;
-		outer = getOuterCore();
+		members.put("parent", getOuterCore());
 	}
 	
 	public CoreMap(Properties p) throws InterpreterException
 	{
 		value = items;
-		outer = getOuterCore();
+		members.put("parent", getOuterCore());
 		Iterator<Object> i = p.keySet().iterator();
 	    while(i.hasNext())
 	    {
@@ -37,13 +37,52 @@ public class CoreMap extends CoreObject {
 	{
 		CoreObject ir = new CoreObject();
 		// todo add core class methods
-		ir.members.put("item", new CoreBuiltin("xItem", this));
+		ir.putMember("item", new CoreBuiltin("xItem", this), true);
+		ir.putMember("count", new CoreBuiltin("xCount", this), true);
+		ir.putMember("remove", new CoreBuiltin("xRemove", this), true);
+		ir.putMember("set", new CoreBuiltin("xSet", this), true);
+		ir.putMember("each", new CoreBuiltin("xEach", this), true);
 		return ir;
 	}
 	
-	public CoreObject xItem(CoreCall cc) throws InterpreterException { return item(cc.argPop().toString()); }
+	public CoreMap getCurrentObject(CoreCall cc)
+	{
+		return (CoreMap) cc.members.get("container");
+	}
 	
-	public CoreObject xAdd(CoreCall cc) throws InterpreterException	{ return add(cc.argPop()); }
+	public CoreObject xItem(CoreCall cc) throws InterpreterException { return getCurrentObject(cc).item(cc.argPop().toString()); }	
+	public CoreObject xSet(CoreCall cc) throws InterpreterException	{ getCurrentObject(cc).addWithKey(cc.argPop().toString(), cc.argPop()); return getCurrentObject(cc); }
+	
+	public CoreObject xCount(CoreCall cc) throws InterpreterException	
+	{ 
+		return new CoreNumber(getCurrentObject(cc).items.size()); 
+	}
+	
+	public CoreObject xRemove(CoreCall cc) throws InterpreterException	
+	{ 
+		String identifier = cc.argPop().toString();
+		CoreObject result = getCurrentObject(cc).items.remove(identifier);
+		if(result == null)
+			result = new CoreObject();
+		return result; 
+	}
+
+	public CoreObject xEach(CoreCall cc) throws InterpreterException	
+	{ 
+		Iterator<String> i = getCurrentObject(cc).items.keySet().iterator();
+		int idx = -1;
+		CoreObject yieldFunction = cc.argPop();
+		while(i.hasNext())
+		{
+			idx++;
+			String identifier = i.next();
+			ClastCapsule args = new ClastCapsule(new Token(), new CoreString(identifier));
+			args.next = new ClastCapsule(new Token(), getCurrentObject(cc).items.get(identifier));
+			args.next.next = new ClastCapsule(new Token(), new CoreNumber(idx));
+			yieldFunction.execute(new CoreCall(cc.callerContext, getCurrentObject(cc), args));
+		}
+		return this;
+	}
 
 	public CoreObject item(String key)
 	{

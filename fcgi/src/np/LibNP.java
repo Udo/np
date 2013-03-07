@@ -105,18 +105,6 @@ public class LibNP
 				throw new InterpreterException(cause.toString()+"\n"+stackTraceToString(e.getCause()), ((ClastNode) cc.value).token);
 		}
 	}
-
-	public CoreObject b_getmembers(CoreCall cc) throws InterpreterException
-	{
-		StringBuilder sb = new StringBuilder();
-		CoreObject curc = cc.callerContext;
-		while(curc != null)
-		{
-			sb.append(curc.hashCode()+" "+curc.getClass().getName()+": "+curc.members.toString()+"\n");
-			curc = curc.outer;
-		}
-		return new CoreString(sb.toString());
-	}
 	
 	/*
 	 * built-in operation to give objects a name, takes two runtime arguments: name and source
@@ -150,9 +138,13 @@ public class LibNP
 				}
 				
 				at.initMembers();
-				at.members.put("parent", previousObject);
+				at.members.put("container", previousObject);
 				
 				//Interpreter.instance.debugTrace.append("dotscope parent="+previousObject.hashCode()+" current="+currentObject.hashCode()+"\n");
+			}
+			else
+			{
+				currentObject.members.put("container", previousObject);
 			}
 			
 			previousObject = currentObject;
@@ -184,8 +176,8 @@ public class LibNP
 			String idx = source.toString();
 			CoreObject result = list.item(idx);
 			
-			Interpreter.instance.debugTrace.append("array scope map="+list.hashCode()+" item#="+
-			  idx+" content="+result.toString()+" source="+source.toString()+"\n");
+			//Interpreter.instance.debugTrace.append("array scope map="+list.hashCode()+" item#="+
+			//  idx+" content="+result.toString()+" source="+source.toString()+"\n");
 			
 			if(Interpreter.instance.assignmentMode)
 				new AssignmentTag(result, list, idx);

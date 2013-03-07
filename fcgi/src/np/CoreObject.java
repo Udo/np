@@ -26,7 +26,6 @@ public class CoreObject
 	 */
 	public Object value = null;
 	public String name = null;
-	public CoreObject outer = null;
 	
 	public boolean isExecutable()
 	{
@@ -53,8 +52,8 @@ public class CoreObject
 		//if(result != null)
 		//	Interpreter.instance.debugTrace.append("object "+this+".getMember("+identifier+") result="+result+"\n");
 		
-		if(result == null && outer != null)
-			return outer.getMember(identifier, true);
+		if(result == null && members.get("parent") != null)
+			return members.get("parent").getMember(identifier, true);
 		
 		return result;
 	}

@@ -7,7 +7,7 @@ public class CoreBoolean extends CoreObject
 	public CoreBoolean(Boolean s) throws InterpreterException
 	{
 		value = s;
-		outer = getOuterCore();
+		members.put("parent", getOuterCore());
 	}
 
 	public CoreBoolean()

@@ -11,22 +11,19 @@ public class CoreNumber extends CoreObject
 	public CoreNumber(Double n) throws InterpreterException
 	{
 		value = n;
-		outer = getOuterCore();
-		members.put("value", this);
+		members.put("parent", getOuterCore());
 	}
 
 	public CoreNumber(int i) throws InterpreterException
 	{
 		value = new Double(i);
-		outer = getOuterCore();
-		members.put("value", this);
+		members.put("parent", getOuterCore());
 	}
 	
 	public CoreNumber(String s) throws InterpreterException
 	{
 		value = Double.parseDouble(s);
-		outer = getOuterCore();
-		members.put("value", this);
+		members.put("parent", getOuterCore());
 	}
 
 	public CoreObject init()

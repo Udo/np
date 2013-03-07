@@ -15,8 +15,6 @@ public class ClastIdentifier extends ClastNode
 	{
 		CoreObject result = null;
 		// resolve reserved words
-		if(node.token.value.equals("outer") && objectContext.outer != null)
-			return objectContext.outer;
 		if(node.token.value.equals("true"))
 			return new CoreBoolean(true);
 		if(node.token.value.equals("false"))

@@ -12,8 +12,6 @@ public class CoreFunction extends CoreObject
 	public CoreFunction(ClastNode fnode, CoreObject objectContext)
 	{
 		value = fnode;
-		outer = null;//objectContext;
-		putMember("this", this, true);
 	}
 		
 	public boolean isExecutable()

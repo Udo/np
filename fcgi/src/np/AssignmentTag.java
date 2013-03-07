@@ -44,8 +44,8 @@ public class AssignmentTag
 		 * will return our current call context. which we don't want (we want our outer context
 		 * in that case)
 		 */
-		if(container.equals(cc))
-			container = cc.outer;
+		//if(container.equals(cc))
+		//	container = cc.outer;
 		
 		if(listIndex > 0)
 		{

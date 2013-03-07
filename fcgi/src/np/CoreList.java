@@ -15,7 +15,7 @@ public class CoreList extends CoreObject
 	public CoreList() throws InterpreterException
 	{
 		value = items;
-		outer = getOuterCore();
+		members.put("parent", getOuterCore());
 	}
 
 	public CoreObject init() throws InterpreterException
@@ -36,29 +36,34 @@ public class CoreList extends CoreObject
 		return ir;
 	}
 	
-	public CoreObject xItem(CoreCall cc) throws InterpreterException { return item(cc.argPop().toDouble().intValue()); }
+	public CoreList getCurrentObject(CoreCall cc)
+	{
+		return (CoreList) cc.members.get("container");
+	}
 	
-	public CoreObject xAdd(CoreCall cc) throws InterpreterException	{ return add(cc.argPop()); }
+	public CoreObject xItem(CoreCall cc) throws InterpreterException { return getCurrentObject(cc).item(cc.argPop().toDouble().intValue()); }
 	
-	public CoreObject xCount(CoreCall cc) throws InterpreterException { return new CoreNumber(items.size()); }
+	public CoreObject xAdd(CoreCall cc) throws InterpreterException	{ return getCurrentObject(cc).add(cc.argPop()); }
 	
-	public CoreObject xPopFirst(CoreCall cc) throws InterpreterException { return popFirst(); }
-
-	public CoreObject xPopLast(CoreCall cc) throws InterpreterException { return popLast(); }
-
-	public CoreObject xRemove(CoreCall cc) throws InterpreterException { return removeByIdx(cc.argPop().toDouble().intValue()); }
-
-	public CoreObject xRemoveObject(CoreCall cc) throws InterpreterException { return removeByObject(cc.argPop()); }
-
-	public CoreObject xSet(CoreCall cc) throws InterpreterException	{ return set(cc.argPop().toDouble().intValue(), cc.argPop()); }
+	public CoreObject xCount(CoreCall cc) throws InterpreterException { return new CoreNumber(getCurrentObject(cc).items.size()); }
 	
-	public CoreObject xInsert(CoreCall cc) throws InterpreterException	{ return insert(cc.argPop().toDouble().intValue(), cc.argPop()); }
+	public CoreObject xPopFirst(CoreCall cc) throws InterpreterException { return getCurrentObject(cc).popFirst(); }
 
-	public CoreObject xSort(CoreCall cc) throws InterpreterException	{ return sort(cc); }
+	public CoreObject xPopLast(CoreCall cc) throws InterpreterException { return getCurrentObject(cc).popLast(); }
+
+	public CoreObject xRemove(CoreCall cc) throws InterpreterException { return getCurrentObject(cc).removeByIdx(cc.argPop().toDouble().intValue()); }
+
+	public CoreObject xRemoveObject(CoreCall cc) throws InterpreterException { return getCurrentObject(cc).removeByObject(cc.argPop()); }
+
+	public CoreObject xSet(CoreCall cc) throws InterpreterException	{ return getCurrentObject(cc).set(cc.argPop().toDouble().intValue(), cc.argPop()); }
+	
+	public CoreObject xInsert(CoreCall cc) throws InterpreterException	{ return getCurrentObject(cc).insert(cc.argPop().toDouble().intValue(), cc.argPop()); }
+
+	public CoreObject xSort(CoreCall cc) throws InterpreterException	{ return getCurrentObject(cc).sort(cc); }
 	
 	public CoreObject xEach(CoreCall cc) throws InterpreterException	
 	{ 
-		Iterator<CoreObject> i = items.iterator();
+		Iterator<CoreObject> i = getCurrentObject(cc).items.iterator();
 		int idx = -1;
 		CoreObject yieldFunction = cc.argPop();
 		while(i.hasNext())
@@ -66,7 +71,7 @@ public class CoreList extends CoreObject
 			idx++;
 			ClastCapsule args = new ClastCapsule(new Token(), i.next());
 			args.next = new ClastCapsule(new Token(), new CoreNumber(idx));
-			yieldFunction.execute(new CoreCall(cc.callerContext, this, args));
+			yieldFunction.execute(new CoreCall(cc.callerContext, getCurrentObject(cc), args));
 		}
 		return this;
 	}

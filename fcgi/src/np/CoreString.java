@@ -10,8 +10,7 @@ public class CoreString extends CoreObject
 	public CoreString(String s) throws InterpreterException
 	{
 		value = s;
-		outer = getOuterCore();
-		members.put("value", this);
+		members.put("parent", getOuterCore());
 	}
 
 	public CoreString()

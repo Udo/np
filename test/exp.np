@@ -1,5 +1,16 @@
-v = 4;
-v.somestring = '!!!';
-v.f = { return this.parent };
+myMap = map
+  #UK:'London' #France:'Paris' #Italy:'Rome';
+  
+myMap.f = {
+  println this.container;
+  };
+  
+myMap.printCap = { country | 
+  println 
+    "The capital of " country 
+    " is " container::country
+  };
+  
+myMap.printCap #UK;
 
-println (v.f); 
+myMap.each { country | println country };
