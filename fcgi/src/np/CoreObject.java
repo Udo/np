@@ -118,7 +118,7 @@ public class CoreObject
 	{
 		if(value != null)
 			return value.toString();
-		if(members.size() == 0)
+		if(members.size() < 2)
 			return "";
 		return "Object";
 	}

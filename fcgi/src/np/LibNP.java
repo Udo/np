@@ -61,6 +61,8 @@ public class LibNP
 		methods.put("||", findMethod("b_or"));
 		// flow control
 		methods.put("if", findMethod("b_if"));
+		methods.put("for", findMethod("b_for"));
+		methods.put("while", findMethod("b_while"));
 		// assignment
 		methods.put("=", findMethod("b_assign")); 
 		// scope and accessors
@@ -313,6 +315,36 @@ public class LibNP
 		return new CoreObject();
 	}
 
+	public CoreObject b_for(CoreCall cc) throws InterpreterException
+	{
+		CoreObject result = null;
+		int startValue = cc.argPop().toDouble().intValue();
+		int endValue = cc.argPop().toDouble().intValue();
+		CoreObject yieldFunction = cc.argPop();
+		for(int i = startValue; i <= endValue; i++)
+		{
+			ClastCapsule args = new ClastCapsule(new Token(), new CoreNumber(i));
+			result = yieldFunction.execute(cc.flatCall(args));
+		}
+		if(result == null)
+			result = new CoreObject();
+		return result;
+	}
+
+	public CoreObject b_while(CoreCall cc) throws InterpreterException
+	{
+		CoreObject result = null;
+		ClastNode condition = cc.argPopExpr();
+		CoreObject yieldFunction = cc.argPop();
+		while( condition.run(cc.callerContext).toBoolean() == true )
+		{
+			result = yieldFunction.execute(cc.flatCall());
+		}
+		if(result == null)
+			result = new CoreObject();
+		return result;
+	}
+
 	public CoreObject b_unsafeprint(CoreCall cc) throws InterpreterException
 	{
 		Interpreter.instance.output.append(b_cat(cc).toString());
@@ -421,9 +453,13 @@ public class LibNP
 	
 	public CoreObject b_eval(CoreCall cc) throws InterpreterException
 	{
+		Interpreter outerInstance = Interpreter.instance;
 		String src = cc.argPop().toString();
 		Interpreter i2 = new Interpreter(Interpreter.instance.req);
-		return i2.eval(src);
+		Interpreter.instance = i2;
+		CoreObject result = i2.eval(src);
+		Interpreter.instance = outerInstance;
+		return result;
 	}
 
 	public CoreObject b_random(CoreCall cc) throws InterpreterException

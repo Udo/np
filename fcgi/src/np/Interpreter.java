@@ -26,6 +26,10 @@ public class Interpreter
 	public RTErrorMessage fatalError = null;
 	public CoreObject rootContext = new CoreObject();
 	
+	public long execTimeStart = System.currentTimeMillis();
+	public long execTimeOut = System.currentTimeMillis()+500;
+	public long execTimeOutChecks = 0;
+	
 	public HashMap<CoreObject, AssignmentTag> assignmentList = new HashMap<CoreObject, AssignmentTag>();
 	public HashMap<CoreObject, String> assignmentNameHints = new HashMap<CoreObject, String>();
 	public boolean assignmentMode = false;
@@ -58,6 +62,20 @@ public class Interpreter
         	msg = m;
         	token = t;
         }
+	}
+	
+	public void checkForTimeout() throws InterpreterException
+	{
+		/*
+		 * execTimeOutChecks is simply there to provide some granularity so
+		 * we don't have to make this system call every time something gets
+		 * executed. 
+		 */
+		execTimeOutChecks++;
+		if(execTimeOutChecks < 1000) return;
+		execTimeOutChecks = 0;
+		if(System.currentTimeMillis() > execTimeOut)
+			throw new InterpreterException("interpreter time out", new Token());
 	}
 	
 	public String getInternalStackTrace(Exception e)

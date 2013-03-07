@@ -18,6 +18,7 @@ public class CoreCall extends CoreObject
 	
 	public CoreCall(CoreObject callerCtx, CoreObject functionObject, ClastNode args) throws InterpreterException
 	{
+		Interpreter.instance.checkForTimeout();
 		if(args == null)
 			args = new ClastNode(new Token());
 
@@ -28,19 +29,37 @@ public class CoreCall extends CoreObject
 		skipNamedParam();
 		
 		callerContext = callerCtx;
-		if(callerCtx != functionObject)
+		if(callerCtx != functionObject && functionObject != null)
 		{
 			putMember("return", new CoreBuiltin("xReturn", this), true);
 			putMember("pop", new CoreBuiltin("xPop", this), true);
 			putMember("argcount", new CoreNumber(argCount), true);
 		}
-		putMember("this", functionObject, true);
-		putMember("container", functionObject.members.get("container"), true);
+		if(functionObject != null)
+		{
+			putMember("this", functionObject, true);
+			putMember("container", functionObject.members.get("container"), true);
+		}
 	}
 	
-	public CoreCall flatCall()
+	/*
+	 * flat calls use the caller context for everything except parameters
+	 */
+	public CoreCall flatCall() throws InterpreterException
 	{
-		return (CoreCall) callerContext;
+		return flatCall(null);
+	}
+	
+	public CoreCall flatCall(ClastNode args) throws InterpreterException
+	{
+		if(args == null)
+		{
+			Interpreter.instance.checkForTimeout();
+			return (CoreCall) callerContext;
+		}
+		CoreCall newCall = new CoreCall(this, null, args);
+		newCall.members = callerContext.members;
+		return newCall;
 	}
 	
 	public CoreObject xReturn(CoreCall cc) throws InterpreterException 
@@ -90,6 +109,16 @@ public class CoreCall extends CoreObject
 			crn = crn.next;
 		}
 		//Interpreter.instance.debugTrace.append("parse args "+members.toString()+"\n");
+		return result;
+	}
+	
+	public ClastNode argPopExpr()
+	{
+		ClastNode result = currentArgNode;
+		
+		currentArgNode = currentArgNode.next;
+		skipNamedParam();
+		
 		return result;
 	}
 	
