@@ -22,17 +22,17 @@ public class CoreList extends CoreObject
 	{
 		CoreObject ir = new CoreObject();
 		// todo add core class methods
-		ir.putMember("item", new CoreBuiltin("xItem", this), true);
 		ir.putMember("add", new CoreBuiltin("xAdd", this), true);
 		ir.putMember("count", new CoreBuiltin("xCount", this), true);
+		ir.putMember("each", new CoreBuiltin("xEach", this), true);
+		ir.putMember("insert", new CoreBuiltin("xInsert", this), true);
+		ir.putMember("item", new CoreBuiltin("xItem", this), true);
 		ir.putMember("popFirst", new CoreBuiltin("xPopFirst", this), true);
 		ir.putMember("popLast", new CoreBuiltin("xPopLast", this), true);
 		ir.putMember("remove", new CoreBuiltin("xRemove", this), true);
 		ir.putMember("removeObject", new CoreBuiltin("xRemoveObject", this), true);
 		ir.putMember("set", new CoreBuiltin("xSet", this), true);
-		ir.putMember("insert", new CoreBuiltin("xInsert", this), true);
 		ir.putMember("sort", new CoreBuiltin("xSort", this), true);
-		ir.putMember("each", new CoreBuiltin("xEach", this), true);
 		return ir;
 	}
 	

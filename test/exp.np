@@ -1,4 +1,3 @@
-v = 2;
-v.m = map 'a':1 'b':2;
-
-println v.['m']::#a; 
+l = (list);
+//l.add 1337;
+println (l.count);

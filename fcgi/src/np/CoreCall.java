@@ -23,9 +23,9 @@ public class CoreCall extends CoreObject
 			args = new ClastNode(new Token());
 
 		value = args;
-		currentArgNode = args;
 		firstArgNode = args;
 		argCount = preParseArgs();
+		currentArgNode = firstArgNode;
 		skipNamedParam();
 		
 		callerContext = callerCtx;
@@ -98,7 +98,11 @@ public class CoreCall extends CoreObject
 		ClastNode crn = firstArgNode;
 		while(crn != null)
 		{
-			if(!crn.isNamed()) 
+			if(crn.token.type.equals("N"))
+			{
+				// ^ this is a bizarre bug that I need to track down some day
+			}
+			else if(!crn.isNamed()) 
 				result++;
 			else
 			{
@@ -107,6 +111,8 @@ public class CoreCall extends CoreObject
 			}
 			crn = crn.next;
 		}
+		if(result == 0 && firstArgNode != null && firstArgNode.token.type.equals("N"))
+			firstArgNode = null;
 		//Interpreter.instance.debugTrace.append("parse args "+members.toString()+"\n");
 		return result;
 	}

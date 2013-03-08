@@ -526,13 +526,18 @@ public class LibNP
 	{
 		CoreList result = new CoreList();
 		
-		ClastNode co = cc.firstArgNode;
-		
-		while (co != null)
+		if(cc.argCount > 0)
 		{
-			CoreObject nmd = co.run(cc.callerContext, null);
-			result.add(nmd);
-			co = co.next;
+			ClastNode co = cc.firstArgNode;
+			
+			Interpreter.instance.debugTrace.append("new list "+co.token.toString()+"\n");
+			
+			while (co != null)
+			{
+				CoreObject nmd = co.run(cc.callerContext, null);
+				result.add(nmd);
+				co = co.next;
+			}
 		}
 		
 		return result;
