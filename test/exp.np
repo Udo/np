@@ -1,10 +1,4 @@
-myMap = map
-  #UK:'London' #France:'Paris' #Italy:'Rome';
-  
+v = 2;
+v.m = map 'a':1 'b':2;
 
-  
-
-
-myMap.each { country | println country };
-
-myMap.(each { country | println country });
+println v.['m']::#a; 

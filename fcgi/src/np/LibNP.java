@@ -2,6 +2,7 @@ package np;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Random;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -221,13 +222,32 @@ public class LibNP
 	private String s_cat(CoreCall cc) throws InterpreterException
 	{
 		CoreObject separateBy = cc.members.get("_sep");
+		CoreObject first = cc.members.get("_first");
+		CoreObject last = cc.members.get("_last");
+		CoreObject pre = cc.members.get("_pre");
+		CoreObject post = cc.members.get("_post");
+
 		StringBuilder r = new StringBuilder();
 		for(int i = 0; i < cc.argCount; i++)
 		{
 			CoreObject ca = cc.argPop();
+
 			if(i > 0 && separateBy != null)
 				r.append(separateBy.toString());
+
+			if(i == cc.argCount-1 && last != null)
+				r.append(last.toString());
+
+			if(pre != null)
+				r.append(pre.toString());
+			
 			r.append(ca.toString());
+			
+			if(post != null)
+				r.append(post.toString());
+
+			if(i == 0 && first != null)
+				r.append(first.toString());
 		}
 		return r.toString();
 	}
@@ -465,8 +485,24 @@ public class LibNP
 	{
 		Interpreter outerInstance = Interpreter.instance;
 		String src = cc.argPop().toString();
+		
 		Interpreter i2 = new Interpreter(Interpreter.instance.req);
 		Interpreter.instance = i2;
+		i2.rootContext.members.put("request", outerInstance.rootContext.members.get("request"));
+		if(cc.members.get("_vars") != null)
+		{
+			CoreObject vars = cc.members.get("_vars");
+			if(vars.getClass() != CoreMap.class)
+				throw new InterpreterException("map object expected for #vars", cc.firstArgNode.token);
+			CoreMap vmap = (CoreMap) vars;
+			Iterator<String> ite = vmap.items.keySet().iterator();
+			while(ite.hasNext())
+			{
+				String identf = ite.next();
+				i2.rootContext.members.put(identf, vmap.items.get(identf));
+			}
+		}
+		
 		CoreObject result = i2.eval(src);
 		Interpreter.instance = outerInstance;
 		return result;

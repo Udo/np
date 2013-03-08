@@ -16,12 +16,12 @@ public class ClastIdentExpr extends ClastNode
 		if(child == null)
 			return new CoreObject();
 			
-		CoreObject xres = ClastExp.invoke(objectContext, lookupContainer, child, child.next);
+		CoreObject xres = ClastExp.invoke(objectContext, null, child, child.next);
+		String ident = xres.toString();
 		
-		//Interpreter.instance.debugTrace.append("-- ident expr "+xres.toString()+"\n");
+		ClastIdentifier ci = new ClastIdentifier(new Token("Identifier", ident));
 		
-		//return ClastIdentifier.iEval(this, xres.toString(), objectContext);
-		return xres;
+		return ci.run(objectContext, lookupContainer);
 	}
 
 }

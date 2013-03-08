@@ -120,7 +120,7 @@ public class CoreObject
 			return value.toString();
 		if(members.size() < 2)
 			return "";
-		return "Object";
+		return "Object "+members.keySet().toString();
 	}
 
 }

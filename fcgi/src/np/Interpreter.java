@@ -25,6 +25,7 @@ public class Interpreter
 	public StringBuilder debugTrace = new StringBuilder();
 	public RTErrorMessage fatalError = null;
 	public CoreObject rootContext = new CoreObject();
+	public CoreCall rootCall = null;
 	
 	public long execTimeStart = System.currentTimeMillis();
 	public long execTimeOut = System.currentTimeMillis()+500;
@@ -90,17 +91,21 @@ public class Interpreter
 	{
 		new LibNP();
 		
-		CoreMap param = new CoreMap();
-		CoreMap env = new CoreMap(FCGIInterface.request.params);
-		CoreMap get = HttpTools.getQueryParameters(param, env.item("QUERY_STRING").toString(), this);
-		CoreMap post = HttpTools.getPostParameters(param, HttpTools.inputStreamToString(this.req.inStream), this);
-		param.putMember("env", env, false);
-		param.putMember("get", get, false);
-		param.putMember("post", post, false);
-		rootContext.putMember("request", param, true);
+		if(rootContext.members.get("request") == null)
+		{
+			CoreMap param = new CoreMap();
+			CoreMap env = new CoreMap(FCGIInterface.request.params);
+			CoreMap get = HttpTools.getQueryParameters(param, env.item("QUERY_STRING").toString(), this);
+			CoreMap post = HttpTools.getPostParameters(param, HttpTools.inputStreamToString(this.req.inStream), this);
+			param.putMember("env", env, false);
+			param.putMember("get", get, false);
+			param.putMember("post", post, false);
+			rootContext.putMember("request", param, true);
+		}
 		rootContext.putMember("global", new CoreObject(), true);
 		
-		return node.run(new CoreCall(new CoreObject(), new CoreObject(), null, null), null);
+		rootCall = new CoreCall(rootContext, rootContext, null, null);
+		return node.run(rootCall, null);
 	}
 	
 	public void load(String fileName)
@@ -139,6 +144,7 @@ public class Interpreter
 			tree.parse(lexer.tokens, "(eval)");
 			ClastNode cnode = ClastFactory.makeClastFromTree(tree.root, null);
 			result.members.put("result", run(cnode));
+			result.members.put("root", rootCall);
 		}
 		catch (InterpreterException e)
 		{
