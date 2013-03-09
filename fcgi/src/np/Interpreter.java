@@ -106,6 +106,7 @@ public class Interpreter
 		
 		rootCall = new CoreCall(rootContext, rootContext, null, null);
 		return node.run(rootCall, null);
+		//return node.run(new CoreCall(new CoreObject(), new CoreObject(), new CoreObject(), null), null);
 	}
 	
 	public void load(String fileName)

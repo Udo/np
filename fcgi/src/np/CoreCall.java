@@ -111,8 +111,8 @@ public class CoreCall extends CoreObject
 			}
 			crn = crn.next;
 		}
-		if(result == 0 && firstArgNode != null && firstArgNode.token.type.equals("N"))
-			firstArgNode = null;
+		//if(result == 0 && firstArgNode != null && firstArgNode.token.type.equals("N"))
+		//	firstArgNode = firstArgNode.next;
 		//Interpreter.instance.debugTrace.append("parse args "+members.toString()+"\n");
 		return result;
 	}

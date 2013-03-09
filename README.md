@@ -39,6 +39,6 @@ to this:
 6) keep in mind that for this to work, the np server has to be actually running. As long as srv.sh isn't running, you'll get a 
 "Bad Gateway" message from nginx.
 
-Doing the np
+Playing around with np
 ==
-As the runtime matures, I'll put up tutorials and documentation at http://np-lang.org/
+As the runtime matures, I'll update tutorials and documentation at http://np-lang.org/

@@ -42,12 +42,12 @@ class npfcgi
 			//if(interp.fatalError != null)
 			//	  System.out.println("\nFatal interpreter error: "+interp.fatalError.toString());
 			
-		    if(true || interp.response.config.get("debugDump") != null && interp.response.config.get("debugDump").equals("true"))
+		    if(interp.response.config.get("debugDump") != null && interp.response.config.get("debugDump").equals("true"))
 		    {
 		    	System.out.println("<!--");
 		    	System.out.println(interp.response.config.get("debugDump"));
 				System.out.println("Memory usage: "+((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1024) + "kB");
-				if(true || interp.response.config.get("debugTree") != null && interp.response.config.get("debugTree").equals("true"))
+				if(interp.response.config.get("debugTree") != null && interp.response.config.get("debugTree").equals("true"))
 				{
 					System.out.println("---");
 					System.out.println(interp.tree.showTree());
