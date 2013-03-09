@@ -35,7 +35,7 @@ to this:
       try_files $uri $uri/ index.php index.np;
 
 5) save, and restart nginx with "/etc/init.d/nginx reload" or whatever is appropriate for your system. Review and then start fcgi/bin/srv.sh.
-If you plan to keep np running for some time, use the Unix screen command to generate a persistent session or resort to making a
+If you plan to keep np running for some time, use the Unix "screen" command to generate a persistent session or resort to making a
 regular service script for it (not included here at this time).
 
 6) keep in mind that for this to work, the np server has to be actually running. As long as srv.sh isn't running, you'll get a 
