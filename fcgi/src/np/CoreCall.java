@@ -19,16 +19,15 @@ public class CoreCall extends CoreObject
 	public CoreCall(CoreObject callerCtx, CoreObject functionObject, CoreObject containerObject, ClastNode args) throws InterpreterException
 	{
 		Interpreter.instance.checkForTimeout();
-		if(args == null)
-			args = new ClastNode(new Token());
+		callerContext = callerCtx;
 
 		value = args;
 		firstArgNode = args;
 		argCount = preParseArgs();
+		//Interpreter.instance.debugTrace.append("new call ctx="+callerCtx+"\n");
 		currentArgNode = firstArgNode;
 		skipNamedParam();
 		
-		callerContext = callerCtx;
 		if(callerCtx != functionObject && functionObject != null)
 		{
 			putMember("return", new CoreBuiltin("xReturn", this), true);
@@ -96,13 +95,11 @@ public class CoreCall extends CoreObject
 	{
 		int result = 0;
 		ClastNode crn = firstArgNode;
+		//Interpreter.instance.debugTrace.append("call params\n");
 		while(crn != null)
 		{
-			if(crn.token.type.equals("N"))
-			{
-				// ^ this is a bizarre bug that I need to track down some day
-			}
-			else if(!crn.isNamed()) 
+			//Interpreter.instance.debugTrace.append("- "+crn.token.value+" "+crn.isNamed()+"\n");
+			if(!crn.isNamed()) 
 				result++;
 			else
 			{
@@ -111,9 +108,8 @@ public class CoreCall extends CoreObject
 			}
 			crn = crn.next;
 		}
-		//if(result == 0 && firstArgNode != null && firstArgNode.token.type.equals("N"))
-		//	firstArgNode = firstArgNode.next;
-		//Interpreter.instance.debugTrace.append("parse args "+members.toString()+"\n");
+		//Interpreter.instance.debugTrace.append("-> count "+result+"\n");
+		//Interpreter.instance.debugTrace.append("parseArgs "+members.toString()+"\n");
 		return result;
 	}
 	
@@ -133,7 +129,8 @@ public class CoreCall extends CoreObject
 			return new CoreObject();
 		
 		CoreObject result = null;
-		//Interpreter.instance.debugTrace.append("ctx pop "+currentArgNode.toString()+"\n");
+		//Interpreter.instance.debugTrace.append("ctx pop "+currentArgNode.token.toString()+
+		//		" ctx="+ctx.members.toString()+"\n");
 		result = currentArgNode.run(ctx, lookupCtx);
 
 		//Interpreter.instance.debugTrace.append("pop "+currentArgNode.token.value+" arg="+result.toString()+"\n");

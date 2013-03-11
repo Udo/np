@@ -87,11 +87,9 @@ public class Interpreter
 		return sw.toString();
 	}
 
-	public CoreObject run(ClastNode node) throws InterpreterException
+	public void initRootContext() throws InterpreterException
 	{
-		new LibNP();
-		
-		if(rootContext.members.get("request") == null)
+		if(rootContext.members.get("request") == null && req != null)
 		{
 			CoreMap param = new CoreMap();
 			CoreMap env = new CoreMap(FCGIInterface.request.params);
@@ -102,9 +100,23 @@ public class Interpreter
 			param.putMember("post", post, false);
 			rootContext.putMember("request", param, true);
 		}
-		rootContext.putMember("global", new CoreObject(), true);
 		
-		rootCall = new CoreCall(rootContext, rootContext, null, null);
+		if(rootContext.members.get("global") == null)
+			rootContext.putMember("global", new CoreObject(), true);
+
+		if(rootContext.members.get("enc") == null)
+			rootContext.putMember("enc", new LibEnc(), true);
+	}
+	
+	public CoreObject run(ClastNode node) throws InterpreterException
+	{
+		new LibNP();
+		
+		initRootContext();
+		
+		if(rootCall == null)
+			rootCall = new CoreCall(rootContext, rootContext, null, null);
+		
 		return node.run(rootCall, null);
 		//return node.run(new CoreCall(new CoreObject(), new CoreObject(), new CoreObject(), null), null);
 	}

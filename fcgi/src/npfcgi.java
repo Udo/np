@@ -1,6 +1,7 @@
 import com.fastcgi.*;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.text.NumberFormat;
 
 import np.*; 
@@ -44,10 +45,10 @@ class npfcgi
 			
 		    if(interp.response.config.get("debugDump") != null && interp.response.config.get("debugDump").equals("true"))
 		    {
-		    	System.out.println("<!--");
-		    	System.out.println(interp.response.config.get("debugDump"));
+		    	System.out.println("<!-- ");
+		    	//System.out.println(interp.lexer.tokens.toString());
 				System.out.println("Memory usage: "+((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1024) + "kB");
-				if(interp.response.config.get("debugTree") != null && interp.response.config.get("debugTree").equals("true"))
+				if(true || interp.response.config.get("debugTree") != null && interp.response.config.get("debugTree").equals("true"))
 				{
 					System.out.println("---");
 					System.out.println(interp.tree.showTree());
@@ -73,7 +74,9 @@ class npfcgi
 	
 	public static void main(String args[])
 	{
-
+		if(Charset.defaultCharset().name() != "UTF-8")
+			System.out.println("Warning: default encoding should be UTF-8, but "+Charset.defaultCharset().name()+" detected.");
+			
 		FCGIInterface intf = new FCGIInterface();
 		while (intf.FCGIaccept() >= 0)
 		{

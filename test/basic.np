@@ -1,68 +1,55 @@
-request.header 'content-type':'text/plain';
-
-request.config #debugDump:false;
-
 println "np automated tests";
 println "------------------------";
 println; 
 
-passCount = 0;
-failCount = 0;
+global.passCount = 0;
+global.failCount = 0;
 
-expect = { n f ex |
-  println n;
-  if(f == ex) { def.passCount++ } { println n " failed (" f "!=" ex ")."; def.failCount++ }
+expect = { testName f ex |
+  if(f == ex) 
+    { global.passCount = global.passCount + 1;  } 
+    { global.failCount = global.failCount + 1; println testName ' failed ( ' ex ' != ' f ' ) '; } 
   };
   
-expect "number equality" { return 1 == 1 } true;
-expect "number inequality" { return 1 == 2 } false;
-expect "string equality" { return "1" == "1" } true;
-expect "null equality" { return abc == null } true;
+expect 'basic equality' 0 0;
 
-expect "basic variables" {
-  thingsThatAreAwesome = 'cats';
-  magicNumber = 40 + 2;  
-  return (cat magicNumber ' ' thingsThatAreAwesome);
-  } '42 cats';
+expect 'math and concat' ({
+    thingsThatAreAwesome = 'cats';
+    magicNumber = 40 + 2;
+    return (cat magicNumber ' ' thingsThatAreAwesome)
+  }) '42 cats';
 
-expect "basic functions" {
-  myFunction = { n |
-    n*n
-    };
-  return (cat "fair and square: " (myFunction 2));
-  } 'fair and square: 4';
+expect 'function parameters' ({ 
+    f = { n | n*n };
+    (f 2)
+  }) 4;
+  
+expect 'named params' ({
+  f = { return (cat 'Hi, my ' _pname ' is ' (pop) '.'); };
+  f #pname:'name' 'Bob'
+  }) 'Hi, my name is Bob.';
+  
+expect '(cat)' ({
+  cat 'OMG' "it's" 'full' 'of' 'cats' #sep:' '
+  }) "OMG it's full of cats";
+  
+expect 'container variable' ({
+  v = 4;
+  v.f = { return container*container };
+  v.f
+  }) 16;
 
-expect "basic scope" {
-  a = 1;
-  f = { import #a; pop + a };
-  return (f 1);
-  } 2;
-
-expect "basic scope limit" {
-  f = { import #a; a = pop };
-  f 1;
-  return a;
-  } null;
-
-expect "named parameters" {
-  f = { 
-    return (cat
-      _name ' And I have ' 
-      argcount ' unnamed param '
-      'containing ' pop ', too.');
-    };  
-  return (f 
-    3.1415 
-    #name:"I'm using a named param!");
-  } "I'm using a named param! And I have 1 unnamed param containing 3.1415, too.";
-
-expect "list definition" {
-  return (cat(list 1 2 3 3:3));
-  } "(list '1' '2' '3' '3':'3')";
+expect 'list definition' ({
+  (list 'apples' 'oranges')
+  }) "(list 'apples' 'oranges')";
+  
+expect 'list accessor' ({
+  (list 'apples' 'oranges')::0
+  }) "apples";
   
 
 
 println;
 println "------------------------";
-println passCount ' tests passed';
-println failCount ' tests failed';
+println 'Passed: ' global.passCount;
+println 'Failed: ' global.failCount;

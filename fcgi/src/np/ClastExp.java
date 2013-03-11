@@ -19,6 +19,8 @@ public class ClastExp extends ClastNode
 	public static CoreObject invoke(CoreObject objectContext, CoreObject lookupContainer, ClastNode method, ClastNode args) throws InterpreterException
 	{
 		CoreObject methodObject = method.run(objectContext, lookupContainer);
+		
+		//Interpreter.instance.debugTrace.append("exp invoke "+method.token.toString()+" ctx="+objectContext+"\n");
 
 		if(methodObject == null)
 			return new CoreObject();

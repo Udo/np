@@ -1,3 +1,4 @@
-l = (list);
-//l.add 1337;
-println (l.count);
+l = (list 1 2 'bla s' 3);
+a = (map #c:l);
+
+unsafeprint a;

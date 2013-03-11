@@ -1,0 +1,15 @@
+This project uses the following resources:
+
+Apache Commons
+==========================================
+http://commons.apache.org/
+
+FastCGI SDK
+==========================================
+http://www.fastcgi.com/
+
+Markdown4J
+==========================================
+Library: https://code.google.com/p/markdown4j/
+John Gruber's Markdown Spec: http://daringfireball.net/projects/markdown/syntax
+

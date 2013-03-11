@@ -60,6 +60,8 @@ public class LibNP
 		methods.put("<", findMethod("b_smaller"));
 		methods.put("<=", findMethod("b_smallerorequal"));
 		methods.put("!", findMethod("b_negate"));
+		methods.put("PFX+", findMethod("b_pfxplus"));
+		methods.put("PFX-", findMethod("b_pfxminus"));
 		methods.put("&&", findMethod("b_and"));
 		methods.put("||", findMethod("b_or"));
 		// flow control
@@ -80,6 +82,9 @@ public class LibNP
 		// constructor calls
 		methods.put("list", findMethod("b_list"));
 		methods.put("map", findMethod("b_map"));
+		methods.put("string", findMethod("b_string"));
+		methods.put("number", findMethod("b_number"));
+		methods.put("boolean", findMethod("b_boolean"));
 		instance = this;
 	}
 	
@@ -167,8 +172,8 @@ public class LibNP
 			int idx = source.toDouble().intValue();
 			CoreObject result = list.item(idx);
 			
-			Interpreter.instance.debugTrace.append("array scope list="+list.hashCode()+" item#="+
-			  idx+" content="+result.toString()+" source="+source.toString()+"\n");
+			//Interpreter.instance.debugTrace.append("array scope list="+list.hashCode()+" item#="+
+			//  idx+" content="+result.toString()+" source="+source.toString()+"\n");
 			
 			if(Interpreter.instance.assignmentMode)
 				new AssignmentTag(result, list, idx);
@@ -211,7 +216,7 @@ public class LibNP
 
 		destinationLocation.doAssignment(cc, source);
 		
-		Interpreter.instance.debugTrace.append("assign "+destinationLocation.container+" "+destinationLocation.name+"="+source+"\n");
+		//Interpreter.instance.debugTrace.append("assign "+destinationLocation.container+" "+destinationLocation.name+"="+source+"\n");
 		
 		if(source.isExecutable())
 			return new CoreObject();
@@ -267,14 +272,14 @@ public class LibNP
 
 	public CoreObject b_print(CoreCall cc) throws InterpreterException
 	{
-		String result = StringEscapeUtils.escapeHtml4(s_cat(cc));
+		String result = StringEscapeUtils.escapeXml(s_cat(cc));
 		Interpreter.instance.output.append(result);
 		return new CoreString(result);
 	}
 
 	public CoreObject b_println(CoreCall cc) throws InterpreterException
 	{
-		String result = StringEscapeUtils.escapeHtml4(s_cat(cc));
+		String result = StringEscapeUtils.escapeXml(s_cat(cc));
 		Interpreter.instance.output.append(result+"\n");
 		return new CoreString(result);
 	}
@@ -349,12 +354,22 @@ public class LibNP
 		return new CoreBoolean(!cc.argPop().toBoolean());
 	}
 	
+	public CoreObject b_pfxplus(CoreCall cc) throws InterpreterException
+	{
+		return new CoreNumber(cc.argPop().toDouble());
+	}
+	
+	public CoreObject b_pfxminus(CoreCall cc) throws InterpreterException
+	{
+		return new CoreNumber(-cc.argPop().toDouble());
+	}
+	
 	public CoreObject b_if(CoreCall cc) throws InterpreterException
 	{
 		Interpreter.instance.debugTrace.append("if "+cc.argCount+" args\n");
 		for(int i = 0; i < cc.argCount-1; i += 2)
 		{
-			Interpreter.instance.debugTrace.append("   stage "+i+"\n");
+			//Interpreter.instance.debugTrace.append("   stage "+i+"\n");
 			if(cc.argPop().toBoolean() == true)
 				return cc.argPop().execute(cc.flatCall());
 			cc.argNOP();
@@ -530,7 +545,7 @@ public class LibNP
 		{
 			ClastNode co = cc.firstArgNode;
 			
-			Interpreter.instance.debugTrace.append("new list "+co.token.toString()+"\n");
+			//Interpreter.instance.debugTrace.append("new list "+co.token.toString()+"\n");
 			
 			while (co != null)
 			{
@@ -544,22 +559,44 @@ public class LibNP
 	}
 	
 	/*
-	 * makes a list
+	 * makes a map
 	 */
 	public CoreObject b_map(CoreCall cc) throws InterpreterException
 	{
 		CoreMap result = new CoreMap();
-		
-		ClastNode co = cc.firstArgNode;
-		
-		while (co != null)
+
+		Iterator<String> i = cc.members.keySet().iterator();
+		while(i.hasNext())
 		{
-			CoreObject nmd = co.run(cc.callerContext, null);
-			result.add(nmd);
-			co = co.next;
+			String key = i.next();
+			if(key.substring(0, 1).equals("_"))
+				result.items.put(key.substring(1), cc.members.get(key));
 		}
 		
 		return result;
 	}
 	
+	/*
+	 * makes a string
+	 */
+	public CoreObject b_string(CoreCall cc) throws InterpreterException
+	{
+		return b_cat(cc);
+	}
+
+	/*
+	 * makes a number
+	 */
+	public CoreObject b_number(CoreCall cc) throws InterpreterException
+	{
+		return new CoreNumber(cc.argPop().toDouble());
+	}
+	
+	/*
+	 * makes a boolean
+	 */
+	public CoreObject b_boolean(CoreCall cc) throws InterpreterException
+	{
+		return new CoreBoolean(cc.argPop().toBoolean());
+	}
 }

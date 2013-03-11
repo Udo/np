@@ -15,7 +15,7 @@ public class Lexer
 
 	int idx, codeLength, currentMode;
 	public ArrayList<Integer> lineBreakDictionary = new ArrayList<Integer>();
-	String sourceText, stringLiteralDelimiter, currentTokenType, lookAhead;
+	String sourceText, stringLiteralDelimiter, currentTokenType, lookAhead, previousChar, currentChar;
 	StringBuilder currentTokenString = new StringBuilder();
 	public ArrayList<Token> tokens;
 
@@ -30,11 +30,13 @@ public class Lexer
 		sourceText = src;
 		tokens = new ArrayList<Token>();
 		lookAhead = "";
+		previousChar = "";
 		updateLineCounter();
 	}
 
 	public String next()
 	{
+		previousChar = currentChar;
 		try
 		{
 			idx++;
@@ -42,7 +44,8 @@ public class Lexer
 				lookAhead = sourceText.substring(idx, idx + 1);
 			else
 				lookAhead = "";
-			return (sourceText.substring(idx - 1, idx));
+			currentChar = (sourceText.substring(idx - 1, idx));
+			return currentChar;
 		}
 		catch(Exception e)
 		{
@@ -109,10 +112,25 @@ public class Lexer
 		commitToken(soloType, currentTokenString);
 	}
 
+	public void consumeOperatorPfx(String currentItem, String[] possibleFollowUps, String soloType)
+	{
+		/*
+		 * this is a special case of operator consumption. if the last item was
+		 * a whitespace, and the following one isn't, this is not an operator but a 
+		 * negation/positive prefix sign. it's also the only place in the entire
+		 * lexer where whitespace is actually significant.
+		 */
+		if(previousChar.matches("\\s") && !lookAhead.matches("\\s"))
+			commitToken("Op", "PFX"+currentItem);
+		else
+			consumeOperator(currentItem, possibleFollowUps, soloType);
+	}
+
 	public void beginLineComment(int advanceIndex)
 	{
 		idx = idx + advanceIndex;
 		currentMode = PARSERMODE_LINECOMMENT;
+		previousChar = " ";
 	}
 
 	public void finishLineComment()
@@ -120,6 +138,7 @@ public class Lexer
 		currentTokenString.setLength(0);
 		currentTokenType = "N";
 		currentMode = PARSERMODE_CODE;
+		previousChar = " ";
 	}
 	
 	public void consumeNumber(String currentItem)
@@ -160,6 +179,7 @@ public class Lexer
 		commitToken("String", printString);
 		commitToken("ParenEnd", "");
 		commitToken("StEnd", "");
+		previousChar = " ";
 	}
 	
 	public void updateLineCounter()
@@ -254,8 +274,8 @@ public class Lexer
 					else if (currentItem.equals("<")) consumeOperator(currentItem, "=".split(","), "Op");
 					else if (currentItem.equals(">")) consumeOperator(currentItem, "=".split(","), "Op");
 					else if (currentItem.equals("=")) consumeOperator(currentItem, "=".split(","), "Op");
-					else if (currentItem.equals("+")) consumeOperator(currentItem, "=,+".split(","), "Op");
-					else if (currentItem.equals("-")) consumeOperator(currentItem, "=,-".split(","), "Op");
+					else if (currentItem.equals("+")) consumeOperatorPfx(currentItem, "=,+".split(","), "Op");
+					else if (currentItem.equals("-")) consumeOperatorPfx(currentItem, "=,-".split(","), "Op");
 					else if (currentItem.equals("*")) consumeOperator(currentItem, "=".split(","), "Op");
 					else if (currentItem.equals("/"))
 					{

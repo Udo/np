@@ -34,6 +34,21 @@ public class ClastIdentifier extends ClastNode
 		return result;
 	}
 	
+	public static CoreObject iEvalLC(ClastNode node, String identifier, CoreObject objectContext) throws InterpreterException
+	{
+		CoreObject result = null;
+
+		result = objectContext.getMember(identifier);
+
+		if(result == null)
+			result = new CoreObject();
+
+		if(Interpreter.instance.assignmentMode)
+			new AssignmentTag(result, objectContext, identifier);
+
+		return result;
+	}
+
 	/*
 	 * identifier objects are interesting. they point to an
 	 * object that must be visible within the current call
@@ -45,7 +60,8 @@ public class ClastIdentifier extends ClastNode
 	{
 		if(lookupContainer == null)
 			return iEval(this, token.value, objectContext);
-		CoreObject result = iEval(this, token.value, lookupContainer);
+		
+		CoreObject result = iEvalLC(this, token.value, lookupContainer);
 		result.putMember("container", lookupContainer, true);
 		return result;
 	}

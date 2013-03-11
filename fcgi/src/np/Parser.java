@@ -39,7 +39,7 @@ public class Parser
 		     new String[] {"#", "@", "$"}
 		));	
 	private final Set<String> OP_UNI1 = new HashSet<String>(Arrays.asList(
-		     new String[] {"!"}
+		     new String[] {"!", "PFX+", "PFX-"}
 		));	
 	private final Set<String> OP_AR0 = new HashSet<String>(Arrays.asList(
 		     new String[] {"*", "/"}

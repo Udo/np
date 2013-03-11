@@ -49,6 +49,11 @@ public class CoreNumber extends CoreObject
 		return (Double) value;
 	}
 	
+	public boolean toBoolean()
+	{
+		return (Double) value != 0;
+	}
+	
 	public String getType()
 	{
 		return("Number");

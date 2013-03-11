@@ -1,7 +1,6 @@
 package np;
 
 import java.lang.reflect.Method;
-
 import np.Interpreter.InterpreterException;
 
 public class CoreBuiltin extends CoreObject
@@ -40,6 +39,7 @@ public class CoreBuiltin extends CoreObject
 	
 	public CoreObject execute(CoreCall cc) throws InterpreterException
 	{
+		//Interpreter.instance.debugTrace.append("builtin execute ctx="+cc.callerContext+"\n");
 		return LibNP.instance.execute(forObject, (Method) value, cc);
 	}
 	
