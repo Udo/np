@@ -2,13 +2,22 @@ package np;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimeZone;
+import java.util.UUID;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -27,25 +36,31 @@ public class LibEnc extends CoreObject
 
 	public LibEnc() throws InterpreterException
 	{
-		putMember("htmlEncode", new CoreBuiltin("xHtmlEncode", this), true);
-		putMember("htmlDecode", new CoreBuiltin("xHtmlDecode", this), true);
-		putMember("csvEncode", new CoreBuiltin("xCsvEncode", this), true);
-		putMember("csvDecode", new CoreBuiltin("xCsvDecode", this), true);
-		putMember("scriptEncode", new CoreBuiltin("xScriptEncode", this), true);
-		putMember("scriptDecode", new CoreBuiltin("xScriptDecode", this), true);
-		putMember("xmlEncode", new CoreBuiltin("xXmlEncode", this), true);
-		putMember("xmlDecode", new CoreBuiltin("xXmlDecode", this), true);
-		putMember("random", new CoreBuiltin("xRandom", this), true);
-		putMember("urlMapDecode", new CoreBuiltin("xUrlMapDecode", this), true);
-		putMember("urlEncode", new CoreBuiltin("xUrlEncode", this), true);
-		putMember("urlDecode", new CoreBuiltin("xUrlDecode", this), true);
 		putMember("base64Encode", new CoreBuiltin("xBase64Encode", this), true);
 		putMember("base64Decode", new CoreBuiltin("xBase64Decode", this), true);
-		putMember("nl2br", new CoreBuiltin("xNl2br", this), true);
-		putMember("markdownToHtml", new CoreBuiltin("xMarkdownToHtml", this), true);
-		putMember("jsonValue", new CoreBuiltin("xJsonValue", this), true);
+		putMember("csvValueEncode", new CoreBuiltin("xCsvValueEncode", this), true);
+		putMember("csvValueDecode", new CoreBuiltin("xCsvValueDecode", this), true);
+		putMember("date", new CoreBuiltin("xDate", this), true);
+		putMember("htmlEncode", new CoreBuiltin("xHtmlEncode", this), true);
+		putMember("htmlDecode", new CoreBuiltin("xHtmlDecode", this), true);
 		putMember("jsonEncode", new CoreBuiltin("xJsonEncode", this), true);
 		putMember("jsonDecode", new CoreBuiltin("xJsonDecode", this), true);
+		putMember("jsonValue", new CoreBuiltin("xJsonValue", this), true);
+		putMember("markdownToHtml", new CoreBuiltin("xMarkdownToHtml", this), true);
+		putMember("md5", new CoreBuiltin("xMd5", this), true);
+		putMember("sha1", new CoreBuiltin("xSha1", this), true);
+		putMember("uuid", new CoreBuiltin("xUuid", this), true);
+		// putMember("numberParse", new CoreBuiltin("xParseNumber", this), true);
+		putMember("numberFormat", new CoreBuiltin("xFormatNumber", this), true);
+		putMember("nl2br", new CoreBuiltin("xNl2br", this), true);
+		putMember("random", new CoreBuiltin("xRandom", this), true);
+		putMember("scriptEncode", new CoreBuiltin("xScriptEncode", this), true);
+		putMember("scriptDecode", new CoreBuiltin("xScriptDecode", this), true);
+		putMember("urlDecode", new CoreBuiltin("xUrlDecode", this), true);
+		putMember("urlEncode", new CoreBuiltin("xUrlEncode", this), true);
+		putMember("urlMapDecode", new CoreBuiltin("xUrlMapDecode", this), true);
+		putMember("xmlEncode", new CoreBuiltin("xXmlEncode", this), true);
+		putMember("xmlDecode", new CoreBuiltin("xXmlDecode", this), true);
 	}
 	
     private Object jsonRecursiveEncode(CoreObject co)
@@ -83,8 +98,89 @@ public class LibEnc extends CoreObject
     {
     	return new CoreString("not yet implemented");
     }
+
+	private CoreObject xNumberFormatOrParse(CoreCall cc, boolean parse) throws InterpreterException 
+	{
+		int decimals = Integer.parseInt(cc.getMemberDefaultString("decimals", "2"));
+		int padTo = Integer.parseInt(cc.getMemberDefaultString("padTo", "0"));
+		String decPoint = cc.getMemberDefaultString("point", ".");
+		String thousandSep = cc.getMemberDefaultString("thousands", ",");
+		String padWith = cc.getMemberDefaultString("padWith", " ");
+		String decimalString = "";
+		if(decimals > 0)
+		{
+			decimalString = ".";
+			for(int i = 0; i < decimals; i++) decimalString = decimalString + "0";
+		}
+		
+		DecimalFormat df = new DecimalFormat("###,###,###,###,###,###,###,##0"+decimalString+";-###,###,###,###,###,###,###,##0"+decimalString);
+
+		if(parse)
+		{
+			CoreNumber result = new CoreNumber(0);
+			try
+            {
+				// this doesn't work at all, so it's not publicly exposed right now
+	            result.value = df.parse(cc.argPop().toString()).doubleValue();
+            }
+            catch (java.text.ParseException e) 
+            { 
+            	result.putMember("error", new CoreBoolean(true), true);
+            }
+			return result;
+		}
+		else
+		{
+			String result = df.format(cc.argPop().toDouble());
+			result = result.replaceAll("\\.", decPoint).replaceAll("\\,", thousandSep);
+
+			while(padTo > 0 && result.length() < padTo && padWith.length() > 0)
+				result = padWith + result;
+			
+			return new CoreString(result);
+		}
+	}
     
-	public CoreObject xJsonDecode(CoreCall cc) throws InterpreterException 
+    public CoreObject xDate(CoreCall cc) throws InterpreterException 
+    {
+    	CoreObject ts = cc.argPop();
+    	long timeStamp = ts.toDouble().longValue()*1000;
+    	/*
+    	 * assume unix timestamp as default (in seconds)
+    	 */
+    	//if(ts.members.get("granularity") != null)
+    	//	timeStamp = timeStamp * ts.members.get("granularity").toDouble().longValue();
+    	//else
+    	//	timeStamp = timeStamp * 1000;
+
+    	if(timeStamp == 0) timeStamp = System.currentTimeMillis();
+    	
+    	String format = cc.getMemberDefaultString("format", "yyyy-MM-dd HH:mm:ss");
+    	String timezone = cc.getMemberDefaultString("timezone", "GMT");
+    	DateFormat df = new SimpleDateFormat(format);
+    	df.setTimeZone(TimeZone.getTimeZone(timezone));
+    	try
+    	{
+    		return new CoreString(df.format(new Date(timeStamp)));
+    	}
+    	catch (Exception e)
+    	{
+    		return new CoreString("(date) failed: "+e.toString());
+    	}
+    	
+    }
+	
+	public CoreObject xFormatNumber(CoreCall cc) throws InterpreterException 
+    {
+    	return xNumberFormatOrParse(cc, false);
+    }
+    
+    public CoreObject xParseNumber(CoreCall cc) throws InterpreterException 
+    {
+    	return xNumberFormatOrParse(cc, true);
+    }
+    
+    public CoreObject xJsonDecode(CoreCall cc) throws InterpreterException 
 	{
 		JSONParser parser=new JSONParser();
 		Object obj;
@@ -111,6 +207,47 @@ public class LibEnc extends CoreObject
 		return new CoreString(JSONObject.escape(cc.argPop().toString()));
 	}
 
+	private CoreObject xHash(CoreCall cc, String algo) throws InterpreterException 
+	{
+		byte[] result;
+		try
+        {
+	        MessageDigest md = MessageDigest.getInstance(algo);
+	        result = md.digest(cc.argPop().toString().getBytes());
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+	        throw new InterpreterException(e.toString(), cc.firstArgNode.token);
+        }
+		
+		String resultString;
+		
+		String format = cc.getMemberDefaultString("format", "hex");
+		if(format.equals("numeric"))
+			resultString = new BigInteger(1, result).toString();
+		else if(format.equals("binary"))
+			resultString = new String(result);
+		else
+			resultString = new BigInteger(1, result).toString(16);
+		
+		return new CoreString(resultString);
+	}
+
+	public CoreObject xMd5(CoreCall cc) throws InterpreterException 
+	{
+		return xHash(cc, "MD5");
+	}
+	
+	public CoreObject xSha1(CoreCall cc) throws InterpreterException 
+	{
+		return xHash(cc, "SHA-1");
+	}
+	
+	public CoreObject xUuid(CoreCall cc) throws InterpreterException 
+	{
+		return new CoreString(UUID.randomUUID().toString());
+	}
+	
 	public CoreObject xMarkdownToHtml(CoreCall cc) throws InterpreterException 
 	{
 		Markdown4jProcessor mdp = new Markdown4jProcessor();
@@ -207,12 +344,12 @@ public class LibEnc extends CoreObject
 		return new CoreString(StringEscapeUtils.unescapeXml(cc.argPop().toString()));
 	}
 	
-	public CoreObject xCsvEncode(CoreCall cc) throws InterpreterException 
+	public CoreObject xCsvValueEncode(CoreCall cc) throws InterpreterException 
 	{ 
 		return new CoreString(StringEscapeUtils.escapeCsv(cc.argPop().toString()));
 	}
 	
-	public CoreObject xCsvDecode(CoreCall cc) throws InterpreterException 
+	public CoreObject xCsvValueDecode(CoreCall cc) throws InterpreterException 
 	{ 
 		return new CoreString(StringEscapeUtils.unescapeCsv(cc.argPop().toString()));
 	}

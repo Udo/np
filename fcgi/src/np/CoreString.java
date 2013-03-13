@@ -66,7 +66,7 @@ public class CoreString extends CoreObject
 			args.next = new ClastCapsule(new Token(), new CoreNumber(i));
 			yieldFunction.execute(new CoreCall(cc.callerContext, yieldFunction, getCurrentObject(cc), args));
 		}
-		return this;
+		return getCurrentObject(cc);
 	}
 
 	public CoreObject xEach(CoreCall cc) throws InterpreterException

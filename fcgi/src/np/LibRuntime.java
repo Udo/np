@@ -14,12 +14,11 @@ import np.Interpreter.InterpreterException;
  * actual language implementation (remember that most language constructs are internally
  * represented by function calls as well).
  */
-public class LibNP
+public class LibRuntime
 {
 	public HashMap<String, Method> methods = new HashMap<String, Method>();
-	private Random randomizr = new Random();
 	
-	public static LibNP instance;
+	public static LibRuntime instance;
 	
 	/*
 	 * looks up a built-in method by name and returns null if none was found.
@@ -41,7 +40,7 @@ public class LibNP
 	 * the methods HashMap because a lot of times, we're using function names that would be illegal
 	 * in Java
 	 */
-	public LibNP() throws InterpreterException
+	public LibRuntime() throws InterpreterException
 	{
 		// basic
 		methods.put("unsafeprint", findMethod("b_unsafeprint"));
@@ -50,8 +49,6 @@ public class LibNP
 		methods.put("cat", findMethod("b_cat"));
 		//methods.put("local", findMethod("b_local"));
 		methods.put("eval", findMethod("b_eval"));
-		// misc
-		methods.put("random", findMethod("b_random"));
 		// logic 
 		methods.put("==", findMethod("b_equal"));
 		methods.put("!=", findMethod("b_notequal"));
@@ -224,6 +221,9 @@ public class LibNP
 		return source;
 	}
 	
+	/*
+	 * generic string concatenation
+	 */
 	private String s_cat(CoreCall cc) throws InterpreterException
 	{
 		CoreObject separateBy = cc.members.get("_sep");
@@ -257,7 +257,9 @@ public class LibNP
 		return r.toString();
 	}
 
-	
+	/*
+	 * (cat) function
+	 */
 	public CoreObject b_cat(CoreCall cc) throws InterpreterException
 	{
 		return new CoreString(s_cat(cc));
@@ -284,6 +286,12 @@ public class LibNP
 		return new CoreString(result);
 	}
 	
+	/*
+	 * equal returns true if 
+	 * - both objects are the same object
+	 * - operand 1 is a number and both converted into a number are equal
+	 * - the string values of both objects are the same
+	 */
 	public CoreObject b_equal(CoreCall cc) throws InterpreterException
 	{
 		CoreObject opnd1 = cc.argPop();
@@ -305,6 +313,9 @@ public class LibNP
 		return result;
 	}
 
+	/*
+	 * generic comparison function
+	 */
 	private CoreObject b_compare(CoreCall cc, int opType) throws InterpreterException
 	{
 		boolean result = false;
@@ -354,11 +365,17 @@ public class LibNP
 		return new CoreBoolean(!cc.argPop().toBoolean());
 	}
 	
+	/*
+	 * handles the plus prefix (as opposed to the simple + operator)
+	 */
 	public CoreObject b_pfxplus(CoreCall cc) throws InterpreterException
 	{
 		return new CoreNumber(cc.argPop().toDouble());
 	}
 	
+	/*
+	 * handles the minus prefix (as opposed to the simple - operator)
+	 */
 	public CoreObject b_pfxminus(CoreCall cc) throws InterpreterException
 	{
 		return new CoreNumber(-cc.argPop().toDouble());
@@ -521,16 +538,6 @@ public class LibNP
 		CoreObject result = i2.eval(src);
 		Interpreter.instance = outerInstance;
 		return result;
-	}
-
-	public CoreObject b_random(CoreCall cc) throws InterpreterException
-	{
-		int fromValue = cc.argPop().toDouble().intValue();
-		int toValue = cc.argPop().toDouble().intValue();
-		int totalSpan = toValue - fromValue;
-		if (totalSpan < 0) totalSpan = -totalSpan;
-		int result = randomizr.nextInt(totalSpan+1) + fromValue;
-		return new CoreNumber(result);
 	}
 
 

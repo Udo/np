@@ -106,11 +106,17 @@ public class Interpreter
 
 		if(rootContext.members.get("enc") == null)
 			rootContext.putMember("enc", new LibEnc(), true);
+		
+		if(rootContext.members.get("math") == null)
+			rootContext.putMember("math", new LibMath(), true);
+		
+		if(rootContext.members.get("sys") == null)
+			rootContext.putMember("sys", new LibSys(), true);
 	}
 	
 	public CoreObject run(ClastNode node) throws InterpreterException
 	{
-		new LibNP();
+		new LibRuntime();
 		
 		initRootContext();
 		

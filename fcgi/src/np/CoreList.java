@@ -73,7 +73,7 @@ public class CoreList extends CoreObject
 			args.next = new ClastCapsule(new Token(), new CoreNumber(idx));
 			yieldFunction.execute(new CoreCall(cc.callerContext, yieldFunction, getCurrentObject(cc), args));
 		}
-		return this;
+		return getCurrentObject(cc);
 	}
 
 	private class NumComp implements Comparator<CoreObject> {
@@ -116,7 +116,7 @@ public class CoreList extends CoreObject
 			Collections.sort(items, new AlphaComp(sortDirection));
 		else if(sortMode.equals("numeric"))
 			Collections.sort(items, new NumComp(sortDirection));
-		return this;
+		return getCurrentObject(cc);
 	}
 	
 	public CoreObject insert(int atIndex, CoreObject ni)
@@ -218,7 +218,10 @@ public class CoreList extends CoreObject
         {
                 if(i > 0) sb.append(" ");
                 CoreObject itemObject = items.get(i);
-                sb.append("'"+itemObject.toString()+"'");
+                if(itemObject.getClass() == CoreNumber.class)
+                    sb.append(itemObject.toString());
+                else
+                	sb.append("'"+itemObject.toString()+"'");
         }
 
         sb.append(")");
