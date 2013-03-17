@@ -43,7 +43,7 @@ public class LibRuntime
 	public LibRuntime() throws InterpreterException
 	{
 		// basic
-		methods.put("unsafeprint", findMethod("b_unsafeprint"));
+		methods.put("unsafePrint", findMethod("b_unsafeprint"));
 		methods.put("print", findMethod("b_print"));
 		methods.put("println", findMethod("b_println"));
 		methods.put("cat", findMethod("b_cat"));

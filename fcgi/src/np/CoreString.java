@@ -64,7 +64,7 @@ public class CoreString extends CoreObject
 		{
 			ClastCapsule args = new ClastCapsule(new Token(), new CoreString(parts[i]));
 			args.next = new ClastCapsule(new Token(), new CoreNumber(i));
-			yieldFunction.execute(new CoreCall(cc.callerContext, yieldFunction, getCurrentObject(cc), args));
+			yieldFunction.execute(cc.flatCall(args));
 		}
 		return getCurrentObject(cc);
 	}

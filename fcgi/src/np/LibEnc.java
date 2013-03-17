@@ -43,6 +43,7 @@ public class LibEnc extends CoreObject
 		putMember("date", new CoreBuiltin("xDate", this), true);
 		putMember("htmlEncode", new CoreBuiltin("xHtmlEncode", this), true);
 		putMember("htmlDecode", new CoreBuiltin("xHtmlDecode", this), true);
+		putMember("htmlBrackets", new CoreBuiltin("xHtmlBrackets", this), true);
 		putMember("jsonEncode", new CoreBuiltin("xJsonEncode", this), true);
 		putMember("jsonDecode", new CoreBuiltin("xJsonDecode", this), true);
 		putMember("jsonValue", new CoreBuiltin("xJsonValue", this), true);
@@ -140,7 +141,19 @@ public class LibEnc extends CoreObject
 			return new CoreString(result);
 		}
 	}
-    
+
+	public static String gmDateRFC(long time)
+	{
+		return gmDate("EEE, dd-MMM-yyyy HH:mm:ss z", time);
+	}
+	
+	public static String gmDate(String format, long time)
+	{
+    	DateFormat df = new SimpleDateFormat(format);
+    	df.setTimeZone(TimeZone.getTimeZone("GMT"));
+		return df.format(new Date(time*1000));
+	}
+	
     public CoreObject xDate(CoreCall cc) throws InterpreterException 
     {
     	CoreObject ts = cc.argPop();
@@ -266,6 +279,16 @@ public class LibEnc extends CoreObject
 		return new CoreString(cc.argPop().toString().replaceAll("\n", "<br/>"));
 	}
 	
+	public static String base64Encode(String s)
+	{
+		return Base64.encodeBase64String(s.getBytes());
+	}
+	
+	public static String base64Decode(String s)
+	{
+		return Base64.decodeBase64(s).toString();
+	}
+	
 	public CoreObject xBase64Encode(CoreCall cc) throws InterpreterException 
 	{
 		return new CoreString(Base64.encodeBase64String(cc.argPop().toString().getBytes()));
@@ -274,6 +297,18 @@ public class LibEnc extends CoreObject
 	public CoreObject xBase64Decode(CoreCall cc) throws InterpreterException 
 	{
 		return new CoreString(new String(Base64.decodeBase64(cc.argPop().toString())));
+	}
+	
+	public static String urlDecode(String s)
+	{
+		try
+        {
+	        return URLDecoder.decode(s, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+	        return "";
+        }
 	}
 	
 	public CoreObject xUrlDecode(CoreCall cc) throws InterpreterException 
@@ -285,6 +320,18 @@ public class LibEnc extends CoreObject
         catch (UnsupportedEncodingException e)
         {
 	        return new CoreString();
+        }
+	}
+	
+	public static String urlEncode(String s)
+	{
+		try
+        {
+	        return URLEncoder.encode(s, "UTF-8").replaceAll("\\+", "%20");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+	        return "";
         }
 	}
 	
@@ -332,6 +379,11 @@ public class LibEnc extends CoreObject
 	public CoreObject xHtmlDecode(CoreCall cc) throws InterpreterException 
 	{ 
 		return new CoreString(StringEscapeUtils.unescapeHtml4(cc.argPop().toString()));
+	}
+	
+	public CoreObject xHtmlBrackets(CoreCall cc) throws InterpreterException 
+	{ 
+		return new CoreString(cc.argPop().toString().replaceAll("\\<", "&lt;").replaceAll("\\>", "&gt;"));
 	}
 	
 	public CoreObject xXmlEncode(CoreCall cc) throws InterpreterException 

@@ -47,6 +47,11 @@ public class RTFile
 		}
 	}
 	
+	public String[] toArray()
+	{
+		return content.split("\\r?\\n");
+	}
+	
 	public RTFile(String fn)
 	{
 		readFile(fn);

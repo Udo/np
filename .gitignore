@@ -1,3 +1,7 @@
+fcgi/sessions/*
+fcgi/log/*
+fcgi/cache/*
+fcgi/
 .DS_Store
 build
 dist

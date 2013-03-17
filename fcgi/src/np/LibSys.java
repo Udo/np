@@ -11,7 +11,13 @@ public class LibSys extends CoreObject
 	{
 		putMember("time", new CoreBuiltin("xTime", this), true);
 		putMember("bench", new CoreBuiltin("xBench", this), true);
+		putMember("execTime", new CoreBuiltin("xExecTime", this), true);
 
+	}
+	
+	public CoreObject xExecTime(CoreCall cc) throws InterpreterException
+	{
+		return new CoreNumber(new Double(System.currentTimeMillis() - Interpreter.instance.execTimeStart));
 	}
 	
 	public CoreObject xTime(CoreCall cc) throws InterpreterException

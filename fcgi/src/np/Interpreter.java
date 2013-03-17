@@ -19,16 +19,16 @@ public class Interpreter
 	public Lexer lexer = new Lexer();
 	public Parser tree = new Parser();
 	public FCGIRequest req;
-	public com.fastcgi.Response response = new com.fastcgi.Response();
 	
 	public StringBuilder output = new StringBuilder();
 	public StringBuilder debugTrace = new StringBuilder();
 	public RTErrorMessage fatalError = null;
 	public CoreObject rootContext = new CoreObject();
 	public CoreCall rootCall = null;
+	public CoreMap responseHeaders;
 	
 	public long execTimeStart = System.currentTimeMillis();
-	public long execTimeOut = System.currentTimeMillis()+500;
+	public long execTimeOut = System.currentTimeMillis()+Integer.parseInt(Configuration.get("max.runtime", "500"));
 	public long execTimeOutChecks = 0;
 	
 	public HashMap<CoreObject, AssignmentTag> assignmentList = new HashMap<CoreObject, AssignmentTag>();
@@ -91,14 +91,8 @@ public class Interpreter
 	{
 		if(rootContext.members.get("request") == null && req != null)
 		{
-			CoreMap param = new CoreMap();
-			CoreMap env = new CoreMap(FCGIInterface.request.params);
-			CoreMap get = HttpTools.getQueryParameters(param, env.item("QUERY_STRING").toString(), this);
-			CoreMap post = HttpTools.getPostParameters(param, HttpTools.inputStreamToString(this.req.inStream), this);
-			param.putMember("env", env, false);
-			param.putMember("get", get, false);
-			param.putMember("post", post, false);
-			rootContext.putMember("request", param, true);
+			LibRequest libReq = new LibRequest(FCGIInterface.request.params, req); 
+			rootContext.putMember("request", libReq.request, true);
 		}
 		
 		if(rootContext.members.get("global") == null)

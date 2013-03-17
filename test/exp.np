@@ -1,4 +1,8 @@
-l = (list 1 2 'bla s' 3);
-a = (map #c:l);
+request.header.set 'content-type' 'text-plain';
 
-unsafeprint a;
+request.setCookie 'sess' (sys.time);
+request.setCookie 'test' 'bla=123';
+
+unsafePrint (request.env);
+
+unsafePrint (request.cookies);

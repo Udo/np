@@ -50,7 +50,7 @@
 <pre><?np
 
     if (request.post::#code)
-      { println (eval request.post::#code).output #default:"(no output)"; }
+      { unsafePrint (enc.htmlBrackets (eval request.post::#code).output) #default:"(no output)"; }
   
 ?></pre>
 

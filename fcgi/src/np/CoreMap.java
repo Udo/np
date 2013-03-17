@@ -42,6 +42,8 @@ public class CoreMap extends CoreObject {
 		ir.putMember("remove", new CoreBuiltin("xRemove", this), true);
 		ir.putMember("set", new CoreBuiltin("xSet", this), true);
 		ir.putMember("each", new CoreBuiltin("xEach", this), true);
+		ir.putMember("keys", new CoreBuiltin("xKeys", this), true);
+		ir.putMember("items", new CoreBuiltin("xItems", this), true);
 		return ir;
 	}
 	
@@ -52,6 +54,24 @@ public class CoreMap extends CoreObject {
 	
 	public CoreObject xItem(CoreCall cc) throws InterpreterException { return getCurrentObject(cc).item(cc.argPop().toString()); }	
 	public CoreObject xSet(CoreCall cc) throws InterpreterException	{ getCurrentObject(cc).addWithKey(cc.argPop().toString(), cc.argPop()); return getCurrentObject(cc); }
+	
+	public CoreObject xKeys(CoreCall cc) throws InterpreterException	
+	{ 
+		CoreList result = new CoreList();
+		Iterator<String> i = getCurrentObject(cc).items.keySet().iterator();
+		while(i.hasNext())
+			result.items.add(new CoreString(i.next()));
+		return result; 
+	}
+	
+	public CoreObject xItems(CoreCall cc) throws InterpreterException	
+	{ 
+		CoreList result = new CoreList();
+		Iterator<String> i = getCurrentObject(cc).items.keySet().iterator();
+		while(i.hasNext())
+			result.items.add(getCurrentObject(cc).items.get(i.next()));
+		return result; 
+	}
 	
 	public CoreObject xCount(CoreCall cc) throws InterpreterException	
 	{ 
@@ -79,7 +99,7 @@ public class CoreMap extends CoreObject {
 			ClastCapsule args = new ClastCapsule(new Token(), new CoreString(identifier));
 			args.next = new ClastCapsule(new Token(), getCurrentObject(cc).items.get(identifier));
 			args.next.next = new ClastCapsule(new Token(), new CoreNumber(idx));
-			yieldFunction.execute(new CoreCall(cc.callerContext, yieldFunction, getCurrentObject(cc), args));
+			yieldFunction.execute(cc.flatCall(args));
 		}
 		return this;
 	}

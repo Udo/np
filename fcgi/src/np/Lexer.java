@@ -175,7 +175,7 @@ public class Lexer
 			idx = endStrPos+4;
 		}
 		commitToken("ParenStart", "");
-		commitToken("Identifier", "unsafeprint");
+		commitToken("Identifier", "unsafePrint");
 		commitToken("String", printString);
 		commitToken("ParenEnd", "");
 		commitToken("StEnd", "");

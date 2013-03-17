@@ -1,3 +1,5 @@
+request.header.set 'content-type' 'text/plain';
+
 println "np automated tests";
 println "------------------------";
 println; 

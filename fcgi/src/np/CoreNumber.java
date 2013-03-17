@@ -51,7 +51,7 @@ public class CoreNumber extends CoreObject
 		for(int idx = thisVal; idx >= endVal; idx--)
 		{
 			ClastCapsule args = new ClastCapsule(new Token(), new CoreNumber(idx));
-			yieldFunction.execute(new CoreCall(cc.callerContext, yieldFunction, getCurrentObject(cc), args));
+			yieldFunction.execute(cc.flatCall(args));
 		}
 		return getCurrentObject(cc);
 	}
@@ -64,7 +64,7 @@ public class CoreNumber extends CoreObject
 		for(int idx = thisVal; idx <= endVal; idx++)
 		{
 			ClastCapsule args = new ClastCapsule(new Token(), new CoreNumber(idx));
-			yieldFunction.execute(new CoreCall(cc.callerContext, yieldFunction, getCurrentObject(cc), args));
+			yieldFunction.execute(cc.flatCall(args));
 		}
 		return getCurrentObject(cc);
 	}
@@ -76,7 +76,7 @@ public class CoreNumber extends CoreObject
 		for(int idx = 1; idx <= max; idx++)
 		{
 			ClastCapsule args = new ClastCapsule(new Token(), new CoreNumber(idx));
-			yieldFunction.execute(new CoreCall(cc.callerContext, yieldFunction, getCurrentObject(cc), args));
+			yieldFunction.execute(cc.flatCall(args));
 		}
 		return getCurrentObject(cc);
 	}

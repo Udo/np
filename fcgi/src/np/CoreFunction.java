@@ -12,6 +12,7 @@ public class CoreFunction extends CoreObject
 	public CoreFunction(ClastNode fnode, CoreObject objectContext)
 	{
 		value = fnode;
+		members.put("outer", objectContext);
 	}
 		
 	public boolean isExecutable()
@@ -29,6 +30,7 @@ public class CoreFunction extends CoreObject
 	public CoreObject execute(CoreCall cc) throws InterpreterException
 	{
 		CoreObject result = null;
+		cc.members.put("outer", members.get("outer"));
 		
 		ClastNode current = ((ClastNode) value).child;
 		while (current != null && cc.returnValue == null)

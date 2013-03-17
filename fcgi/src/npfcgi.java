@@ -3,8 +3,10 @@ import com.fastcgi.*;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.text.NumberFormat;
+import java.util.Iterator;
 
 import np.*; 
+import np.Interpreter.InterpreterException;
 
 class npfcgi
 { 
@@ -27,7 +29,29 @@ class npfcgi
 	    return sb.toString();
 	}
 
-	public static void handleRequest(FCGIRequest req)
+	public static void putResponseHeaders(Interpreter itp)
+	{
+		if(itp.responseHeaders.items.get("content-type") == null) 
+        {
+			System.out.println("content-type: "+Configuration.get("content-type", "text/html; charset=utf-8"));
+        }
+		Iterator<String> i = itp.responseHeaders.items.keySet().iterator();
+		while(i.hasNext())
+		{
+			String key = i.next();
+			System.out.println(key+": "+itp.responseHeaders.items.get(key));
+		}
+		CoreList plainHeaders = (CoreList) itp.responseHeaders.members.get("flat");
+		if(plainHeaders != null)
+		for(int idx = 0; idx < plainHeaders.items.size(); idx++)
+		{
+			System.out.println(plainHeaders.item(idx));
+		}
+		System.out.println("");
+	}
+	
+	@SuppressWarnings("unused")
+    public static void handleRequest(FCGIRequest req)
 	{
 		try
 		{
@@ -35,25 +59,23 @@ class npfcgi
 			Interpreter.instance = interp;
 			interp.load(System.getProperty("SCRIPT_FILENAME"));
 
-			System.out.println(interp.response.headers.get("content-type"));
-			System.out.println("");
+			putResponseHeaders(interp);
  
 			System.out.println(interp.output.toString());
 
 			//if(interp.fatalError != null)
 			//	  System.out.println("\nFatal interpreter error: "+interp.fatalError.toString());
 			
-		    if(interp.response.config.get("debugDump") != null && interp.response.config.get("debugDump").equals("true"))
+		    if(false)
 		    {
 		    	System.out.println("<!-- ");
 		    	//System.out.println(interp.lexer.tokens.toString());
 				System.out.println("Memory usage: "+((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1024) + "kB");
-				if(true || interp.response.config.get("debugTree") != null && interp.response.config.get("debugTree").equals("true"))
-				{
-					System.out.println("---");
-					System.out.println(interp.tree.showTree());
-				}
-			    System.out.println("---");
+				
+				System.out.println("---");
+				System.out.println(interp.tree.showTree());
+				
+				System.out.println("---");
 				System.out.println("debug trace: " + interp.debugTrace.toString());
 			    System.out.println("---");
 				//System.out.println("root object: " + interp.rootObject.members.toString());
@@ -77,6 +99,8 @@ class npfcgi
 		if(Charset.defaultCharset().name() != "UTF-8")
 			System.out.println("Warning: default encoding should be UTF-8, but "+Charset.defaultCharset().name()+" detected.");
 			
+		Configuration.init();
+		
 		FCGIInterface intf = new FCGIInterface();
 		while (intf.FCGIaccept() >= 0)
 		{

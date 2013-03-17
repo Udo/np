@@ -32,7 +32,7 @@ public class CoreCall extends CoreObject
 		{
 			putMember("return", new CoreBuiltin("xReturn", this), true);
 			putMember("pop", new CoreBuiltin("xPop", this), true);
-			putMember("argcount", new CoreNumber(argCount), true);
+			putMember("argCount", new CoreNumber(argCount), true);
 		}
 		if(functionObject != null)
 			putMember("this", functionObject, true);
