@@ -16,7 +16,9 @@ np:L is a list-based, curly-braced, lexically-scoped, garbage-collected, interpr
 
 ```Lua
 -- declaring and using a variable
-new myVar = 2001
+new myNumber = 2001
+new myString = 'this is a string'
+new myBool = true
 new myTable = (: 1 2 3 4 5 option = 'hello')
 
 -- multiple return values from a function call
@@ -73,6 +75,22 @@ else
 ```
 
 ### Operators
+
+Relational operators are: `<` (less than) `>` (greater than) `<=` (less-or-equal) `>=` (greater-or-equal) `==` (equal) `!=` (not equal)
+
+Note that these operators do not cast variables into other types, so `'123' != 123`.
+
+Logical operators are: `and` `or` `not`
+
+Arithmetic operators are: `^` (to-the-power-of) `-` (unary sign) `*` (multiply) `/` (divide) `+` (add) `-` (subtract) 
+
+There is an operator for string concatenation: `..`
+
+
+
+
+
+
 
 
 
