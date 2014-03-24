@@ -32,7 +32,7 @@ result, error = doSomething()
 new myFunc = {(argument1) print(argument1) }
 
 -- declaring a function with named parameters
-new myFuncNamed = {(n) print(n.out) }
+new myFuncNamed = {(n) print(n[1] n[2] n.out) }
 
 -- calling a function with named parameters 
 myFuncNamed(: 'param1' 'param2' out = 'hello world!' )
