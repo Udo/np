@@ -1,3 +1,5 @@
+-- comment
+
 new myvar = '123'
 
 print('multiline 

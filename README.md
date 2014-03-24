@@ -1,16 +1,48 @@
 #np:L - Udo's Mod
 
-Following the first iteration of np, I'm now experimenting a bit with the Lua 5.2 codebase - to see what np concepts (and other stuff that comes to mind) could be imported into that platform.
+Following the first iteration of np, I'm now experimenting a bit with the Lua 5.2 codebase - to see what np concepts (and other stuff that comes to mind) could be imported into that platform. I made this decision after thinking about a pure C port of the original np proof-of-concept, but why start from nothing if you can start from an excellent and time-proven codebase?
 
 So to make it perfectly clear: this is a playground where I basically mutilate a beloved programming language, step by step turning it into a grotesque monster. This is not for the faint-hearted.
 
 ## Deviations from Lua
 
-Any and all of these are probably horrible, broken, and horribly broken.
+There are several objectives I want to reach that require a somewhat heavy modification of the Lua base, to a point where the language can't be recognized anymore. However, as I move some of the original (Java) np ideas into the interpreter, I'm also keeping some of the excellent Lua ideas around, hopefully to construct a beautiful chimera... it's alive... mwahaha!
+
+## General syntax
+
+np:L is a list-based, curly-braced, lexically-scoped, garbage-collected, interpreted language with dynamic typing. White space does not have significant meaning. Semicolons and commas are used to delimit statements and list entries respectively, but can be omitted in cases where it's semantically unambiguous.
+
+### Variables, Statements and Assignments
+
+```Lua
+-- declaring and using a variable
+new myVar = 2001
+new myTable = (: 1 2 3 4 5 option = 'hello')
+
+-- multiple return values from a function call
+result, error = doSomething()
+```
+
+### Function Declarations and Usage
+
+```Lua
+-- declaring a function
+new myFunc = {(argument1) print(argument1) }
+
+-- declaring a function with named parameters
+new myFuncNamed = {(n) print(n.out) }
+
+-- calling a function with named parameters 
+myFuncNamed(: 'param1' 'param2' out = 'hello world!' )
+```
+
+Remark: like the whole thing, this is a work in progress. I'm not happy with the idea that there are two ways to write and use a function. Ideally, I'd use the old np pattern of tacking on named parameters like this: `myFunc('param1' 'param2' | out = 'hello world' )`. However, that requires injecting the named parameter list into the function environment - something I have not figured out a simple solution for with the Lua codebase (if it was simple, it seems the Lua designers would have done it already instead of going with that ugly :/self hack).
 
 ### Event binding
 
-`setmetatable` and `getmetatable` are now bundled in the function `events(table [, metatable])` which I believe describes better what it does. Also, the metamethod naming convention has changed to leave out the leading double underscore. The following methods are supported:
+As I'm letting go of the idea that everything needs to be a full object, I'm embracing and extending Lua's metatable idea instead. One thing I definitely wanted to avoid is the cross-polution of (potentially serializable) data and meta methods that plagues JavaScript. The initial np did this by providing a different scope operator when accessing hashmap data. A similar but cleaner idea comes in the form of the `events` binding in np:L. 
+
+Any object can have an events table that specifies its behavior in certain situations. Right now, the following events are supported, most of them are from mainline Lua:
 
 ````
 index, newindex, update, gc, mode, len, eq, add, sub, 
@@ -19,22 +51,18 @@ mul, div, mod, pow, unm, lt, le, concat, call
 
 Consider this example where the `index` and `update` events are bound to a table:
 
-````
+```Lua
 events(someTable, (: 
 	update = {(t key val) print('---update of key'  key val) }
 	index = {(t key) print('---index of key'  key ) }
   ))
-````
+```
 
-### Functions are {()}
+### Conditional Statements
 
-Functions look a lot like blocks now, except for the parameter header: `new myFunc = {(a) ... }`
+The `if` statement works a lot like you'd expect, with the little caveat that the `cond` (analogous to "else if() ...") and `else` statements do not get their own curly-braced block. Instead, the whole conditional is contained within one block:
 
-### Curly braces
-
-The do...end, if...then...end constructs have been replaced with curly-braced alternatives. For example, the while loop now reads `while(true){ doSomething() }` and there have been multiple changes to if...then:
-
-````
+```Lua
 if(...) {
 	doThis()
 cond(...)
@@ -42,48 +70,11 @@ cond(...)
 else
   doTheOther()
 }
-````
+```
 
-Even though the use of `cond` (which replaces `elseif`) and `else` are not entirely consistent with the traditional curly brace paradigm, this pattern reduces the amount of noise needed to make the entire expression.
+### Operators
 
-### So: do we really this many commas?
 
-Commata are now optional in tables. Table constructors now look like this: `new sparseTable = (: 1 2 3 bla = 'blurp)`, function declarations: `function (a b c) ... end`, and function calls: `myFunc(1 2 3)`. Commas are still needed in `for` loops, `return` statements, and multiple value returns.
 
-### Table constructors without curly braces
 
-For now, a table constructor looks like this: `new myTable = (: 1, 2, 3)`. This enables functions with named parameters to look like `myfunc(:2, bla = 123)` instead of the awkward `myfunc{2, bla = 123}`, and it also frees up curly braces syntactically. 
-
-Ideally, I would like table constructors to work without the : at all, but I don't see how that could be done without a second lexer pass. That would also lead to ambiguity about what statements like `(1)` mean, but I guess we could live with that as long as we handle `()` correctly. Don't know about this yet...
-
-The downside of doing named param functions like this at all is that developers have to choose between the "normal" convention and the table-based convention. The disadvantage of the current table-based method is also that the function's parameter declaration becomes almost meaningless. In a better world, I would like to be able to mix them: `myfunc(1, 2 | option = 'a')` so any named stuff is optional and comes after the pipe symbol. This would mean injecting a table into the local function state, maybe something named "options".
-
-### Length operator "#" becomes base functions size() and asize()
-
-For now, the length operator # still works, and will return the true size of the array. However, there is now the equivalent `size()` function. If you really want to count only the numerical keys in a table, there's now the `asize()` function for that. 
-
-### pairs() iterator => each()
-
-Again, for readability. I'm thinking about altering the syntax for invoking iterators altogether, maybe something like this:
-``
-with each(myTable) key,value do
-...
-end
-`` instead of `for key,value in each(myTable) do ... end`
-
-### Replaced the not-equal operator with !=
-
-It's got better readability for pretty much everyone coming from any other language, so I replaced the ~= with !=. 
-
-### "Short" strings can be multiline 
-
-Strings starting with either of the quotation mark characters can now be multi-line.
-
-### Table sizes are reported correctly
-
-Table sizes reported by the # operator in Lua are weird. The # operator now reports the actual table size in entries, no matter which ones are keyed and in what order they are. 
-
-### "Local" keyword replaced with "new"
-
-This was done to emphasize the variable-declaration function of the keyword, to delineate the code visually from Lua code, and to hint at the fact that this should be the default way to make new variables. I'm considering throwing a warning every time a global variable is initiated.
 
