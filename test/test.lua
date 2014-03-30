@@ -1,5 +1,7 @@
 -- comment
 
+print('----------------- starting test script ------------------');
+
 new myvar = '123'
 
 print('multiline 
@@ -49,11 +51,13 @@ new myfunc = {(a) return a, 2 }
 
 obj.test((: 1 opt = 23) 1000+myfunc(3))
 
-x = 3
+x = 300000
 new i = 1        -- local to the chunk
 
 while i<=x {
   new x = i*2    -- local to the while body
-  print(x)         --> 2, 4, 6, 8, ...
+	obj.lasti = i
   i = i + 1
 }
+
+print('end loop benchmark' i, 'iterations');

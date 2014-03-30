@@ -7,5 +7,7 @@ fcgi/
 *.a
 src/lua
 src/luac
+src/np
+src/npc
 build
 dist
