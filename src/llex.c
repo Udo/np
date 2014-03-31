@@ -35,7 +35,7 @@
 /* ORDER RESERVED */
 static const char *const luaX_tokens [] = {
     "and", "break", "do", "else", "cond",
-    "end", "false", "for", "function", "goto", "if",
+    "end", "false", "for", "function", "/*goto*/", "if",
     "in", "new", "nil", "not", "or", "repeat",
     "return", "then", "true", "until", "while",
     "..", "...", "==", ">=", "<=", "!=", "::", "<eof>",

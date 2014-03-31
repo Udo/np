@@ -60,4 +60,4 @@ while i<=x {
   i = i + 1
 }
 
-print('end loop benchmark' i, 'iterations');
+print('end loop benchmark' i 'iterations');
