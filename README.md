@@ -54,6 +54,24 @@ new b = 20
 a, b = switchFunc(a b)
 ```
 
+#### Scope
+
+Variables are scoped to the block they're declared in.
+
+```Lua
+-- make a new variable a
+new a = 5
+print('just declared' a)
+
+{
+	print('inside the block' a)
+	new a = 10
+	print('redeclared inside block' a)
+}
+
+print('after exiting the block' a)
+```
+
 ### Event binding
 
 As I'm letting go of the idea that everything needs to be a full object, I'm embracing and extending Lua's metatable idea instead. One thing I definitely wanted to avoid is the cross-polution of (potentially serializable) data and meta methods that plagues JavaScript. The initial np did this by providing a different scope operator when accessing hashmap data. A similar but cleaner idea comes in the form of the `events` binding in np:L. 

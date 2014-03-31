@@ -78,3 +78,5 @@ new b = 20
 a, b = switchFunc(a b)
 
 print(a b)
+
+new ? = {(a b c) return(a) }

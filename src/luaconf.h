@@ -128,7 +128,7 @@
 @@ environment, used to access global names.
 ** CHANGE it if you do not like this name.
 */
-#define LUA_ENV		"_ENV"
+#define LUA_ENV		"root"
 
 
 /*
