@@ -79,4 +79,14 @@ a, b = switchFunc(a b)
 
 print(a b)
 
-new ? = {(a b c) return(a) }
+-- make a new variable a
+new a = 5
+print('just declared' a)
+
+{
+    print('inside the block' a)
+    new a = 10
+    print('redeclared inside block' a)
+}
+
+print('after exiting the block' a)

@@ -61,15 +61,15 @@ Variables are scoped to the block they're declared in.
 ```Lua
 -- make a new variable a
 new a = 5
-print('just declared' a)
+print('just declared' a) -- 5
 
 {
-	print('inside the block' a)
+	print('inside the block' a) -- still 5
 	new a = 10
-	print('redeclared inside block' a)
+	print('redeclared inside block' a) -- 10
 }
 
-print('after exiting the block' a)
+print('after exiting the block' a) -- 5 again
 ```
 
 ### Event binding
