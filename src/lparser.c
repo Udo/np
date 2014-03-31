@@ -604,10 +604,6 @@ static int block_follow (LexState *ls, int withuntil) {
 static void statlist (LexState *ls) {
   /* statlist -> { stat [`;'] } */
   while (!block_follow(ls, 1)) {
-    if (ls->t.token == TK_RETURN) {
-      statement(ls);
-      return;  /* 'return' must be last statement */
-    }
     statement(ls);
   }
 }
@@ -994,7 +990,7 @@ static UnOpr getunopr (int op) {
   switch (op) {
     case TK_NOT: return OPR_NOT;
     case '-': return OPR_MINUS;
-    case '#': return OPR_LEN;
+    //case '#': return OPR_LEN;
     default: return OPR_NOUNOPR;
   }
 }
@@ -1499,6 +1495,26 @@ static void exprstat (LexState *ls) {
   }
 }
 
+static void _body (LexState *ls, expdesc *e, int ismethod, int line) {
+  /* body ->  `(' parlist `)' block END */
+  FuncState new_fs;
+  BlockCnt bl;
+  new_fs.f = addprototype(ls);
+  new_fs.f->linedefined = line;
+  open_func(ls, &new_fs, &bl);
+  checknext(ls, '(');
+  if (ismethod) {
+    new_localvarliteral(ls, "self");  /* create 'self' parameter */
+    adjustlocalvars(ls, 1);
+  }
+  parlist(ls);
+  checknext(ls, ')');
+  statlist(ls);
+  new_fs.f->lastlinedefined = ls->linenumber;
+  check_match(ls, TK_END, TK_FUNCTION, line);
+  codeclosure(ls, e);
+  close_func(ls);
+}
 
 static void retstat (LexState *ls) {
   /* stat -> RETURN [explist] [';'] */
@@ -1508,6 +1524,7 @@ static void retstat (LexState *ls) {
   if (block_follow(ls, 1) || ls->t.token == ';')
     first = nret = 0;  /* return no values */
   else {
+	  checknext(ls, '(');
     nret = explist(ls, &e, 0);  /* optional return values */
     if (hasmultret(e.k)) {
       luaK_setmultret(fs, &e);
@@ -1527,6 +1544,7 @@ static void retstat (LexState *ls) {
         lua_assert(nret == fs->freereg - first);
       }
     }
+	  checknext(ls, ')');
   }
   luaK_ret(fs, first, nret);
   testnext(ls, ';');  /* skip optional semicolon */

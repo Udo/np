@@ -20,7 +20,7 @@ mt.bla = 123;
 
 print( mt[nil] )
 
-print('table size: '..#mt..' size: '..size(mt)..' asize: '..asize(mt))
+print('table size: '..size(mt)..' asize: '..asize(mt))
 
 for i,v in each(mt) {
 	print('each: '..i..' == '..tostring(v))
@@ -41,13 +41,18 @@ else
 new obj = (:)
 obj.v = 10
 obj.test = {(a b) 
-	print('object test: '..a[1]..' opt:'..a.opt..' sz:'..#a..' b:'..b)
+	print('object test: '..a[1]..' opt:'..a.opt..' b:'..b)
 }
 
 new mfunc = {()};
 
 
-new myfunc = {(a) return a, 2 }
+new myfunc = {(a) 
+	if(a != 0) {
+		return(a, 2) 
+	else
+		print('zero', 20) }
+	}
 
 obj.test((: 1 opt = 23) 1000+myfunc(3))
 
@@ -61,3 +66,6 @@ while i<=x {
 }
 
 print('end loop benchmark' i 'iterations');
+
+print(myfunc(1))
+print(myfunc(0))
