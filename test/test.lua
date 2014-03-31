@@ -69,3 +69,12 @@ print('end loop benchmark' i 'iterations');
 
 print(myfunc(1))
 print(myfunc(0))
+
+new switchFunc = {(a b) return(b a) }
+
+new a = 10
+new b = 20
+
+a, b = switchFunc(a b)
+
+print(a b)

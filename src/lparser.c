@@ -1525,7 +1525,7 @@ static void retstat (LexState *ls) {
     first = nret = 0;  /* return no values */
   else {
 	  checknext(ls, '(');
-    nret = explist(ls, &e, 0);  /* optional return values */
+    nret = explist(ls, &e, ')');  /* optional return values */
     if (hasmultret(e.k)) {
       luaK_setmultret(fs, &e);
       if (e.k == VCALL && nret == 1) {  /* tail call? */

@@ -40,6 +40,20 @@ myFuncNamed(: 'param1' 'param2' out = 'hello world!' )
 
 Remark: like the whole thing, this is a work in progress. I'm not happy with the idea that there are two ways to write and use a function. Ideally, I'd use the old np pattern of tacking on named parameters like this: `myFunc('param1' 'param2' | out = 'hello world' )`. However, that requires injecting the named parameter list into the function environment - something I have not figured out a simple solution for with the Lua codebase (if it was simple, it seems the Lua designers would have done it already instead of going with that ugly :/self hack).
 
+#### Multiple Return Values
+
+You can return multiple values from a function. If the receiving end of those values contains less variables, the extra values are discarded. On the receiving side, multiple variables must be separated by commata.
+
+```Lua
+-- declaring the function
+new switchFunc = {(a b) return(b a) }
+
+new a = 10
+new b = 20
+
+a, b = switchFunc(a b)
+```
+
 ### Event binding
 
 As I'm letting go of the idea that everything needs to be a full object, I'm embracing and extending Lua's metatable idea instead. One thing I definitely wanted to avoid is the cross-polution of (potentially serializable) data and meta methods that plagues JavaScript. The initial np did this by providing a different scope operator when accessing hashmap data. A similar but cleaner idea comes in the form of the `events` binding in np:L. 
