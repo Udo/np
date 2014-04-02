@@ -97,9 +97,9 @@ events(someTable, (:
 The `if` statement works a lot like you'd expect, with the little caveat that the `cond` (analogous to "else if() ...") and `else` statements do not get their own curly-braced block. Instead, the whole conditional is contained within one block:
 
 ```Lua
-if(...) {
+if a == 1 {
 	doThis()
-cond(...)
+else a == 2
 	doThat()
 else
   doTheOther()
