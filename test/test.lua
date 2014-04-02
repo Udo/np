@@ -22,10 +22,6 @@ print( mt[nil] )
 
 print('table size: '..size(mt)..' asize: '..asize(mt))
 
-for i,v in each(mt) {
-	print('each: '..i..' == '..tostring(v))
-}
-
 --[[with each(mt) i,v do
 	print('with-each: '..i..' == '..v)
 end]]--
@@ -56,7 +52,7 @@ new myfunc = {(a)
 
 obj.test((: 1 opt = 23) 1000+myfunc(3))
 
-x = 300000
+new x = 300000
 new i = 1        -- local to the chunk
 
 while i<=x {
@@ -90,3 +86,8 @@ print('just declared' a)
 }
 
 print('after exiting the block' a)
+
+for i,v in each(root) {
+	print('- ' i ' == ' tostring(v))
+}
+

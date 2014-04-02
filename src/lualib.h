@@ -35,7 +35,7 @@ LUAMOD_API int (luaopen_bit32) (lua_State *L);
 #define LUA_MATHLIBNAME	"math"
 LUAMOD_API int (luaopen_math) (lua_State *L);
 
-#define LUA_DBLIBNAME	"debug"
+#define LUA_DBLIBNAME	"reflect"
 LUAMOD_API int (luaopen_debug) (lua_State *L);
 
 #define LUA_LOADLIBNAME	"package"
