@@ -74,13 +74,34 @@ print('after exiting the block' a) -- 5 again
 
 ### Event binding
 
-As I'm letting go of the idea that everything needs to be a full object, I'm embracing and extending Lua's metatable idea instead. One thing I definitely wanted to avoid is the cross-polution of (potentially serializable) data and meta methods that plagues JavaScript. The initial np did this by providing a different scope operator when accessing hashmap data. A similar but cleaner idea comes in the form of the `events` binding in np:L. 
+As I'm letting go of the idea that everything needs to be a full object, I'm embracing and extending Lua's metatable idea instead - only by another name. Metamethods are now event handlers (and in some cases, event policies), because that's what they do. One thing I definitely wanted to avoid is the cross-polution of (potentially serializable) data and meta methods that plagues JavaScript. The initial np did this by providing a different scope operator when accessing hashmap data. A similar but cleaner idea comes in the form of the `events` binding in np:L. 
 
 Any object can have an events table that specifies its behavior in certain situations. Right now, the following events are supported, most of them are from mainline Lua:
 
 ````
-index, newindex, update, gc, weak, len, eq, add, sub, 
-mul, div, mod, pow, unm, lt, le, concat, call
+index    {(table key) ... }         is called when a non-existent entry is called
+index    table2                     the entry is looked up in table2
+newindex {(table key value) ...}    when a new entry is created
+update   {(table key value) ...}    when an existing entry is updated
+weak		 'values', 'keys' or both   specifies weak referencing in values and/or keys
+call     {(table parameter) ...}    allows the table name to be used like a function
+events   value                      when events(table) is called, this value is returned
+tostring {(table) ... }             overrides the default tostring(table) output
+concat   {(operand1 operand2) ...}  concatenation
+
+Arithmetics
+unm      {(operand1) ...}           unary minus
+add      {(operand1 operand2) ...}  addition
+sub      {(operand1 operand2) ...}  subtraction
+mul      {(operand1 operand2) ...}  multiplication
+div      {(operand1 operand2) ...}  division
+mod      {(operand1 operand2) ...}  modulo
+pow      {(operand1 operand2) ...}  exponentiation
+
+Logical Operations
+eq       {(operand1 operand2) ...}  equality
+lt       {(operand1 operand2) ...}  less than
+gt       {(operand1 operand2) ...}  greater than
 ````
 
 Consider this example where the `index` and `update` events are bound to a table:
