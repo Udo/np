@@ -83,7 +83,7 @@ index    {(table key) ... }         is called when a non-existent entry is calle
 index    table2                     the entry is looked up in table2
 newindex {(table key value) ...}    when a new entry is created
 update   {(table key value) ...}    when an existing entry is updated
-weak		 'values', 'keys' or both   specifies weak referencing in values and/or keys
+weak     'values', 'keys' or both   specifies weak referencing in values and/or keys
 call     {(table parameter) ...}    allows the table name to be used like a function
 events   value                      when events(table) is called, this value is returned
 tostring {(table) ... }             overrides the default tostring(table) output
