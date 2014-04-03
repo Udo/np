@@ -104,7 +104,7 @@ static int luaB_getmetatable (lua_State *L) {
     lua_pushnil(L);
     return 1;  /* no metatable */
   }
-  luaL_getmetafield(L, 1, "metatable");
+  luaL_getmetafield(L, 1, "events");
   return 1;  /* returns either __metatable field (if present) or metatable */
 }
 
@@ -114,7 +114,7 @@ static int luaB_setmetatable (lua_State *L) {
 	if(t != LUA_TNIL && t != LUA_TTABLE)
 		return luaB_getmetatable(L);
   luaL_checktype(L, 1, LUA_TTABLE);
-  if (luaL_getmetafield(L, 1, "metatable"))
+  if (luaL_getmetafield(L, 1, "events"))
     return luaL_error(L, "cannot change a protected metatable");
   lua_settop(L, 2);
   lua_setmetatable(L, 1);
