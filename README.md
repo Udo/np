@@ -122,6 +122,7 @@ There is an operator for string concatenation: `..`
 
 The following word can't be used for variable names, since they are reserved keywords within the language.
 
+```
 break     - breaks out of the current block
 else      - conditional statement that can follow if
 for       - for loops
@@ -141,7 +142,7 @@ false     - boolean false
 and       - boolean and
 not       - boolean not
 or        - boolean or
-
+```
 
 
 
