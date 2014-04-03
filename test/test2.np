@@ -7,3 +7,30 @@ else a == 2
 else
   print('else')
 }
+
+new cond = {(...) return(...) }
+
+print( ?(1 2 3 4 5) )
+
+root.ieach = {( tbl callback ) 
+  for i,v in each( tbl ) {
+	  callback( i v )
+	}
+}
+
+--[[
+ieach( root {( i v )
+	print( i v )
+})
+]]--
+
+fine = 1
+
+new someFunc = {() 
+  new root = (: print = print)
+  print('fine' root.fine) 
+}
+
+someFunc()
+
+print('outer' root.fine)
