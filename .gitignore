@@ -5,9 +5,7 @@ fcgi/
 .DS_Store
 *.o
 *.a
-src/lua
-src/luac
-src/np
-src/npc
+bin/np
+bin/npc
 build
 dist

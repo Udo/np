@@ -1,2 +1,4 @@
 make clean;
-make macosx;
+make $1;
+mv src/np bin/
+mv src/npc bin/
