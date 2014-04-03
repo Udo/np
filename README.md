@@ -98,15 +98,15 @@ The `if` statement works a lot like you'd expect, with the little caveat that th
 
 ```Lua
 if a == 1 {
-	doThis()
+  doThis()
 else a == 2
-	doThat()
+  doThat()
 else
   doTheOther()
 }
 ```
 
-### Operators
+## Operators
 
 Relational operators are: `<` (less than) `>` (greater than) `<=` (less-or-equal) `>=` (greater-or-equal) `==` (equal) `!=` (not equal)
 
@@ -118,7 +118,29 @@ Arithmetic operators are: `^` (to-the-power-of) `-` (unary sign) `*` (multiply) 
 
 There is an operator for string concatenation: `..`
 
+## Reserved Keywords
 
+The following word can't be used for variable names, since they are reserved keywords within the language.
+
+break     - breaks out of the current block
+else      - conditional statement that can follow if
+for       - for loops
+if        - conditional statement
+(in)      - (will be removed)
+repeat    - repeat ... until (condition) loop
+return    - return value from a function
+until     - repeat ... until(condition) loop
+while     - while (condition) { ... } loop
+
+new       - make new variable
+
+nil       - null value
+true      - boolean true
+false     - boolean false
+
+and       - boolean and
+not       - boolean not
+or        - boolean or
 
 
 
