@@ -309,7 +309,7 @@ static int db_sethook (lua_State *L) {
   }
   if (gethooktable(L) == 0) {  /* creating hook table? */
     lua_pushstring(L, "k");
-    lua_setfield(L, -2, "mode");  /** hooktable.__mode = "k" */
+    lua_setfield(L, -2, "weak");  /** hooktable.__mode = "k" */
     lua_pushvalue(L, -1);
     lua_setmetatable(L, -2);  /* setmetatable(hooktable) = hooktable */
   }

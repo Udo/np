@@ -79,7 +79,7 @@ As I'm letting go of the idea that everything needs to be a full object, I'm emb
 Any object can have an events table that specifies its behavior in certain situations. Right now, the following events are supported, most of them are from mainline Lua:
 
 ````
-index, newindex, update, gc, mode, len, eq, add, sub, 
+index, newindex, update, gc, weak, len, eq, add, sub, 
 mul, div, mod, pow, unm, lt, le, concat, call
 ````
 
