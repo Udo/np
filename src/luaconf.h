@@ -227,7 +227,7 @@
 @@ LUAI_MAXSHORTLEN is the maximum length for short strings, that is,
 ** strings that are internalized. (Cannot be smaller than reserved words
 ** or tags for metamethods, as these strings must be internalized;
-** #("function") = 8, #("__newindex") = 10.)
+** #("function") = 8, #("newindex") = 10.)
 */
 #define LUAI_MAXSHORTLEN        40
 

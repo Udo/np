@@ -162,7 +162,7 @@ static int traceback (lua_State *L) {
   if (msg)
     luaL_traceback(L, L, msg, 1);
   else if (!lua_isnoneornil(L, 1)) {  /* is there an error object? */
-    if (!luaL_callmeta(L, 1, "__tostring"))  /* try its 'tostring' metamethod */
+    if (!luaL_callmeta(L, 1, "tostring"))  /* try its 'tostring' metamethod */
       lua_pushliteral(L, "(no error message)");
   }
   return 1;

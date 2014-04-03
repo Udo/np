@@ -1003,7 +1003,7 @@ static void createmetatable (lua_State *L) {
   lua_setmetatable(L, -2);  /* set table as metatable for strings */
   lua_pop(L, 1);  /* pop dummy string */
   lua_pushvalue(L, -2);  /* get string library */
-  lua_setfield(L, -2, "__index");  /* metatable.__index = string */
+  lua_setfield(L, -2, "index");  /* metatable.__index = string */
   lua_pop(L, 1);  /* pop metatable */
 }
 

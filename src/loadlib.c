@@ -609,7 +609,7 @@ static int ll_seeall (lua_State *L) {
     lua_setmetatable(L, 1);
   }
   lua_pushglobaltable(L);
-  lua_setfield(L, -2, "__index");  /* mt.__index = _G */
+  lua_setfield(L, -2, "index");  /* mt.__index = _G */
   return 0;
 }
 
@@ -692,7 +692,7 @@ LUAMOD_API int luaopen_package (lua_State *L) {
   luaL_getsubtable(L, LUA_REGISTRYINDEX, CLIBS);
   lua_createtable(L, 0, 1);  /* metatable for CLIBS */
   lua_pushcfunction(L, gctm);
-  lua_setfield(L, -2, "__gc");  /* set finalizer for CLIBS table */
+  lua_setfield(L, -2, "gc");  /* set finalizer for CLIBS table */
   lua_setmetatable(L, -2);
   /* create `package' table */
   luaL_newlib(L, pk_funcs);
