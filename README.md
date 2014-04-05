@@ -40,6 +40,25 @@ myFuncNamed(: 'param1' 'param2' out = 'hello world!' )
 
 Remark: like the whole thing, this is a work in progress. I'm not happy with the idea that there are two ways to write and use a function. Ideally, I'd use the old np pattern of tacking on named parameters like this: `myFunc('param1' 'param2' | out = 'hello world' )`. However, that requires injecting the named parameter list into the function environment - something I have not figured out a simple solution for with the Lua codebase (if it was simple, it seems the Lua designers would have done it already instead of going with that ugly :/self hack).
 
+#### Return 
+
+Functions can use the `return` statement at any time (not just at the end of the function body). 
+
+```Lua
+new fooFunc = {(bar)
+	if bar > 0 {
+		return('greater than zero')
+	else bar < 0
+	  return('less than zero')
+	else
+	  return('equal to zero')
+	}
+	return(bar)
+}
+```
+
+The `return` statement is function-like, meaning its arguments have to be enclosed in parens.
+
 #### Multiple Return Values
 
 You can return multiple values from a function. If the receiving end of those values contains less variables, the extra values are discarded. On the receiving side, multiple variables must be separated by commata.
