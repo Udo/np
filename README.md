@@ -42,22 +42,22 @@ Remark: like the whole thing, this is a work in progress. I'm not happy with the
 
 #### Return 
 
-Functions can use the `return` statement at any time (not just at the end of the function body). 
+Functions can use the `return()` statement at any time (not just at the end of the function body). 
 
 ```Lua
 new fooFunc = {(bar)
-	if bar > 0 {
-		return('greater than zero')
-	else bar < 0
-	  return('less than zero')
-	else
-	  return('equal to zero')
-	}
-	return(bar)
+  if bar > 0 {
+    return('greater than zero')
+  else bar < 0
+    return('less than zero')
+  else true
+    return('equal to zero')
+  }
+  return(bar)
 }
 ```
 
-The `return` statement is function-like, meaning its arguments have to be enclosed in parens.
+The `return()` statement is function-like, meaning its arguments have to be enclosed in parens.
 
 #### Multiple Return Values
 

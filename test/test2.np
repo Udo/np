@@ -1,38 +1,14 @@
 new a = 1
 
-if a == 1 {
-  print(1)
-else a == 2
-  print(2)
-else
-  print('else')
+new fooFunc = {(bar)
+  if bar > 0 {
+    return('greater than zero')
+  else bar < 0
+    return('less than zero')
+  else true
+    return('equal to zero')
+  }
+  return(bar)
 }
 
-new cond = {(...) return(...) }
-
-print( ?(1 2 3 4 5) )
-
-root.ieach = {( tbl callback ) 
-  for i,v in each( tbl ) {
-	  callback( i v )
-	}
-}
-
-root.if = 1
-
---[[
-ieach( root {( i v )
-	print( i v )
-})
-]]--
-
-fine = 1
-
-new someFunc = {() 
-  new root = (: print = print)
-  print('fine' root.fine) 
-}
-
-someFunc()
-
-print('outer' root.fine)
+print(fooFunc(-10))
