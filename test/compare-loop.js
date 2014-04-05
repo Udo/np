@@ -1,11 +1,9 @@
-console.log("---------------- JavaScript test script --------------------");
 
 var tbl = { };
 var i = 0;
+var x = 0;
 
 while(i < 10000000) {
-  tbl.last = i
+  tbl.last = i*i*i
   i +=1
 }
-
-console.log("end JavaScript loop benchmark "+i+" iterations");

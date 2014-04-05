@@ -1,11 +1,10 @@
-print('----------------- NP test script ------------------');
 
 new tbl = (:)
 new i = 0        -- local to the chunk
+new x = 0
 
 while i < 10000000 {
-  tbl.lasti = i
+  tbl.last = i*i*i
   i = i + 1
 }
 
-print('end loop benchmark' i, 'iterations');

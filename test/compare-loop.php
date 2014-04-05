@@ -1,12 +1,10 @@
----------------- PHP test script --------------------
 <?php
 
 $i = 0;
 $tbl = array();
+$x = 0;
 while($i < 10000000)
 {
+  $tbl['last'] = $i*$i*$i;
   $i = $i +1;
-  $tbl['test'] = $i;
 }
-
-print('end PHP loop benchmark  '.$i.' iterations');
