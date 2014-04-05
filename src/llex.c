@@ -163,6 +163,7 @@ void luaX_setinput (lua_State *L, LexState *ls, ZIO *z, TString *source,
   ls->L = L;
   ls->current = firstchar;
   ls->lookahead.token = TK_EOS;  /* no look-ahead token */
+	ls->lastToken = ls->lookahead;
   ls->z = z;
   ls->fs = NULL;
   ls->linenumber = 1;
@@ -524,7 +525,7 @@ static int llex (LexState *ls, SemInfo *seminfo) {
           ts = luaX_newstring(ls, luaZ_buffer(ls->buff),
                                   luaZ_bufflen(ls->buff));
           seminfo->ts = ts;
-          if (isreserved(ts))  /* reserved word? */
+          if (ls->lastToken.token != '.' && isreserved(ts))  /* reserved word? */
             return ts->tsv.extra - 1 + FIRST_RESERVED;
           else {
             return TK_NAME;
@@ -543,7 +544,8 @@ static int llex (LexState *ls, SemInfo *seminfo) {
 
 void luaX_next (LexState *ls) {
   ls->lastline = ls->linenumber;
-  if (ls->lookahead.token != TK_EOS) {  /* is there a look-ahead token? */
+  ls->lastToken = ls->t;
+	if (ls->lookahead.token != TK_EOS) {  /* is there a look-ahead token? */
     ls->t = ls->lookahead;  /* use this one */
     ls->lookahead.token = TK_EOS;  /* and discharge it */
   }

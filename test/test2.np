@@ -18,6 +18,8 @@ root.ieach = {( tbl callback )
 	}
 }
 
+root.if = 1
+
 --[[
 ieach( root {( i v )
 	print( i v )
