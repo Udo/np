@@ -1,13 +1,10 @@
--- comment
-
 print('----------------- NP test script ------------------');
 
-new obj = (:)
-
+new tbl = (:)
 new i = 0        -- local to the chunk
 
 while i < 10000000 {
-  obj.lasti = i
+  tbl.lasti = i
   i = i + 1
 }
 
