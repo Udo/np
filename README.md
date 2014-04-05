@@ -149,9 +149,7 @@ else      - conditional statement that can follow if
 for       - for loops
 if        - conditional statement
 (in)      - (will be removed)
-repeat    - repeat ... until (condition) loop
 return    - return value from a function
-until     - repeat ... until(condition) loop
 while     - while (condition) { ... } loop
 
 new       - make new variable
