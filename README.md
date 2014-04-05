@@ -163,7 +163,7 @@ not       - boolean not
 or        - boolean or
 ```
 
-
+Keywords can, however, be used as table keys when using the dot notation, for example `myTable.if.foo` is valid.
 
 
 
