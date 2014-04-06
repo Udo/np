@@ -23,8 +23,9 @@
 static int luaB_print (lua_State *L) {
   int n = lua_gettop(L);  /* number of arguments */
   int i;
-  lua_getglobal(L, "tostring");
-  for (i=1; i<=n; i++) {
+  lua_getglobal(L, "to");
+	lua_getfield(L, -1, "string");
+	for (i=1; i<=n; i++) {
     const char *s;
     size_t l;
     lua_pushvalue(L, -1);  /* function to be called */
@@ -422,8 +423,14 @@ static int luaB_tostring (lua_State *L) {
   return 1;
 }
 
+static const luaL_Reg to_funcs[] = {
+  {"number", luaB_tonumber},
+  {"string", luaB_tostring},
+  {NULL, NULL}
+};
 
 static const luaL_Reg base_funcs[] = {
+ // {"tostring", luaB_tostring},
   {"assert", luaB_assert},
   {"collectgarbage", luaB_collectgarbage},
   {"dofile", luaB_dofile},
@@ -443,8 +450,6 @@ static const luaL_Reg base_funcs[] = {
   {"set", luaB_rawset},
   {"select", luaB_select},
   {"events", luaB_setmetatable},
-  {"tonumber", luaB_tonumber},
-  {"tostring", luaB_tostring},
   {"type", luaB_type},
   {"xpcall", luaB_xpcall},
   {NULL, NULL}
@@ -463,3 +468,7 @@ LUAMOD_API int luaopen_base (lua_State *L) {
   return 1;
 }
 
+LUAMOD_API int luaopen_to (lua_State *L) {
+  luaL_newlib(L, to_funcs);
+  return 1;
+}

@@ -14,6 +14,9 @@
 
 LUAMOD_API int (luaopen_base) (lua_State *L);
 
+#define LUA_TOLIBNAME	"to"
+LUAMOD_API int (luaopen_to) (lua_State *L);
+
 #define LUA_COLIBNAME	"coroutine"
 LUAMOD_API int (luaopen_coroutine) (lua_State *L);
 
