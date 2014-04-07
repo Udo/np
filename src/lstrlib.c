@@ -76,6 +76,32 @@ static int str_reverse (lua_State *L) {
 }
 
 
+static int str_split (lua_State *L) {
+  size_t l, i;
+	char* token;
+	char* string;
+	char* tofree;
+	const char* sep;
+
+	string = strdup(luaL_checklstring(L, 1, &l));
+	sep = luaL_checklstring(L, 2, &l);
+	lua_newtable(L);
+	i = 1;
+
+	if (string != NULL) {
+	  tofree = string;
+	  while ((token = strsep(&string, sep)) != NULL)
+	  {
+	    lua_pushstring(L, token);
+			lua_rawseti(L, -2, i++);
+	  }
+	  free(tofree);
+	}
+
+  return 1;
+}
+
+
 static int str_lower (lua_State *L) {
   size_t l;
   size_t i;
@@ -987,6 +1013,7 @@ static const luaL_Reg strlib[] = {
   {"gsub", str_gsub},
   {"size", str_len},
   {"lower", str_lower},
+  {"split", str_split},
   {"match", str_match},
   {"rep", str_rep},
   {"reverse", str_reverse},
