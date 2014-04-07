@@ -1,6 +1,9 @@
+new spl = ('q,w,e,r'):split(',')
+events(spl, (: index = table) )
 
-new spl = string.split('a,b,c,d,e', ',')
-
-for i,v in ipairs(spl) {
+for i,v in each(spl) {
 	print(i,v)
 }
+
+new jnt = spl:join('-')
+print(jnt)
