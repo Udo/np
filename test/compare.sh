@@ -1,6 +1,8 @@
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo "Ruby Interpreter:"
 time ruby compare-loop.rb
+echo "Ruby times():"
+time ruby compare-loop.2.rb
 echo "PHP Interpreter:"
 time php -f compare-loop.php
 echo "JavaScript JIT:"
