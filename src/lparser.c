@@ -24,6 +24,7 @@
 #include "lstate.h"
 #include "lstring.h"
 #include "ltable.h"
+#include <stdio.h>
 
 
 
@@ -55,7 +56,7 @@ typedef struct BlockCnt {
 */
 static void statement (LexState *ls);
 static void expr (LexState *ls, expdesc *v);
-
+static void retstat (LexState *ls, int single);
 
 static void anchor_token (LexState *ls) {
   /* last token from outer function must be EOS */
@@ -887,7 +888,7 @@ static void primaryexp (LexState *ls, expdesc *v) {
       return;
     }
     default: {
-      luaX_syntaxerror(ls, "unexpected symbol");
+			luaX_syntaxerror(ls, "unexpected symbol");
     }
   }
 }
@@ -903,12 +904,12 @@ static void suffixedexp (LexState *ls, expdesc *v) {
     switch (ls->t.token) {
       case '.': {  /* fieldsel */
    	  	expdesc key;
-		luaK_exp2anyregup(fs, v);
-		luaX_next(ls);  /* skip the dot or colon */
-		checkname(ls, &key);
-		luaK_indexed(fs, v, &key);
+				luaK_exp2anyregup(fs, v);
+				luaX_next(ls);  /* skip the dot or colon */
+				checkname(ls, &key);
+				luaK_indexed(fs, v, &key);
         // to do: put self value away for later
-		break;
+				break;
       }
       case '[': {  /* `[' exp1 `]' */
         expdesc key;
@@ -1611,7 +1612,7 @@ static void exprstat (LexState *ls) {
   }
 }
 
-static void retstat (LexState *ls) {
+static void retstat (LexState *ls, int single) {
   /* stat -> RETURN [explist] [';'] */
   FuncState *fs = ls->fs;
   expdesc e;
@@ -1619,9 +1620,13 @@ static void retstat (LexState *ls) {
   if (block_follow(ls, 1) || ls->t.token == ';')
     first = nret = 0;  /* return no values */
   else {
-	  checknext(ls, '(');
-    nret = explist(ls, &e, ')');  /* optional return values */
-    if (hasmultret(e.k)) {
+	  if(single == 0) {
+			checknext(ls, '(');
+	    nret = explist(ls, &e, ')');  /* optional return values */
+    }
+		else
+	    nret = explist(ls, &e, 0);  /* optional return values */
+  	if (hasmultret(e.k)) {
       luaK_setmultret(fs, &e);
       if (e.k == VCALL && nret == 1) {  /* tail call? */
         SET_OPCODE(getcode(fs,&e), OP_TAILCALL);
@@ -1639,7 +1644,7 @@ static void retstat (LexState *ls) {
         lua_assert(nret == fs->freereg - first);
       }
     }
-	  checknext(ls, ')');
+	  if(single == 0) checknext(ls, ')');
   }
   luaK_ret(fs, first, nret);
   testnext(ls, ';');  /* skip optional semicolon */
@@ -1693,9 +1698,14 @@ static void statement (LexState *ls) {
       labelstat(ls, str_checkname(ls), line);
       break;
     }
+    case '=': {  /* stat -> retstat */
+      luaX_next(ls);  /* skip RETURN */
+      retstat(ls, 1);
+      break;
+    }
     case TK_RETURN: {  /* stat -> retstat */
       luaX_next(ls);  /* skip RETURN */
-      retstat(ls);
+      retstat(ls, 0);
       break;
     }
     case TK_BREAK:   /* stat -> breakstat */

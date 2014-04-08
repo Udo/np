@@ -71,8 +71,8 @@ static int luaB_getmetatable (lua_State *L) {
 
 
 static int luaB_setmetatable (lua_State *L) {
-  int t = lua_type(L, 2);
-	if(t != LUA_TNIL && t != LUA_TTABLE)
+  int n = lua_gettop(L);
+	if(n == 1)
 		return luaB_getmetatable(L);
   luaL_checktype(L, 1, LUA_TTABLE);
   if (luaL_getmetafield(L, 1, "events"))
@@ -354,17 +354,6 @@ static int pcallcont (lua_State *L) {
   return finishpcall(L, (status == LUA_YIELD));
 }
 
-
-static int luaB_pcall (lua_State *L) {
-  int status;
-  luaL_checkany(L, 1);
-  lua_pushnil(L);
-  lua_insert(L, 1);  /* create space for status result */
-  status = lua_pcallk(L, lua_gettop(L) - 2, LUA_MULTRET, 0, 0, pcallcont);
-  return finishpcall(L, (status == LUA_OK));
-}
-
-
 static int luaB_xpcall (lua_State *L) {
   int status;
   int n = lua_gettop(L);
@@ -376,7 +365,17 @@ static int luaB_xpcall (lua_State *L) {
   return finishpcall(L, (status == LUA_OK));
 }
 
-
+static int luaB_pcall (lua_State *L) {
+  int n = lua_gettop(L);
+	if(n > 1)
+		return luaB_xpcall(L);
+  int status;
+  luaL_checkany(L, 1);
+  lua_pushnil(L);
+  lua_insert(L, 1);  /* create space for status result */
+  status = lua_pcallk(L, lua_gettop(L) - 2, LUA_MULTRET, 0, 0, pcallcont);
+  return finishpcall(L, (status == LUA_OK));
+}
 
 static const luaL_Reg base_funcs[] = {
  // {"tostring", luaB_tostring},
@@ -388,11 +387,11 @@ static const luaL_Reg base_funcs[] = {
   //{"getmetatable", luaB_getmetatable},
   {"list", luaB_ipairs},
   //{"loadfile", luaB_loadfile},
-  {"load", luaB_load},
+  {"compile", luaB_load},
   {"size", luaB_rawlen},
   {"asize", luaB_rawalen},
   {"next", luaB_next},
-  {"pcall", luaB_pcall},
+  {"try", luaB_pcall},
   {"print", luaB_print},
   {"equal", luaB_rawequal},
   {"get", luaB_rawget},
@@ -400,7 +399,7 @@ static const luaL_Reg base_funcs[] = {
   {"select", luaB_select},
   {"events", luaB_setmetatable},
   {"type", luaB_type},
-  {"xpcall", luaB_xpcall},
+  /*{"xpcall", luaB_xpcall},*/
   {NULL, NULL}
 };
 

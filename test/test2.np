@@ -15,3 +15,10 @@ for i,v in each(spl) {
 
 new jnt = spl:join('-')
 print(jnt)
+
+new foo = {()
+	new z = 1
+	= 2,1,2,z
+}
+
+print(foo())
