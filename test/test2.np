@@ -1,5 +1,7 @@
+table.index = table
+
 new spl = ('q,w,e,r'):split(',')
-events(spl, (: index = table) )
+events(spl, table)
 
 for i,v in each(spl) {
 	print(i,v)

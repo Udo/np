@@ -278,6 +278,7 @@ LUAMOD_API int luaopen_table (lua_State *L) {
   lua_getfield(L, -1, "unpack");
   lua_setglobal(L, "unpack");
 #endif
+	// todo: add "index" pointer to this table
   return 1;
 }
 
