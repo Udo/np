@@ -298,6 +298,7 @@ static int luaB_load (lua_State *L) {
 /* }====================================================== */
 
 
+/*
 static int dofilecont (lua_State *L) {
   return lua_gettop(L) - 1;
 }
@@ -310,7 +311,7 @@ static int luaB_dofile (lua_State *L) {
     return lua_error(L);
   lua_callk(L, 0, LUA_MULTRET, 0, dofilecont);
   return dofilecont(L);
-}
+}*/
 
 
 static int luaB_assert (lua_State *L) {
@@ -381,7 +382,7 @@ static const luaL_Reg base_funcs[] = {
  // {"tostring", luaB_tostring},
   {"assert", luaB_assert},
   {"collectgarbage", luaB_collectgarbage},
-  {"dofile", luaB_dofile},
+  //{"dofile", luaB_dofile},
   {"each", luaB_pairs},
   {"error", luaB_error},
   //{"getmetatable", luaB_getmetatable},
