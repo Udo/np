@@ -9,3 +9,4 @@ bin/np
 bin/npc
 build
 dist
+tmp/*

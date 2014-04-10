@@ -1,5 +1,8 @@
 <?php
 
+if(!isset($_REQUEST['code'])) $_REQUEST['code'] = '';
+if(!isset($out)) $out = '[no output]';
+
 function exec_timeout($cmd, $timeout) {
   // File descriptors passed to the process.
   $descriptors = array(
@@ -55,7 +58,9 @@ function exec_timeout($cmd, $timeout) {
   $errors = stream_get_contents($pipes[2]);
 
   if (!empty($errors)) {
-    throw new \Exception($errors);
+    $delim = '.np:';
+    $dlPos = strpos($errors, $delim);
+    $buffer .= substr($errors, $dlPos+4);
   }
 
   // Kill the process in case the timeout expired and it's still running.
@@ -76,39 +81,60 @@ function exec_timeout($cmd, $timeout) {
 
 <form method="post" action="cgidemo.php">
 
-  <textarea name="code" id="code" placeholder="Your np code here"><?= htmlspecialchars($_POST['code']) ?></textarea>
+  <textarea name="code" id="code" placeholder="Your np code here"><?= htmlspecialchars($_REQUEST['code']) ?></textarea>
   <input type="submit" value="Run"/>
 
 </form>
 
 <?php
 
-if($_POST['code'])
+if($_REQUEST['code'])
 {
-  $tmpFile = '../tmp/'.md5(time().mt_rand(1, 1000000)).'np';
-  $npf = 'root.require = false
+  $tmpFile = '../tmp/'.md5(time().mt_rand(1, 1000000)).'.np';
+  file_put_contents($tmpFile, 'root.require = false
 root.io = false
 root.os = false
 root.reflect = false
 
-'.chr(10).$_POST['code'];
-  //exec_timeout(, )
+'.chr(10).$_REQUEST['code']);
+  $out = exec_timeout('../bin/np '.$tmpFile, 0.2);
+  unlink($tmpFile);
 }
 
 
 ?>
 
+<h3>Output:</h3>
+<pre id="out"><?= htmlspecialchars($out) ?></pre>
+
 <style>
+  * {
+    font-family: Tahoma, Helvetica;
+  }
 
   textarea {
+    border: 1px solid #369;
     width: 99%;
     padding: 4px;
     font-family: Consolas, monospace;
-    background: #9af;
+    background: #68c;
     color: white;
     font-size: 12px;
     line-height: 130%;
     min-height: 200px;
+  }
+  
+  input[type=submit] {
+    border: 1px solid #369;
+    padding: 4px;
+    color: black;
+    background: #6c8;
+    min-width: 80px;
+    cursor: pointer;
+  }
+
+  input[type=submit]:hover {
+    background: #8ea;
   }
 
 </style>
