@@ -97,7 +97,7 @@ root.os = false
 root.reflect = false
 
 '.chr(10).$_REQUEST['code']);
-  $out = exec_timeout('../bin/np '.$tmpFile, 0.2);
+  $out = exec_timeout('timeout --preserve-status 0.01s ../bin/np '.$tmpFile, 1);
   unlink($tmpFile);
 }
 
