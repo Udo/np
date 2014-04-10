@@ -82,7 +82,7 @@ function exec_timeout($cmd, $timeout) {
 <form method="post" action="cgidemo.php">
 
   <textarea name="code" id="code" placeholder="Your np code here"><?= htmlspecialchars($_REQUEST['code']) ?></textarea>
-  <input type="submit" value="Run"/>
+  <input type="submit" value="⇲ Run"/>
 
 <h3>Output:</h3>
 </form>
