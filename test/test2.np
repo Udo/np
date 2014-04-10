@@ -21,4 +21,4 @@ new foo = {()
 	= 2,1,2,z
 }
 
-print(foo())
+print(table)

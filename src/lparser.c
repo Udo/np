@@ -990,6 +990,7 @@ static void simpleexp (LexState *ls, expdesc *v) {
 static UnOpr getunopr (int op) {
   switch (op) {
     case TK_NOT: return OPR_NOT;
+    case '!': return OPR_NOT;
     case '-': return OPR_MINUS;
     //case '#': return OPR_LEN;
     default: return OPR_NOUNOPR;
@@ -1264,8 +1265,10 @@ static int assignment (LexState *ls, struct LHS_assign *lh, int nvars) {
     int nexps;
     switch(ls->t.token) {
       /* hook for compound_assignment */
-      case '+': case '-': case '*': case '/': case TK_CONCAT:
-        return compound_assignment(ls,lh,nvars);
+			case '+': case '-': case '*': case '/': case TK_CONCAT:
+			{
+				return compound_assignment(ls,lh,nvars);
+			}
     }
     checknext(ls, '=');
     nexps = explist(ls, &e, 0);

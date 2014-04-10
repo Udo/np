@@ -305,13 +305,16 @@ void luaV_concat (lua_State *L, int total) {
   do {
     StkId top = L->top;
     int n = 2;  /* number of elements handled in this pass (at least 2) */
-    if (!(ttisstring(top-2) || ttisnumber(top-2)) || !tostring(L, top-1)) {
+		// this effectively deactivates the concat metatable event, but I prefer the behavior we enable by doing it
+		/*
+		if (!(ttisstring(top-2) || ttisnumber(top-2) || ttisnil(top-2))) {
       if (!call_binTM(L, top-2, top-1, top-2, TM_CONCAT))
         luaG_concaterror(L, top-2, top-1);
     }
-    else if (tsvalue(top-1)->len == 0)  /* second operand is empty? */
+    else */
+		if (tsvalue(top-1)->len == 0)  /* second operand is empty? */
       (void)tostring(L, top - 2);  /* result is first operand */
-    else if (ttisstring(top-2) && tsvalue(top-2)->len == 0) {
+    else if (ttisnil(top-2) || (ttisstring(top-2) && tsvalue(top-2)->len == 0)) {
       setobjs2s(L, top - 2, top - 1);  /* result is second op. */
     }
     else {

@@ -509,6 +509,7 @@ static int llex (LexState *ls, SemInfo *seminfo) {
             return TK_DOTS;   /* '...' */
           else return TK_CONCAT;   /* '..' */
         }
+				else if (ls->current == '=') return TK_CONCAT;
         else if (!lisdigit(ls->current)) return '.';
         /* else go through */
       }
