@@ -1,5 +1,7 @@
 <?php
 
+header('content-type: text/html; charset=utf8');
+
 if(!isset($_REQUEST['code'])) $_REQUEST['code'] = '';
 if(!isset($out)) $out = '[no output]';
 
