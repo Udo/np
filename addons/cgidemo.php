@@ -84,6 +84,7 @@ function exec_timeout($cmd, $timeout) {
   <textarea name="code" id="code" placeholder="Your np code here"><?= htmlspecialchars($_REQUEST['code']) ?></textarea>
   <input type="submit" value="Run"/>
 
+<h3>Output:</h3>
 </form>
 
 <?php
@@ -104,10 +105,20 @@ root.reflect = false
 
 ?>
 
-<h3>Output:</h3>
 <pre id="out"><?= htmlspecialchars($out) ?></pre>
 
 <style>
+  form {
+	  position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+  }
+
+  #out {
+  	margin-top: 130px;
+  }
+
   * {
     font-family: Tahoma, Helvetica;
   }
