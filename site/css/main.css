@@ -1,0 +1,230 @@
+<?
+  $mainColor2 = '#6f6';
+  $mainColor = '#0e0';
+  $textColor1 = '#333';
+  $textColor2 = '#ccc';
+  $linkColor = '#22d';
+  $footerColor = '#333';
+?>
+
+/* ==========================================================================
+   HTML5 Boilerplate styles - h5bp.com (generated via initializr.com)
+   ========================================================================== */
+body { 
+  color: <?= $textColor1 ?>;
+  font-family: Trebuchet MS, Helvetica, Arial;
+  line-height: 150%;
+  text-align: center; margin: 0 0 0 0; vertical-align: middle; 
+} 
+
+.nameda{display: block; position: relative; top: -50px; visibility: hidden;}
+
+.col-3 {
+			-webkit-column-count: 3;
+			-webkit-column-gap: 10px;
+
+			-moz-column-count: 3;
+			-moz-column-gap: 10px;
+
+			column-count: 3;
+			column-gap: 10px;
+}
+
+.dea {
+  color: #77f;
+}
+
+.dea:hover {
+  color: <?= $linkColor ?>;
+}
+
+header, .main-container {
+  width: 960px;
+  margin: 0 auto;
+  text-align: left;
+  padding: 0;
+}
+
+.functionhead {
+  font-size: 130%;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  margin-top: 24px;
+  margin-bottom: 12px;
+  background: #eee;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  color: gray;
+}
+
+.fname {
+  color: #808;
+}
+
+.farg {
+  color: #448;
+  font-style: italic;
+}
+
+.minihdr {
+  color: gray;
+  font-size: 90%;
+  font-weight: bold;
+}
+
+.seealso {
+  margin-top: 12px;
+
+}
+
+h3 {
+  color: #666;
+}
+
+h2 {
+  color: #444;
+}
+
+code {
+  color: green;
+}
+
+.main-container {
+  margin-top: 58px;
+  margin-bottom: 74px;
+  min-height: 600px;
+}
+
+a {
+  color: <?= $linkColor ?>;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+a.loadsrc {
+  display: inline-block;
+  font-size: 60%;
+  padding: 4px;
+  background: #ffc;
+  cursor: pointer;
+  float: right;
+  border: 1px solid #ccc;
+}
+
+pre {
+  width: 92%;
+  border: 1px solid #ccc;
+  padding: 4px;
+  font-size: 13px !important;
+}
+
+.sh_np {
+  background: #ffd !important;
+}
+
+.op {
+  background: #efe;
+  border: 1px solid #ccc;
+  padding: 4px;
+}
+
+.megabutton {
+  display: inline-block;
+  padding: 12px;
+  width: 200px;
+  background: #0a3;
+  color: white;
+  border-radius: 8px;
+  border: 3px solid #3f6;
+}
+
+#side
+{
+  position: fixed;
+  width: 400px;
+  left: 50%;
+  top: 38px;
+  margin-left: 70px;
+  padding: 6px;
+  background: #eee;
+  height: 90%;
+}
+
+.header-container {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  background: url('/img/random_grey_variations.png') #666;
+  border-bottom: 1px solid #bbb;
+  box-shadow: 0 0 16px #888;
+}
+
+.footer-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: url('/img/random_grey_variations.png') <?= $footerColor ?>;
+  border-top: 1px solid #bbb;
+  box-shadow: 0 0 16px #888;
+  padding: 0;
+  font-size: 12px;
+}
+
+footer {
+  text-align: center;
+  padding: 2;
+  padding-left: 8px;
+  padding-right: 8px;
+  margin: 0;
+  color: <?= $textColor2 ?>;
+  font-weight: normal;
+}
+ 
+footer a {
+  color: <?= $textColor2 ?>;
+  font-weight: bold;
+}
+
+.tutcol {
+  width: 540px;
+}
+
+h1.title {
+  float: left;
+  font-size: 16px;
+  margin: 0;
+  padding: 4px;
+}
+
+h1 a, nav a {
+  color: white;
+}
+
+nav a {
+  display: inline-block;
+  padding: 4px;
+  padding-left: 12px;
+  font-size: 90%;
+  color: <?= $textColor2 ?>;
+}
+
+nav {
+  float: right;
+  padding: 0;
+  margin: 0;
+}
+
+nav > ul {
+  padding: 0;
+  margin: 0;
+  text-align: right;
+}
+
+nav > ul > li {
+  margin-right: -4px;
+  display: inline-block;
+}
