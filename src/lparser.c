@@ -1495,7 +1495,7 @@ static void forstat (LexState *ls, int line) {
 }
 
 
-static void test_then_block (LexState *ls, int *escapelist, int requireDo) {
+static void test_then_block (LexState *ls, int *escapelist, int *shortIf, int requireDo) {
   /* test_then_block -> [IF | ELSEIF] cond THEN block */
   BlockCnt bl;
   FuncState *fs = ls->fs;
@@ -1504,7 +1504,10 @@ static void test_then_block (LexState *ls, int *escapelist, int requireDo) {
   luaX_next(ls);  /* skip IF or ELSEIF */
   expr(ls, &v);  /* read condition */
 	if(requireDo == 1)
-  	checknext(ls, TK_DO);
+	{
+		int doFound = testnext(ls, TK_DO);
+		if(doFound == 0) (*shortIf) = 1;
+	}
   if (ls->t.token == TK_GOTO || ls->t.token == TK_BREAK) {
     luaK_goiffalse(ls->fs, &v);  /* will jump to label if condition is true */
     enterblock(fs, &bl, 0);  /* must enter block before 'goto' */
@@ -1522,7 +1525,10 @@ static void test_then_block (LexState *ls, int *escapelist, int requireDo) {
     enterblock(fs, &bl, 0);
     jf = v.f;
   }
-  statlist(ls);  /* `then' part */
+	if((*shortIf) == 1)
+		statement(ls);
+	else
+  	statlist(ls);  /* `then' part */
   leaveblock(fs);
   if (ls->t.token == TK_ELSE ||
       ls->t.token == TK_ELSEIF)  /* followed by 'else'/'elseif'? */
@@ -1535,12 +1541,14 @@ static void ifstat (LexState *ls, int line) {
   /* ifstat -> IF cond THEN block {ELSEIF cond THEN block} [ELSE block] END */
   FuncState *fs = ls->fs;
   int escapelist = NO_JUMP;  /* exit list for finished parts */
-  test_then_block(ls, &escapelist, 1);  /* IF cond THEN block */
+	int shortIfStatement = 0;
+  test_then_block(ls, &escapelist, &shortIfStatement, 1);  /* IF cond THEN block */
   while (ls->t.token == TK_ELSEIF)
-    test_then_block(ls, &escapelist, 0);  /* ELSEIF cond THEN block */
+    test_then_block(ls, &escapelist, &shortIfStatement, 0);  /* ELSEIF cond THEN block */
   if (testnext(ls, TK_ELSE))
     block(ls);  /* `else' part */
-  check_match(ls, TK_END, TK_IF, line);
+	if(shortIfStatement == 0)
+  	check_match(ls, TK_END, TK_IF, line);
   luaK_patchtohere(fs, escapelist);  /* patch escape list to 'if' end */
 }
 
