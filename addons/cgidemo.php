@@ -109,14 +109,16 @@ root.reflect = false
 
 <style>
   form {
-	  position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	background: #eee;
   }
 
   #out {
-  	margin-top: 130px;
+  	margin-top: 290px;
+	width: 100%;
   }
 
   * {
