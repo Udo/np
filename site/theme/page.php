@@ -26,7 +26,7 @@
                     <ul>
                         <li><a href="/">About</a></li>
                         <!--<li><a href="/tutorial">Tutorial</a></li>-->
-                        <li><a href="/tutorial2">Tutorial</a></li>
+                        <li><a href="/tutorial">Tutorial</a></li>
                         <!--<li><a href="/docs">Docs</a></li>-->
                         <li><a href="https://github.com/Udo/np">Get</a></li>
                         <li><a href="https://github.com/Udo/np/issues">Bugs</a></li>
