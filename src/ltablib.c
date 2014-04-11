@@ -263,8 +263,8 @@ static const luaL_Reg tab_funcs[] = {
   {"maxn", maxn},
 #endif
   {"insert", tinsert},
-  {"pack", pack},
-  {"unpack", unpack},
+  {"condense", pack},
+  {"expand", unpack},
   {"remove", tremove},
   {"sort", sort},
   {NULL, NULL}
@@ -275,8 +275,8 @@ LUAMOD_API int luaopen_table (lua_State *L) {
   luaL_newlib(L, tab_funcs);
 #if defined(LUA_COMPAT_UNPACK)
   /* _G.unpack = table.unpack */
-  lua_getfield(L, -1, "unpack");
-  lua_setglobal(L, "unpack");
+  lua_getfield(L, -1, "expand");
+  lua_setglobal(L, "expand");
 #endif
 	// todo: add "index" pointer to this table
   return 1;
