@@ -646,7 +646,7 @@ LUA_API void lua_rawget (lua_State *L, int idx) {
   StkId t;
   lua_lock(L);
   t = index2addr(L, idx);
-  api_check(L, ttistable(t), "table expected");
+  api_check(L, ttistable(t), "list expected");
   setobj2s(L, L->top - 1, luaH_get(hvalue(t), L->top - 1));
   lua_unlock(L);
 }
@@ -656,7 +656,7 @@ LUA_API void lua_rawgeti (lua_State *L, int idx, int n) {
   StkId t;
   lua_lock(L);
   t = index2addr(L, idx);
-  api_check(L, ttistable(t), "table expected");
+  api_check(L, ttistable(t), "list expected");
   setobj2s(L, L->top, luaH_getint(hvalue(t), n));
   api_incr_top(L);
   lua_unlock(L);
@@ -668,7 +668,7 @@ LUA_API void lua_rawgetp (lua_State *L, int idx, const void *p) {
   TValue k;
   lua_lock(L);
   t = index2addr(L, idx);
-  api_check(L, ttistable(t), "table expected");
+  api_check(L, ttistable(t), "list expected");
   setpvalue(&k, cast(void *, p));
   setobj2s(L, L->top, luaH_get(hvalue(t), &k));
   api_incr_top(L);
@@ -778,7 +778,7 @@ LUA_API void lua_rawset (lua_State *L, int idx) {
   lua_lock(L);
   api_checknelems(L, 2);
   t = index2addr(L, idx);
-  api_check(L, ttistable(t), "table expected");
+  api_check(L, ttistable(t), "list expected");
   setobj2t(L, luaH_set(L, hvalue(t), L->top-2), L->top-1);
   invalidateTMcache(hvalue(t));
   luaC_barrierback(L, gcvalue(t), L->top-1);
@@ -792,7 +792,7 @@ LUA_API void lua_rawseti (lua_State *L, int idx, int n) {
   lua_lock(L);
   api_checknelems(L, 1);
   t = index2addr(L, idx);
-  api_check(L, ttistable(t), "table expected");
+  api_check(L, ttistable(t), "list expected");
   luaH_setint(L, hvalue(t), n, L->top - 1);
   luaC_barrierback(L, gcvalue(t), L->top-1);
   L->top--;
@@ -806,7 +806,7 @@ LUA_API void lua_rawsetp (lua_State *L, int idx, const void *p) {
   lua_lock(L);
   api_checknelems(L, 1);
   t = index2addr(L, idx);
-  api_check(L, ttistable(t), "table expected");
+  api_check(L, ttistable(t), "list expected");
   setpvalue(&k, cast(void *, p));
   setobj2t(L, luaH_set(L, hvalue(t), &k), L->top - 1);
   luaC_barrierback(L, gcvalue(t), L->top - 1);
@@ -824,7 +824,7 @@ LUA_API int lua_setmetatable (lua_State *L, int objindex) {
   if (ttisnil(L->top - 1))
     mt = NULL;
   else {
-    api_check(L, ttistable(L->top - 1), "table expected");
+    api_check(L, ttistable(L->top - 1), "list expected");
     mt = hvalue(L->top - 1);
   }
   switch (ttypenv(obj)) {
@@ -864,7 +864,7 @@ LUA_API void lua_setuservalue (lua_State *L, int idx) {
   if (ttisnil(L->top - 1))
     uvalue(o)->env = NULL;
   else {
-    api_check(L, ttistable(L->top - 1), "table expected");
+    api_check(L, ttistable(L->top - 1), "list expected");
     uvalue(o)->env = hvalue(L->top - 1);
     luaC_objbarrier(L, gcvalue(o), hvalue(L->top - 1));
   }
@@ -1122,7 +1122,7 @@ LUA_API int lua_next (lua_State *L, int idx) {
   int more;
   lua_lock(L);
   t = index2addr(L, idx);
-  api_check(L, ttistable(t), "table expected");
+  api_check(L, ttistable(t), "list expected");
   more = luaH_next(L, hvalue(t), L->top - 1);
   if (more) {
     api_incr_top(L);

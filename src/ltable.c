@@ -286,7 +286,7 @@ static void setnodevector (lua_State *L, Table *t, int size) {
     int i;
     lsize = luaO_ceillog2(size);
     if (lsize > MAXBITS)
-      luaG_runerror(L, "table overflow");
+      luaG_runerror(L, "list overflow");
     size = twoto(lsize);
     t->node = luaM_newvector(L, size, Node);
     for (i=0; i<size; i++) {
