@@ -250,13 +250,13 @@
 @@ LUA_COMPAT_UNPACK controls the presence of global 'unpack'.
 ** You can replace it with 'table.unpack'.
 */
-#define LUA_COMPAT_UNPACK
+//#define LUA_COMPAT_UNPACK
 
 /*
 @@ LUA_COMPAT_LOADERS controls the presence of table 'package.loaders'.
 ** You can replace it with 'package.searchers'.
 */
-#define LUA_COMPAT_LOADERS
+//#define LUA_COMPAT_LOADERS
 
 /*
 @@ macro 'lua_cpcall' emulates deprecated function lua_cpcall.
@@ -278,12 +278,12 @@
 @@ LUA_COMPAT_LOADSTRING defines the function 'loadstring' in the base
 ** library. You can rewrite 'loadstring(s)' as 'load(s)'.
 */
-#define LUA_COMPAT_LOADSTRING
+//#define LUA_COMPAT_LOADSTRING
 
 /*
 @@ LUA_COMPAT_MAXN defines the function 'maxn' in the table library.
 */
-#define LUA_COMPAT_MAXN
+//#define LUA_COMPAT_MAXN
 
 /*
 @@ The following macros supply trivial compatibility for some
@@ -301,7 +301,7 @@
 @@ LUA_COMPAT_MODULE controls compatibility with previous
 ** module functions 'module' (Lua) and 'luaL_register' (C).
 */
-#define LUA_COMPAT_MODULE
+//#define LUA_COMPAT_MODULE
 
 #endif				/* } */
 
