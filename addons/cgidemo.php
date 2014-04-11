@@ -99,11 +99,10 @@ root.io = false
 root.os = false
 root.reflect = false
 
-'.chr(10).$_REQUEST['code']);
+'.file_get_contents('cgidemo-examplestate.np').chr(10).$_REQUEST['code']);
   $out = exec_timeout('timeout --preserve-status 0.01s ../bin/np '.$tmpFile, 1);
   unlink($tmpFile);
 }
-
 
 ?>
 
