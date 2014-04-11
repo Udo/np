@@ -1,0 +1,8 @@
+new fizzBuzzer = {(i)
+  new fbResult 
+  if (i % 3 == 0) fbResult = 'Fizz' 
+  if (i % 5 == 0) fbResult .= 'Buzz' 
+  if (!fbResult) fbResult = i 
+  = fbResult, i
+}
+
