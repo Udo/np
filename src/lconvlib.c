@@ -64,10 +64,17 @@ static int luaCV_tonumber (lua_State *L) {
   return 1;
 }
 
+static int luaCV_type (lua_State *L) {
+  luaL_checkany(L, 1);
+  lua_pushstring(L, luaL_typename(L, 1));
+  return 1;
+}
+
 
 static const luaL_Reg conv_funcs[] = {
   {"number", luaCV_tonumber},
   {"string", luaCV_tostring},
+  {"type", luaCV_type},
   {NULL, NULL}
 };
 

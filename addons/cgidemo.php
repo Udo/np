@@ -94,12 +94,11 @@ function exec_timeout($cmd, $timeout) {
 if($_REQUEST['code'])
 {
   $tmpFile = '../tmp/'.md5(time().mt_rand(1, 1000000)).'.np';
-  file_put_contents($tmpFile, 'root.require = nil
-root.package = nil
+  file_put_contents($tmpFile, '
+root.sys = nil
+root.lib = nil
 root.io = nil
 root.os = nil
-root.reflect = nil
-root.compile = nil
 
 '.file_get_contents('cgidemo-examplestate.np').chr(10).$_REQUEST['code']);
   $out = exec_timeout('timeout --preserve-status 0.01s ../bin/np '.$tmpFile, 1);

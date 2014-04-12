@@ -14,7 +14,7 @@
 
 LUAMOD_API int (luaopen_base) (lua_State *L);
 
-#define LUA_CONVLIBNAME	"conv"
+#define LUA_CONVLIBNAME	"to"
 LUAMOD_API int (luaopen_conv) (lua_State *L);
 
 #define LUA_COLIBNAME	"coroutine"
@@ -38,10 +38,10 @@ LUAMOD_API int (luaopen_bit32) (lua_State *L);
 #define LUA_MATHLIBNAME	"math"
 LUAMOD_API int (luaopen_math) (lua_State *L);
 
-#define LUA_DBLIBNAME	"reflect"
+#define LUA_DBLIBNAME	"sys"
 LUAMOD_API int (luaopen_debug) (lua_State *L);
 
-#define LUA_LOADLIBNAME	"package"
+#define LUA_LOADLIBNAME	"lib"
 LUAMOD_API int (luaopen_package) (lua_State *L);
 
 
