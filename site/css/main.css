@@ -228,3 +228,6 @@ nav > ul > li {
   margin-right: -4px;
   display: inline-block;
 }
+
+.com { color: #888 !important }
+.kwd { color: #333 !important; font-weight: bold !important; }

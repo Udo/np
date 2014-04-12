@@ -10,11 +10,11 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=1024">
         <base href="http://np-lang.org/">
-        <link rel="stylesheet" href="http://direct.np-lang.org/css/">
+        <link rel="stylesheet" href="/css/">
         <link rel="icon" type="image/png" href="favicon.png">
         
-        <script src="http://direct.np-lang.org/js/"></script>
         <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?autoload=true&lang=lua"></script>
+        <script src="/js/"></script>
     </head>
     <body>
         <!--[if lt IE 7]>
