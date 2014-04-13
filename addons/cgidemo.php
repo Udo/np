@@ -5,78 +5,28 @@ header('content-type: text/html; charset=utf8');
 if(!isset($_REQUEST['code'])) $_REQUEST['code'] = '';
 if(!isset($out)) $out = '[no output]';
 
-function exec_timeout($cmd, $timeout) {
-  // File descriptors passed to the process.
-  $descriptors = array(
-    0 => array('pipe', 'r'),  // stdin
-    1 => array('pipe', 'w'),  // stdout
-    2 => array('pipe', 'w')   // stderr
-  );
+function cmd_exec($cmd, &$stdout, &$stderr)
+{
+    $outfile = tempnam(".", "cmd");
+    $errfile = tempnam(".", "cmd");
+    $descriptorspec = array(
+        0 => array("pipe", "r"),
+        1 => array("file", $outfile, "w"),
+        2 => array("file", $errfile, "w")
+    );
+    $proc = proc_open($cmd, $descriptorspec, $pipes);
+   
+    if (!is_resource($proc)) return 255;
 
-  // Start the process.
-  $process = proc_open('exec ' . $cmd, $descriptors, $pipes);
+    fclose($pipes[0]);    //Don't really want to give any input
 
-  if (!is_resource($process)) {
-    throw new \Exception('Could not execute process');
-  }
+    $exit = proc_close($proc);
+    $stdout = file_get_contents($outfile);
+    $stderr = file_get_contents($errfile);
 
-  // Set the stdout stream to none-blocking.
-  stream_set_blocking($pipes[1], 0);
-
-  // Turn the timeout into microseconds.
-  $timeout = $timeout * 1000000;
-
-  // Output buffer.
-  $buffer = '';
-
-  // While we have time to wait.
-  while ($timeout > 0) {
-    $start = microtime(true);
-
-    // Wait until we have output or the timer expired.
-    $read  = array($pipes[1]);
-    $other = array();
-    stream_select($read, $other, $other, 0, $timeout);
-
-    // Get the status of the process.
-    // Do this before we read from the stream,
-    // this way we can't lose the last bit of output if the process dies between these functions.
-    $status = proc_get_status($process);
-
-    // Read the contents from the buffer.
-    // This function will always return immediately as the stream is none-blocking.
-    $buffer .= stream_get_contents($pipes[1]);
-
-    if (!$status['running']) {
-      // Break from this loop if the process exited before the timeout.
-      break;
-    }
-
-    // Subtract the number of microseconds that we waited.
-    $timeout -= (microtime(true) - $start) * 1000000;
-  }
-
-  // Check if there were any errors.
-  $errors = stream_get_contents($pipes[2]);
-
-  if (!empty($errors)) {
-    $delim = '.np:';
-    $dlPos = strpos($errors, $delim);
-    $buffer .= substr($errors, $dlPos+4);
-  }
-
-  // Kill the process in case the timeout expired and it's still running.
-  // If the process already exited this won't do anything.
-  proc_terminate($process, 9);
-
-  // Close all streams.
-  fclose($pipes[0]);
-  fclose($pipes[1]);
-  fclose($pipes[2]);
-
-  proc_close($process);
-
-  return $buffer;
+    unlink($outfile);
+    unlink($errfile);
+    return $exit;
 }
 
 ?>
@@ -101,8 +51,12 @@ root.io = nil
 root.os = nil
 
 '.file_get_contents('cgidemo-examplestate.np').chr(10).$_REQUEST['code']);
-  $out = exec_timeout('timeout --preserve-status 0.01s ../bin/np '.$tmpFile, 1);
-  unlink($tmpFile);
+  $err = '';
+  cmd_exec('timeout --preserve-status 0.01s ../bin/np '.$tmpFile, $out, $err);
+  if($err != '')
+    $out = substr($err, strpos($err, '.np:')+4);
+  #$out = shell_exec('whoami');
+  #unlink($tmpFile);
 }
 
 ?>
@@ -111,16 +65,11 @@ root.os = nil
 
 <style>
   form {
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	background: #eee;
+
   }
 
   #out {
-  	margin-top: 290px;
-	width: 100%;
+    width: 100%;
   }
 
   * {

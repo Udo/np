@@ -65,7 +65,7 @@ PR['registerLangHandler'](
   <p>
     will print out:
   </p>
-  
+   
   <pre class="op">Hello World!</pre>
   
   <p>
@@ -353,6 +353,50 @@ print(guessMe(42))</pre>
   of <code>secretNumber</code>'s existence once the block terminates.
   </p>
   
+  <h3>Constructors</h3>
+  
+  <p>
+    Constructors are functions that build and initialize objects.</p>
+  
+  <pre class="sh_np">new Bugbear = {(name)
+    = (: 
+      name = name  
+      species = 'Bugbear' 
+      health = 100 )
+} 
+new bjorn = Bugbear('Bjorn')
+print('Hey folks. My name is' bjorn.name 
+  'and I am a' bjorn.species)</pre>
+  
+  <p>
+    This inits a new Bugbear called Bjorn. He has a name, a species, and a health score.
+    However, he just exists, he's pure data. To be alive, one must have the ability to
+    do things.
+  </p>
+  
+  <p>
+    Let's start by defining what the Bugbear species can do.
+  </p>
+  
+  <pre class="sh_np">
+-- the species
+new BugbearSpecies = (:
+  say = {(creature text) 
+    print(creature.name 'says:' text) }
+)
+BugbearSpecies.index = BugbearSpecies
+-- how to build a bugbear
+new Bugbear = {(name)
+  new creature = (: 
+    name = name  
+    species = 'Bugbear' )
+  events(creature, BugbearSpecies)
+  = creature
+}
+-- init Bjorn
+new bjorn = Bugbear('Bjorn')
+bjorn:say('Hello everybody!')
+</pre>
 
 </div>
 

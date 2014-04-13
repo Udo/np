@@ -1,0 +1,16 @@
+-- the species
+new BugbearSpecies = (:
+  say = {(creature text) 
+    print(creature.name 'says:' text) }
+)
+-- how to build a bugbear
+new Bugbear = {(name)
+  new creature = (: 
+    name = name  
+    species = 'Bugbear' )
+  events(creature, BugbearSpecies)
+  = creature
+}
+-- init Bjorn
+new bjorn = Bugbear('Bjorn')
+bjorn:say('Hello everybody!')

@@ -134,6 +134,33 @@ void luaV_gettable (lua_State *L, const TValue *t, TValue *key, StkId val) {
 }
 
 
+void luaV_selfop (lua_State *L, const TValue *t, TValue *key, StkId val) {
+  int loop;
+  for (loop = 0; loop < MAXTAGLOOP; loop++) {
+    const TValue *tm;
+    if (ttistable(t)) {  /* `t' is a table? */
+      Table *h = hvalue(t);
+      const TValue *res = luaH_get(h->metatable, key); /* do a primitive get */
+			
+      if (!ttisnil(res) ||  /* result is not nil? */
+          (tm = fasttm(L, h->metatable, TM_INDEX)) == NULL) { /* or no TM? */
+        setobj2s(L, val, res);
+        return;
+      }
+      /* else will try the tag method */
+    }
+    else if (ttisnil(tm = luaT_gettmbyobj(L, t, TM_INDEX)))
+      luaG_typeerror(L, t, "index");
+    if (ttisfunction(tm)) {
+      callTM(L, tm, t, key, val, 1);
+      return;
+    }
+    t = tm;  /* else repeat with 'tm' */
+  }
+  luaG_runerror(L, "loop in gettable");
+}
+
+
 void luaV_settable (lua_State *L, const TValue *t, TValue *key, StkId val) {
   int loop;
   for (loop = 0; loop < MAXTAGLOOP; loop++) {
@@ -625,7 +652,7 @@ void luaV_execute (lua_State *L) {
       vmcase(OP_SELF,
         StkId rb = RB(i);
         setobjs2s(L, ra+1, rb);
-        Protect(luaV_gettable(L, rb, RKC(i), ra));
+        Protect(luaV_selfop(L, rb, RKC(i), ra));
       )
       vmcase(OP_ADD,
         arith_op(luai_numadd, TM_ADD);
