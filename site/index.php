@@ -18,5 +18,6 @@ $content = ob_get_clean();
 
 include('theme/page.php');
 
-WriteToFile('../visitor.log', date('Y-m-d').' ref='.$_SERVER['HTTP_REFERER'].' ip='.$_SERVER['REMOTE_ADDR'].' uri='.$_SERVER['DOCUMENT_URI'].chr(10).chr(13));
+//WriteToFile('../visitor.log', date('Y-m-d').' ref='.$_SERVER['HTTP_REFERER'].
+//  ' ip='.$_SERVER['REMOTE_ADDR'].' uri='.$_SERVER['DOCUMENT_URI'].chr(10).chr(13));
 ?>

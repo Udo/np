@@ -5,6 +5,35 @@ $GLOBALS['title'] = 'np Tutorial';
 ob_start();
 
 ?>
+<script>
+
+PR['registerLangHandler'](
+    PR['createSimpleLexer'](
+        [
+         // Whitespace
+         [PR['PR_PLAIN'],       /^[\t\n\r \xA0]+/, null, '\t\n\r \xA0'],
+         // A double or single quoted, possibly multi-line, string.
+         [PR['PR_STRING'],      /^(?:\"(?:[^\"\\]|\\[\s\S])*(?:\"|$)|\'(?:[^\'\\]|\\[\s\S])*(?:\'|$))/, null, '"\'']
+        ],
+        [
+         // A comment is either a line comment that starts with two dashes, or
+         // two dashes preceding a long bracketed block.
+         [PR['PR_COMMENT'], /^--(?:\[(=*)\[[\s\S]*?(?:\]\1\]|$)|[^\r\n]*)/],
+         // A long bracketed block not preceded by -- is a string.
+         [PR['PR_STRING'],  /^\[(=*)\[[\s\S]*?(?:\]\1\]|$)/],
+         [PR['PR_KEYWORD'], /^(?:and|break|do|else|otherwise|end|false|for|if|in|new|nil|not|or|return|true|while)\b/, null],
+         // A number is a hex integer literal, a decimal real literal, or in
+         // scientific notation.
+         [PR['PR_LITERAL'],
+          /^[+-]?(?:0x[\da-f]+|(?:(?:\.\d+|\d+(?:\.\d*)?)(?:e[+\-]?\d+)?))/i],
+         // An identifier
+         [PR['PR_PLAIN'], /^[a-z_]\w*/i],
+         // A run of punctuation
+         [PR['PR_PUNCTUATION'], /^[^\w\t\n\r \xA0][^\w\t\n\r \xA0\"\'\-\+=]*/]
+        ]),
+    ['lua']);
+
+</script>
 
 <div id="side"><iframe id="srcwnd" src="http://openfu.com/dev/np/addons/cgidemo.php" style="width: 100%; border: none; height: 100%;"></iframe></div>
 
@@ -240,19 +269,95 @@ backAgain(list.expand(myPreciousss))</pre>
   features later!
   </p>
 
-  <div style="height:200px"></div>
+  <h3>Scope</h3>
+
+  <p>
+  In np, every function is in its own little world:
+  </p>
   
+  <pre class="sh_np">new vegetable = 'Potato'
+print(vegetable)
+new f = {()
+  new vegetable = 'Bacon' 
+  print(vegetable 'is my vegetable')
+}
+f()
+print(vegetable) </pre>
+
+  <p>
+  However, if no local variable by a certain name can be found, np
+  will try and look if it's available in the outer context:
+  </p>
+
+  <pre class="sh_np">new vegetable = 'Potato'
+new f = {()
+  print(vegetable 'is my vegetable')
+}
+f() </pre>
+
+  <h3>Block Scope</h3>
   
+  <p>
+  Let's give the <i>block</i> a formal introduction. A block is a piece of
+  code enclosed by curly braces: <code>{ ... }</code>. It's like a function,
+  but can't do a lot of the things that functions can. Blocks cannot:
+  <ul>
+    <li>have parameters</li> 
+    <li>return values</li>
+    <li>be passed around in variables</li>
+  </ul>
+  Unlike a function, a block is always executed where it's found. It is
+  very useful to
+  <ul>
+    <li>tie multiple statements together</li>
+    <li>limit the scope of variables</li>
+  </ul>
+  </p>
   
+  <pre class="sh_np">if true {
+  new hubris = 'superiority'
+  print("Look at me, I'm a block.")
+  print("I even got my own variable.")
+  print("It's a sign of my " hubris)
+}</pre>
   
+  <h3>Scope Shenanigans</h3>
+
+  <p>
+  Using an outer variable in a function can be very useful. Local variables
+  and hierarchical contexts are not limited to functions, they can be used
+  in blocks, too. For example, consider this function that wants to keep
+  a secret:
+  </p>  
   
+  <pre class="sh_np">new guessMe 
+{
+  new secretNumber = 42
+  guessMe = {(guess)
+    if guess == secretNumber
+      = 'Darn, you guessed it'
+    otherwise
+      = 'Nope, fail haha'
+  }
+}
+print(guessMe(1))
+print(guessMe(13))
+print(guessMe(42))</pre>
   
-  
-  
+  <p>
+  This example shows how easy it is to give functions and objects an internal
+  state that can't be accessed from the outside, and all without polluting the
+  variable space. Since <code>secretNumber</code> is bound to the block it
+  was created in, it's not visible to anything outside that block. Since 
+  <code>guessMe()</code> was created within the block, it's the only witness
+  of <code>secretNumber</code>'s existence once the block terminates.
+  </p>
   
 
 </div>
 
+  <div style="height:200px"></div>
+  
 <?
 
 $c = ob_get_clean();
@@ -262,32 +367,3 @@ print(str_replace('<pre class="sh_np">', '<a class="loadsrc"
     \'http://openfu.com/dev/np/addons/cgidemo.php?code=\'+escape($(this).next().text()));">&gt;&gt;&gt;</a><pre class="sh_np prettyprint lang-lua">', $c));
 
 ?>
-<script>
-
-PR['registerLangHandler'](
-    PR['createSimpleLexer'](
-        [
-         // Whitespace
-         [PR['PR_PLAIN'],       /^[\t\n\r \xA0]+/, null, '\t\n\r \xA0'],
-         // A double or single quoted, possibly multi-line, string.
-         [PR['PR_STRING'],      /^(?:\"(?:[^\"\\]|\\[\s\S])*(?:\"|$)|\'(?:[^\'\\]|\\[\s\S])*(?:\'|$))/, null, '"\'']
-        ],
-        [
-         // A comment is either a line comment that starts with two dashes, or
-         // two dashes preceding a long bracketed block.
-         [PR['PR_COMMENT'], /^--(?:\[(=*)\[[\s\S]*?(?:\]\1\]|$)|[^\r\n]*)/],
-         // A long bracketed block not preceded by -- is a string.
-         [PR['PR_STRING'],  /^\[(=*)\[[\s\S]*?(?:\]\1\]|$)/],
-         [PR['PR_KEYWORD'], /^(?:and|break|do|else|otherwise|end|false|for|if|in|new|nil|not|or|return|true|while)\b/, null],
-         // A number is a hex integer literal, a decimal real literal, or in
-         // scientific notation.
-         [PR['PR_LITERAL'],
-          /^[+-]?(?:0x[\da-f]+|(?:(?:\.\d+|\d+(?:\.\d*)?)(?:e[+\-]?\d+)?))/i],
-         // An identifier
-         [PR['PR_PLAIN'], /^[a-z_]\w*/i],
-         // A run of punctuation
-         [PR['PR_PUNCTUATION'], /^[^\w\t\n\r \xA0][^\w\t\n\r \xA0\"\'\-\+=]*/]
-        ]),
-    ['lua']);
-
-</script>
