@@ -75,8 +75,12 @@ static int luaB_setmetatable (lua_State *L) {
 	if(n == 1)
 		return luaB_getmetatable(L);
   luaL_checktype(L, 1, LUA_TTABLE);
+	if(n == 3) {
+	  
+		return 1;
+	}	
   if (luaL_getmetafield(L, 1, "events"))
-    return luaL_error(L, "cannot change a protected metatable");
+    return luaL_error(L, "cannot change a protected events list");
   lua_settop(L, 2);
   lua_setmetatable(L, 1);
   return 1;

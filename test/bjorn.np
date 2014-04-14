@@ -1,16 +1,10 @@
--- the species
-new BugbearSpecies = (:
+new BugbearBehavior = (:
   say = {(creature text) 
-    print(creature.name 'says:' text) }
+    print(creature.name 'says:' text 'BURP!') }
 )
--- how to build a bugbear
-new Bugbear = {(name)
-  new creature = (: 
-    name = name  
-    species = 'Bugbear' )
-  events(creature, BugbearSpecies)
-  = creature
-}
--- init Bjorn
-new bjorn = Bugbear('Bjorn')
+
+new bjorn = (: name = 'Bjorn' )
+
+events(bjorn, 'say', BugbearBehavior.say)
+
 bjorn:say('Hello everybody!')

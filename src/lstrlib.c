@@ -190,12 +190,12 @@ static int str_char (lua_State *L) {
 }
 
 
+/*
 static int writer (lua_State *L, const void* b, size_t size, void* B) {
   (void)L;
   luaL_addlstring((luaL_Buffer*) B, (const char *)b, size);
   return 0;
 }
-
 
 static int str_dump (lua_State *L) {
   luaL_Buffer b;
@@ -207,7 +207,7 @@ static int str_dump (lua_State *L) {
   luaL_pushresult(&b);
   return 1;
 }
-
+*/
 
 
 /*
@@ -1006,16 +1006,16 @@ static int str_format (lua_State *L) {
 static const luaL_Reg strlib[] = {
   {"byte", str_byte},
   {"char", str_char},
-  {"dump", str_dump},
+  //{"dump", str_dump},
   {"find", str_find},
   {"format", str_format},
-  {"gmatch", gmatch},
-  {"gsub", str_gsub},
-  {"size", str_len},
+  {"pattern", gmatch},
+  {"replace", str_gsub},
+  {"length", str_len},
   {"lower", str_lower},
   {"split", str_split},
   {"match", str_match},
-  {"rep", str_rep},
+  {"repeat", str_rep},
   {"reverse", str_reverse},
   {"sub", str_sub},
   {"upper", str_upper},
