@@ -139,8 +139,16 @@ void luaV_selfop (lua_State *L, const TValue *t, TValue *key, StkId val) {
   for (loop = 0; loop < MAXTAGLOOP; loop++) {
     const TValue *tm;
     if (ttistable(t)) {  /* `t' is a table? */
-      Table *h = hvalue(t);
-      const TValue *res = luaH_get(h->metatable, key); /* do a primitive get */
+			Table *h = hvalue(t);
+      const TValue *res;
+			
+			if(!h->metatable) {
+				setobj2s(L, val, luaO_nilobject);
+        return;
+			}
+			else {
+				res = luaH_get(h->metatable, key); /* do a primitive get */
+			}
 			
       if (!ttisnil(res) ||  /* result is not nil? */
           (tm = fasttm(L, h->metatable, TM_INDEX)) == NULL) { /* or no TM? */

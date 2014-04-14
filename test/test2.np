@@ -1,24 +1,8 @@
-table.index = table
-
-new a = 1
-
-a += 10
-
-print(a)
-
-new spl = ('q,w,e,r'):split(',')
-events(spl, table)
-
-for i,v in each(spl) {
-	print(i,v)
+condition = {(...)
+  new args = (:...)
+	new idx = 1
+	new cnt = args:count()
+	print(cnt)
 }
 
-new jnt = spl:join('-')
-print(jnt)
-
-new foo = {()
-	new z = 1
-	= 2,1,2,z
-}
-
-print(table)
+print( ?(true 1 2) )

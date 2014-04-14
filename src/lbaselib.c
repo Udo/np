@@ -97,6 +97,12 @@ static int luaB_rawlen (lua_State *L) {
 }
 
 
+static int luaB_cond (lua_State *L) {
+	luaL_dostring(L, "=true");
+  return 1;
+}
+
+
 static int luaB_rawalen (lua_State *L) {
   int t = lua_type(L, 1);
   luaL_argcheck(L, t == LUA_TTABLE || t == LUA_TSTRING, 1,
@@ -227,12 +233,13 @@ static const luaL_Reg base_funcs[] = {
   {"each", luaB_pairs},
   {"raise", luaB_error},
   //{"getmetatable", luaB_getmetatable},
-  {"list", luaB_ipairs},
+  {"items", luaB_ipairs},
   //{"loadfile", luaB_loadfile},
   {"size", luaB_rawlen},
   {"count", luaB_rawalen},
   {"next", luaB_next},
   {"try", luaB_pcall},
+  {"condition", luaB_cond},
   {"print", luaB_print},
   {"select", luaB_select},
   {"events", luaB_setmetatable},

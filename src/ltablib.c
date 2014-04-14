@@ -20,7 +20,6 @@
 
 
 
-#if defined(LUA_COMPAT_MAXN)
 static int maxn (lua_State *L) {
   lua_Number max = 0;
   luaL_checktype(L, 1, LUA_TTABLE);
@@ -35,7 +34,6 @@ static int maxn (lua_State *L) {
   lua_pushnumber(L, max);
   return 1;
 }
-#endif
 
 
 static int tinsert (lua_State *L) {
@@ -259,9 +257,7 @@ static int sort (lua_State *L) {
 
 static const luaL_Reg tab_funcs[] = {
   {"join", tconcat},
-#if defined(LUA_COMPAT_MAXN)
-  {"maxn", maxn},
-#endif
+  {"count", maxn},
   {"insert", tinsert},
   {"condense", pack},
   {"expand", unpack},

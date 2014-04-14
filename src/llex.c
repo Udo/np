@@ -471,7 +471,7 @@ static int llex (LexState *ls, SemInfo *seminfo) {
         next(ls);
         if (ls->current != '(') return '?';
         else { 
-					seminfo->ts = luaS_new(ls->L, "cond");
+					seminfo->ts = luaS_new(ls->L, "condition");
 					return TK_NAME; 
 				}
       }
