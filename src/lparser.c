@@ -1693,10 +1693,10 @@ static void exprstat (LexState *ls) {
 		    assignment(ls, &v, 1);
 		    break;
 		  }
-		  default: {
+		  /*default: {
 		    check_condition(ls, v.v.k == VCALL, "syntax error");
-		    SETARG_C(getcode(fs, &v.v), 1);  /* call statement uses no results */
-		  }
+		    SETARG_C(getcode(fs, &v.v), 1);  
+		  }*/
 		}
   }
 }
