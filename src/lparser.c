@@ -1254,7 +1254,7 @@ static int get_table_unpack(LexState *ls, struct LHS_assign *lh, expdesc * e) {
   adjustlocalvars(ls, 1);
   luaK_setoneret(ls->fs, e);  /* close last expression */
   while(lh) {
-    expdesc key, keyval;
+    expdesc key;
     expdesc * v = &lh->v;
     switch(v->k) {
       case VLOCAL:
@@ -1270,7 +1270,6 @@ static int get_table_unpack(LexState *ls, struct LHS_assign *lh, expdesc * e) {
       default:
         luaX_syntaxerror( ls, "syntax error in " LUA_QL("in") " vars" );
     }
-    keyval=key;
     luaK_indexed(ls->fs, e, &key);
     luaK_storevar(ls->fs, v, e);
     lh=lh->prev;
