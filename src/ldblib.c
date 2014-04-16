@@ -47,6 +47,23 @@ static int db_setmetatable (lua_State *L) {
 }
 
 
+#if defined(JH_LUA_TYPEMETA)
+static const char *const db_types[] = {"nil","boolean","lightuserdata",
+	"number","string","list","function","userdata","thread",NULL};
+
+static int db_settypemt (lua_State *L) {
+  int ty = luaL_checkoption(L, 1, NULL, db_types);
+  int t = lua_type(L, 2);
+  luaL_argcheck(L, t == LUA_TNIL || t == LUA_TTABLE, 2,
+                    "nil or list expected");
+  lua_remove(L, 1);
+  lua_settop(L, 1);
+  lua_settypemt(L, ty);
+  return 0;
+}
+
+
+#endif
 static int db_getuservalue (lua_State *L) {
   if (lua_type(L, 1) != LUA_TUSERDATA)
     lua_pushnil(L);
@@ -538,6 +555,9 @@ static const luaL_Reg dblib[] = {
   {"sethook", db_sethook},
   {"setlocal", db_setlocal},
   {"setmetatable", db_setmetatable},
+#if defined(JH_LUA_TYPEMETA)
+  {"settypemt", db_settypemt},
+#endif
   {"setupvalue", db_setupvalue},
   {"traceback", db_traceback},
   {"collectgarbage", db_collectgarbage},

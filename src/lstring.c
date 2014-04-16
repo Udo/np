@@ -178,7 +178,15 @@ Udata *luaS_newudata (lua_State *L, size_t s, Table *e) {
     luaM_toobig(L);
   u = &luaC_newobj(L, LUA_TUSERDATA, sizeof(Udata) + s, NULL, 0)->u;
   u->uv.len = s;
+#if defined(JH_LUA_TYPEMETA)
+  u->uv.metatable = G(L)->mt[LUA_TUSERDATA];
+  if (u->uv.metatable) {
+	luaC_objbarrier(L, u, u->uv.metatable);
+    luaC_checkfinalizer(L, (GCObject*)u, u->uv.metatable);
+  }
+#else
   u->uv.metatable = NULL;
+#endif
   u->uv.env = e;
   return u;
 }

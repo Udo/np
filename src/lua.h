@@ -26,6 +26,8 @@
 #define LUA_COPYRIGHT	LUA_RELEASE "  Copyright (C) 1994-2014 np-lang.org, Lua.org, PUC-Rio"
 #define LUA_AUTHORS	"R. Ierusalimschy, L. H. de Figueiredo, W. Celes, U. Schroeter"
 
+#define JH_LUA_TYPEMETA 1
+#define JH_LUA_TABLECLASS 1
 
 /* mark for precompiled code ('<esc>Lua') */
 #define LUA_SIGNATURE	"\033Lua"
@@ -244,6 +246,9 @@ LUA_API void  (lua_rawsetp) (lua_State *L, int idx, const void *p);
 LUA_API int   (lua_setmetatable) (lua_State *L, int objindex);
 LUA_API void  (lua_setuservalue) (lua_State *L, int idx);
 
+#if defined(JH_LUA_TYPEMETA)
+LUA_API int   (lua_settypemt) (lua_State *L, int type);
+#endif
 
 /*
 ** 'load' and 'call' functions (load and run Lua code)

@@ -1,8 +1,9 @@
-condition = {(...)
-  new args = (:...)
-	new idx = 1
-	new cnt = args:count()
-	print(cnt)
-}
+new l = (: 1 2 3 4)
 
-print( ?(true 1 2) )
+events(l, (:
+  index = {(tbl idx)
+		print('idx: ' idx)
+	}
+  ))
+	
+print(l.bla)

@@ -367,7 +367,15 @@ static void rehash (lua_State *L, Table *t, const TValue *ek) {
 
 Table *luaH_new (lua_State *L) {
   Table *t = &luaC_newobj(L, LUA_TTABLE, sizeof(Table), NULL, 0)->h;
+#if defined(JH_LUA_TYPEMETA)
+  t->metatable = G(L)->mt[LUA_TTABLE];
+  if (t->metatable) {
+        luaC_objbarrierback(L, (GCObject*)t, t->metatable);
+        luaC_checkfinalizer(L, (GCObject*)t, t->metatable);
+  }
+#else
   t->metatable = NULL;
+#endif
   t->flags = cast_byte(~0);
   t->array = NULL;
   t->sizearray = 0;

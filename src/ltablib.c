@@ -266,6 +266,19 @@ static const luaL_Reg tab_funcs[] = {
   {NULL, NULL}
 };
 
+#ifndef JH_LUA_TYPEMETA
+#undef JH_LUA_TABLECLASS
+#endif
+#if defined(JH_LUA_TABLECLASS)
+static void createmetatable (lua_State *L) {
+  lua_createtable(L, 0, 1);  /* table to be type metatable for tables */
+  lua_pushvalue(L, -1);      /* copy table */
+  lua_settypemt(L, LUA_TTABLE);   /* set table as type metatable for tables */
+  lua_pushvalue(L, -2);      /* get table library */
+  lua_setfield(L, -2, "index");  /* metatable.__index = table */
+  lua_pop(L, 1);			 /* pop metatable */
+}
+#endif
 
 LUAMOD_API int luaopen_table (lua_State *L) {
   luaL_newlib(L, tab_funcs);
@@ -273,6 +286,9 @@ LUAMOD_API int luaopen_table (lua_State *L) {
   /* _G.unpack = table.unpack */
   lua_getfield(L, -1, "expand");
   lua_setglobal(L, "expand");
+#endif
+#if defined(JH_LUA_TABLECLASS)
+	createmetatable(L);
 #endif
 	// todo: add "index" pointer to this table
   return 1;
