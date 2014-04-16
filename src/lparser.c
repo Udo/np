@@ -585,7 +585,6 @@ static void close_func (LexState *ls) {
 /* GRAMMAR RULES */
 /*============================================================*/
 
-
 /*
 ** check whether current token is in the follow set of a block.
 ** 'until' closes syntactical blocks, but do not close scope,
@@ -1245,13 +1244,49 @@ static int compound_assignment(LexState *ls, struct LHS_assign *lh, int nvars) {
   return COMPOUND_ASSIGNMENT;
 }
 
+static int get_table_unpack(LexState *ls, struct LHS_assign *lh, expdesc * e) {
+  lu_byte from_var;
+  luaX_next(ls);
+  new_localvarliteral(ls, "(in)");
+  suffixedexp(ls, e);
+  luaK_exp2nextreg(ls->fs, e);
+  from_var = ls->fs->nactvar;
+  adjustlocalvars(ls, 1);
+  luaK_setoneret(ls->fs, e);  /* close last expression */
+  while(lh) {
+    expdesc key, keyval;
+    expdesc * v = &lh->v;
+    switch(v->k) {
+      case VLOCAL:
+        codestring(ls, &key, getlocvar(ls->fs, v->u.info)->varname);
+        break;
+      case VUPVAL:
+        codestring(ls, &key, ls->fs->f->upvalues[v->u.info].name);
+        break;
+      case VINDEXED:
+        lua_assert(ISK(v->u.ind.idx));
+        init_exp(&key, VK, INDEXK(v->u.ind.idx));
+        break;
+      default:
+        luaX_syntaxerror( ls, "syntax error in " LUA_QL("in") " vars" );
+    }
+    keyval=key;
+    luaK_indexed(ls->fs, e, &key);
+    luaK_storevar(ls->fs, v, e);
+    lh=lh->prev;
+    if(lh) init_exp(e, VNONRELOC, ls->fs->freereg-1); 
+  }
+  removevars(ls->fs,from_var);
+  return 1;  /* don't recursively complex assignments */
+}
+
 static int assignment (LexState *ls, struct LHS_assign *lh, int nvars) {
   expdesc e;
   int assignment_type = NORMAL_ASSIGNMENT;
   check_condition(ls, vkisvar(lh->v.k), "syntax error");
   if (testnext(ls, ',')) {  /* assignment -> ',' suffixedexp assignment */
     struct LHS_assign nv;
-    nv.prev = lh;
+		nv.prev = lh;
     nv.next = NULL;
     lh->next = &nv;
     suffixedexp(ls, &nv.v);
@@ -1268,6 +1303,10 @@ static int assignment (LexState *ls, struct LHS_assign *lh, int nvars) {
 			case '+': case '-': case '*': case '/': case TK_CONCAT:
 			{
 				return compound_assignment(ls,lh,nvars);
+			}
+			case TK_IN:
+			{
+				return get_table_unpack(ls,lh,&e);
 			}
     }
     checknext(ls, '=');
@@ -1573,6 +1612,33 @@ static void localstat (LexState *ls) {
     new_localvar(ls, str_checkname(ls));
     nvars++;
   } while (testnext(ls, ','));
+	
+  /* table unpack hook for the local variable case */
+  if (testnext(ls,TK_IN)) { 
+    lu_byte from_var;
+    int regs = ls->fs->freereg;
+    int vars = ls->fs->nactvar;
+    luaK_reserveregs(ls->fs, nvars);
+    suffixedexp(ls, &e);
+		adjustlocalvars(ls, nvars);
+    new_localvarliteral(ls, "(in)");
+    luaK_exp2nextreg(ls->fs, &e);
+    from_var = ls->fs->nactvar;
+    adjustlocalvars(ls, 1);
+    luaK_setoneret(ls->fs, &e);  /* close last expression */
+    for (nexps=0; nexps<nvars; nexps++) {
+      expdesc v, key;
+      TString * key_str=getlocvar(ls->fs, vars+nexps)->varname;
+      init_exp(&e, VNONRELOC, ls->fs->freereg-1);
+      codestring(ls, &key, key_str );
+      luaK_indexed(ls->fs, &e, &key);
+      init_exp(&v, VLOCAL, regs+nexps);
+      luaK_storevar(ls->fs, &v, &e);
+    }
+    removevars(ls->fs, from_var);
+    return;
+  }
+	
   if (testnext(ls, '='))
     nexps = explist(ls, &e, 0);
   else {
@@ -1620,6 +1686,18 @@ static void exprstat (LexState *ls) {
   else { /* stat -> assignment ? */
     v.prev = v.next = NULL;
     assignment(ls, &v, 1);
+		switch(ls->t.token) {
+		   /* assignment cases */
+		  case '=': case ',': case TK_IN: {
+		    v.prev = NULL;
+		    assignment(ls, &v, 1);
+		    break;
+		  }
+		  default: {
+		    check_condition(ls, v.v.k == VCALL, "syntax error");
+		    SETARG_C(getcode(fs, &v.v), 1);  /* call statement uses no results */
+		  }
+		}
   }
 }
 

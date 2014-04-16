@@ -1,0 +1,140 @@
+Index: lparser.c
+===================================================================
+--- lparser.c	(lua 5.2.2)
++++ lparser.c	(8/22/2013)
+@@ -1133,21 +1133,61 @@
+ }
+ 
+ 
+-static void assignment (LexState *ls, struct LHS_assign *lh, int nvars) {
++static int get_table_unpack(LexState *ls, struct LHS_assign *lh, expdesc * e) {
++  lu_byte from_var;
++  luaX_next(ls);
++  new_localvarliteral(ls, "(in)");
++  suffixedexp(ls, e);
++  luaK_exp2nextreg(ls->fs, e);
++  from_var = ls->fs->nactvar;
++  adjustlocalvars(ls, 1);
++  luaK_setoneret(ls->fs, e);  /* close last expression */
++  while(lh) {
++    expdesc key, keyval;
++    expdesc * v = &lh->v;
++    switch(v->k) {
++      case VLOCAL:
++        codestring(ls, &key, getlocvar(ls->fs, v->u.info)->varname);
++        break;
++      case VUPVAL:
++        codestring(ls, &key, ls->fs->f->upvalues[v->u.info].name);
++        break;
++      case VINDEXED:
++        lua_assert(ISK(v->u.ind.idx));
++        init_exp(&key, VK, INDEXK(v->u.ind.idx));
++        break;
++      default:
++        luaX_syntaxerror( ls, "syntax error in " LUA_QL("in") " vars" );
++    }
++    keyval=key;
++    luaK_indexed(ls->fs, e, &key);
++    luaK_storevar(ls->fs, v, e);
++    lh=lh->prev;
++    if(lh) init_exp(e, VNONRELOC, ls->fs->freereg-1); 
++  }
++  removevars(ls->fs,from_var);
++  return 1;  /* don't recursively complex assignments */
++}
++
++static int assignment (LexState *ls, struct LHS_assign *lh, int nvars) {
+   expdesc e;
+   check_condition(ls, vkisvar(lh->v.k), "syntax error");
+   if (testnext(ls, ',')) {  /* assignment -> ',' suffixedexp assignment */
+     struct LHS_assign nv;
++    int skip_assignments;
+     nv.prev = lh;
+     suffixedexp(ls, &nv.v);
+     if (nv.v.k != VINDEXED)
+       check_conflict(ls, lh, &nv.v);
+     checklimit(ls->fs, nvars + ls->L->nCcalls, LUAI_MAXCCALLS,
+                     "C levels");
+-    assignment(ls, &nv, nvars+1);
++    skip_assignments=assignment(ls, &nv, nvars+1);
++    if(skip_assignments) return skip_assignments;
+   }
+   else {  /* assignment -> `=' explist */
+     int nexps;
++    if(ls->t.token==TK_IN) /* table unpack hook */
++      return get_table_unpack(ls,lh,&e);
+     checknext(ls, '=');
+     nexps = explist(ls, &e);
+     if (nexps != nvars) {
+@@ -1158,11 +1198,12 @@
+     else {
+       luaK_setoneret(ls->fs, &e);  /* close last expression */
+       luaK_storevar(ls->fs, &lh->v, &e);
+-      return;  /* avoid default */
++      return 0;  /* avoid default */
+     }
+   }
+   init_exp(&e, VNONRELOC, ls->fs->freereg-1);  /* default assignment */
+   luaK_storevar(ls->fs, &lh->v, &e);
++  return 0;
+ }
+ 
+ 
+@@ -1440,6 +1481,31 @@
+     new_localvar(ls, str_checkname(ls));
+     nvars++;
+   } while (testnext(ls, ','));
++  /* table unpack hook for the local variable case */
++  if (testnext(ls,TK_IN)) { 
++    lu_byte from_var;
++    int regs = ls->fs->freereg;
++    int vars = ls->fs->nactvar;
++    luaK_reserveregs(ls->fs, nvars);
++    suffixedexp(ls, &e);
++	adjustlocalvars(ls, nvars);
++    new_localvarliteral(ls, "(in)");
++    luaK_exp2nextreg(ls->fs, &e);
++    from_var = ls->fs->nactvar;
++    adjustlocalvars(ls, 1);
++    luaK_setoneret(ls->fs, &e);  /* close last expression */
++    for (nexps=0; nexps<nvars; nexps++) {
++      expdesc v, key;
++      TString * key_str=getlocvar(ls->fs, vars+nexps)->varname;
++      init_exp(&e, VNONRELOC, ls->fs->freereg-1);
++      codestring(ls, &key, key_str );
++      luaK_indexed(ls->fs, &e, &key);
++      init_exp(&v, VLOCAL, regs+nexps);
++      luaK_storevar(ls->fs, &v, &e);
++    }
++    removevars(ls->fs, from_var);
++    return;
++  }
+   if (testnext(ls, '='))
+     nexps = explist(ls, &e);
+   else {
+@@ -1482,14 +1548,18 @@
+   FuncState *fs = ls->fs;
+   struct LHS_assign v;
+   suffixedexp(ls, &v.v);
+-  if (ls->t.token == '=' || ls->t.token == ',') { /* stat -> assignment ? */
+-    v.prev = NULL;
+-    assignment(ls, &v, 1);
++  switch(ls->t.token) {
++    /* assignment cases */
++    case '=': case ',': case TK_IN: {
++      v.prev = NULL;
++      assignment(ls, &v, 1);
++      break;
++    }
++    default: {
++      check_condition(ls, v.v.k == VCALL, "syntax error");
++      SETARG_C(getcode(fs, &v.v), 1);  /* call statement uses no results */
++    }
+   }
+-  else {  /* stat -> func */
+-    check_condition(ls, v.v.k == VCALL, "syntax error");
+-    SETARG_C(getcode(fs, &v.v), 1);  /* call statement uses no results */
+-  }
+ }
+ 
+ 
