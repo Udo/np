@@ -14,6 +14,7 @@
 
 #include "lauxlib.h"
 #include "lualib.h"
+#include "ltm.h"
 
 
 #define aux_getn(L,n)	(luaL_checktype(L, n, LUA_TTABLE), luaL_len(L, n))
@@ -275,7 +276,7 @@ static void createmetatable (lua_State *L) {
   lua_pushvalue(L, -1);      /* copy table */
   lua_settypemt(L, LUA_TTABLE);   /* set table as type metatable for tables */
   lua_pushvalue(L, -2);      /* get table library */
-  lua_setfield(L, -2, "index");  /* metatable.__index = table */
+  lua_setfield(L, -2, "event");  /* metatable.__index = table */
   lua_pop(L, 1);			 /* pop metatable */
 }
 #endif

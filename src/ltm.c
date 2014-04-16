@@ -31,7 +31,7 @@ LUAI_DDEF const char *const luaT_typenames_[LUA_TOTALTAGS] = {
 
 void luaT_init (lua_State *L) {
   static const char *const luaT_eventname[] = {  /* ORDER TM */
-    "index", "newindex", "update",
+    "event", "index", "newindex", "update",
     "gc", "weak", "size", "eq",
     "add", "sub", "mul", "div", "mod",
     "pow", "unm", "lt", "le",

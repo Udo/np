@@ -1,9 +1,22 @@
+
 new l = (: 1 2 3 4)
 
 events(l, (:
-  index = {(tbl idx)
-		print('idx: ' idx)
+  event = {(tbl eventName)
+		= {(a) 
+		  = eventName
+	  }
 	}
-  ))
+	bla = {(meTable) print('bla: ' meTable.name) }
+  )
+)
 	
-print(l.bla)
+new s = 'abcde'
+
+--bjorn:say('Hello everybody!')
+	
+print(s:upper())
+
+print(l:bla())
+
+print(l:blu(1))

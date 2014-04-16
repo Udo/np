@@ -752,7 +752,7 @@ static void constructor (LexState *ls, expdesc *t) {
 /* }====================================================================== */
 
 
-
+// parse function parameter list
 static void parlist (LexState *ls) {
   /* parlist -> [ param { `,' param } ] */
   FuncState *fs = ls->fs;
@@ -781,7 +781,7 @@ static void parlist (LexState *ls) {
   luaK_reserveregs(fs, fs->nactvar);  /* reserve register for parameters */
 }
 
-
+// parse function definition
 static void body (LexState *ls, expdesc *e, int ismethod, int line) {
   /* body ->  `(' parlist `)' block END */
   FuncState new_fs;
@@ -816,7 +816,7 @@ static int explist (LexState *ls, expdesc *v, int limitedBy) {
   return n;
 }
 
-
+// parse function call parameters
 static void funcargs (LexState *ls, expdesc *f, int line) {
   FuncState *fs = ls->fs;
   expdesc args;

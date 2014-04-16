@@ -1,0 +1,18 @@
+new l = (: name = 'King Joffrey' 1 2 3 4 )
+
+events(l, (: 
+  event = {(tbl idx)
+    print('accessing' idx)
+    = {(a b c d e)
+      print('func' idx a b c d e)
+			= a
+    }
+  }
+	blr = {(meTable) print('BLR: ' meTable.name) }
+))
+
+l:bla(10 11 12)
+
+l:blr(20 21 22 23 24)
+
+print(("abcd"):upper())

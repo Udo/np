@@ -16,6 +16,7 @@
 * grep "ORDER TM"
 */
 typedef enum {
+  TM_EVENT,
   TM_INDEX,
   TM_NEWINDEX,
 	TM_UPDATE,

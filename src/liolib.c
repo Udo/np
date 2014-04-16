@@ -623,7 +623,7 @@ static const luaL_Reg flib[] = {
 static void createmeta (lua_State *L) {
   luaL_newmetatable(L, LUA_FILEHANDLE);  /* create metatable for file handles */
   lua_pushvalue(L, -1);  /* push metatable */
-  lua_setfield(L, -2, "index");  /* metatable.__index = metatable */
+  lua_setfield(L, -2, "event");  /* metatable.__index = metatable */
   luaL_setfuncs(L, flib, 0);  /* add file methods to new metatable */
   lua_pop(L, 1);  /* pop new metatable */
 }

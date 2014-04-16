@@ -134,40 +134,36 @@ void luaV_gettable (lua_State *L, const TValue *t, TValue *key, StkId val) {
 }
 
 
-void luaV_selfop (lua_State *L, const TValue *t, TValue *key, StkId val) {
+void luaV_selfop (lua_State *L, const TValue *to, TValue *key, StkId val) {
   int loop;
+	const TValue *t = to;
   for (loop = 0; loop < MAXTAGLOOP; loop++) {
-    const TValue *tm = luaO_nilobject;
+    const TValue *tm;
     if (ttistable(t)) {  /* `t' is a table? */
-			Table *h = hvalue(t);
-      const TValue *res = luaO_nilobject;
+      Table *h = hvalue(t);
+      const TValue *res;
+			if(t == to) {
+				if(h->metatable)
+					res = luaH_get(h->metatable, key);
+				else 
+					res = luaO_nilobject;
+			} else {
+				res = luaH_get(h, key);
+			}  
 			
-			if(h->metatable) {
-				res = luaH_get(h->metatable, key); /* do a primitive get */
-        if (!ttisnil(res)) {
-					setobj2s(L, val, res);
-        	return;
-        }
-				tm = fasttm(L, h->metatable, TM_INDEX);
-				if(tm == NULL) {
-					setobj2s(L, val, res);
-	      	return;
-				} 
-			}
-			else {
-				luaG_runerror(L, "list has no events table");
-			}
-			
+      if (!ttisnil(res) ||  /* result is not nil? */
+          (tm = fasttm(L, h->metatable, TM_EVENT)) == NULL) { /* or no TM? */
+        setobj2s(L, val, res);
+        return;
+      }
+      /* else will try the tag method */
     }
-    /* else will try the tag method */
-    else if (ttisnil(tm = luaT_gettmbyobj(L, t, TM_INDEX)))
+    else if (ttisnil(tm = luaT_gettmbyobj(L, t, TM_EVENT)))
       luaG_typeerror(L, t, "index");
-
     if (ttisfunction(tm)) {
       callTM(L, tm, t, key, val, 1);
       return;
     }
-
     t = tm;  /* else repeat with 'tm' */
   }
   luaG_runerror(L, "loop in gettable");
