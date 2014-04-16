@@ -82,9 +82,9 @@ static int tremove (lua_State *L) {
 
 static void addfield (lua_State *L, luaL_Buffer *b, int i) {
   lua_rawgeti(L, 1, i);
-  if (!lua_isstring(L, -1))
-    luaL_error(L, "invalid value (%s) at index %d in table for "
-                  LUA_QL("concat"), luaL_typename(L, -1), i);
+  if (lua_isstring(L, -1))
+  /*  luaL_error(L, "invalid value (%s) at index %d in table for "
+                  LUA_QL("concat"), luaL_typename(L, -1), i);*/
   luaL_addvalue(b);
 }
 
@@ -254,13 +254,10 @@ static int sort (lua_State *L) {
 }
 
 static int tbl_add (lua_State *L) {
-  int n = aux_getn(L, 1);
-  luaL_checkstack(L, 40, "");  /* assume array is smaller than 2^40 */
-  if (!lua_isnoneornil(L, 2))  /* is there a 2nd argument? */
-    luaL_checktype(L, 2, LUA_TFUNCTION);
-  lua_settop(L, 2);  /* make sure there is two arguments */
-  auxsort(L, 1, n);
-  return 0;
+	luaL_checktype(L, 1, LUA_TTABLE);
+  int pos = aux_getn(L, 1) + 1;  /* first empty element */
+  lua_rawseti(L, 1, pos);  /* t[pos] = v */
+  return 1;
 }
 
 /* }====================================================== */
@@ -283,11 +280,15 @@ static const luaL_Reg tab_funcs[] = {
 #endif
 #if defined(JH_LUA_TABLECLASS)
 static void createmetatable (lua_State *L) {
-  lua_createtable(L, 0, 1);  /* table to be type metatable for tables */
+	lua_createtable(L, 0, 1);  /* table to be type metatable for tables */
   lua_pushvalue(L, -1);      /* copy table */
   lua_settypemt(L, LUA_TTABLE);   /* set table as type metatable for tables */
   lua_pushvalue(L, -2);      /* get table library */
   lua_setfield(L, -2, "event");  /* metatable.__index = table */
+	
+	lua_getfield(L, -2, "add");
+	lua_setfield(L, -2, "add");
+	
   lua_pop(L, 1);			 /* pop metatable */
 }
 #endif

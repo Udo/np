@@ -62,16 +62,18 @@ const TValue *luaT_gettm (Table *events, TMS event, TString *ename) {
 
 const TValue *luaT_gettmbyobj (lua_State *L, const TValue *o, TMS event) {
   Table *mt;
-  switch (ttypenv(o)) {
-    case LUA_TTABLE:
-      mt = hvalue(o)->metatable;
-      break;
-    case LUA_TUSERDATA:
-      mt = uvalue(o)->metatable;
-      break;
-    default:
-      mt = G(L)->mt[ttypenv(o)];
-  }
+	if(ttypenv(o) == LUA_TTABLE && (mt = hvalue(o)->metatable)) {
+		
+	}
+	else {
+	  switch (ttypenv(o)) {
+	    case LUA_TUSERDATA:
+	      mt = uvalue(o)->metatable;
+	      break;
+	    default:
+	      mt = G(L)->mt[ttypenv(o)];
+	  }
+	}
   return (mt ? luaH_getstr(mt, G(L)->tmname[event]) : luaO_nilobject);
 }
 
