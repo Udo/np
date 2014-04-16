@@ -98,8 +98,8 @@ static int luaB_rawlen (lua_State *L) {
 
 
 static int luaB_cond (lua_State *L) {
-	luaL_dostring(L, "=true");
-  return 1;
+	return luaL_dostring(L, "=true");
+  //return 1;
 }
 
 
