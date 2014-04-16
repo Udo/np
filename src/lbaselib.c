@@ -115,11 +115,15 @@ static int luaB_rawalen (lua_State *L) {
 static int pairsmeta (lua_State *L, const char *method, int iszero,
                       lua_CFunction iter) {
   if (!luaL_getmetafield(L, 1, method)) {  /* no metamethod? */
-    luaL_checktype(L, 1, LUA_TTABLE);  /* argument must be a table */
-    lua_pushcfunction(L, iter);  /* will return generator, */
-    lua_pushvalue(L, 1);  /* state, */
-    if (iszero) lua_pushinteger(L, 0);  /* and initial value */
-    else lua_pushnil(L);
+		if(lua_type(L, 1) == LUA_TTABLE) {
+	    lua_pushcfunction(L, iter);  /* will return generator, */
+	    lua_pushvalue(L, 1);  /* state, */
+	    if (iszero) lua_pushinteger(L, 0);  /* and initial value */
+	    else lua_pushnil(L);
+		}
+		else {
+			lua_pushnil(L);
+		}
   }
   else {
     lua_pushvalue(L, 1);  /* argument 'self' to metamethod */

@@ -26,3 +26,13 @@ print('arbiray size ' arbiray:count())
 new name, occupation, status in l;
 
 print(name occupation status)
+
+for k,v in each(lmpf) {
+  print(k v)
+}
+
+-- each() with an empty object should just not do anything
+for k,v in each(lmpf) {
+  print(k v)
+}
+
