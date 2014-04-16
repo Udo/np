@@ -5,6 +5,6 @@ new BugbearBehavior = (:
 
 new bjorn = (: name = 'Bjorn' )
 
-events(bjorn, 'say', BugbearBehavior.say)
+events(bjorn, BugbearBehavior)
 
 bjorn:say('Hello everybody!')
