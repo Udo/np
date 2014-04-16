@@ -375,28 +375,31 @@ print('Hey folks. My name is' bjorn.name
   </p>
   
   <p>
-    Let's start by defining what the Bugbear species can do.
+    One of the ways to make objects do things is to define
+    events they can respond to. 
+    There are some standard events that allow you to modify how
+    an object responds to common incidents - but you can also specify
+    your own. In this sense, event handlers in np are a lot like class
+    methods in other languages.
+  </p>
+  
+  <p>
+  Let's make a Bugbear that can talk, by providing a <code>say</code> event:
   </p>
   
   <pre class="sh_np">
--- the species
-new BugbearSpecies = (:
+new BugbearBehavior = (:
   say = {(creature text) 
-    print(creature.name 'says:' text) }
+    print(creature.name 'says:' text 'BURP!') }
 )
-BugbearSpecies.index = BugbearSpecies
--- how to build a bugbear
-new Bugbear = {(name)
-  new creature = (: 
-    name = name  
-    species = 'Bugbear' )
-  events(creature, BugbearSpecies)
-  = creature
-}
--- init Bjorn
-new bjorn = Bugbear('Bjorn')
+new bjorn = (: name = 'Bjorn' )
+events(bjorn, BugbearBehavior)
 bjorn:say('Hello everybody!')
 </pre>
+
+  <p>
+  
+  </p>
 
 </div>
 
