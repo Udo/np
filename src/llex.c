@@ -444,8 +444,9 @@ static int llex (LexState *ls, SemInfo *seminfo) {
       }
       case '=': {
         next(ls);
-        if (ls->current != '=') return '=';
-        else { next(ls); return TK_EQ; }
+        if (ls->current == '=') { next(ls); return TK_EQ; }
+        else if (ls->current == '>') { next(ls); return TK_RETURN; }
+        else return '=';
       }
       case '<': {
         next(ls);
