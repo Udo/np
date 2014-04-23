@@ -1712,8 +1712,9 @@ static void retstat (LexState *ls, int single) {
 			checknext(ls, '(');
 	    nret = explist(ls, &e, ')');  /* optional return values */
     }
-		else
+		else {
 	    nret = explist(ls, &e, 0);  /* optional return values */
+		}
   	if (hasmultret(e.k)) {
       luaK_setmultret(fs, &e);
       if (e.k == VCALL && nret == 1) {  /* tail call? */
@@ -1786,7 +1787,7 @@ static void statement (LexState *ls) {
       labelstat(ls, str_checkname(ls), line);
       break;
     }
-    case '=': {  /* stat -> retstat */
+    case TK_RETURNSHORT: {  /* stat -> retstat */
       luaX_next(ls);  /* skip RETURN */
       retstat(ls, 1);
       break;

@@ -28,7 +28,8 @@ enum RESERVED {
   /* other terminal symbols */
   TK_CONCAT, TK_DOTS, TK_EQ, TK_GE, TK_LE, TK_NE, TK_DBCOLON, TK_EOS,
   TK_NUMBER, TK_NAME, TK_STRING, 
-	TK_TBLSTART, TK_TBLEND, TK_TERN
+	TK_TBLSTART, TK_TBLEND, TK_TERN,
+	TK_RETURNSHORT
 };
 
 /* number of reserved words */

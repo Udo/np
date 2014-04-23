@@ -1,10 +1,15 @@
-new BugbearBehavior = (:
+new BugbearEvents = (:
   say = {(creature text) 
-    print(creature.name 'says:' text 'BURP!') }
+    print(creature.name 'the' creature.species 
+      'says:' text 'BURP!') 
+    }
+  create = {(creature) 
+    creature.species = 'Bugbear'
+    => creature
+    }
 )
+new bear = create(BugbearEvents, (: name = 'Bjorn' ))
+bear:say('Hello everybody!')
 
-new bjorn = (: name = 'Bjorn' )
-
-events(bjorn, BugbearBehavior)
-
-bjorn:say('Hello everybody!')
+new f = {(a) => 1, 2, 3 }
+print(f(1))
