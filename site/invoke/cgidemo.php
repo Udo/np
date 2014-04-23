@@ -52,7 +52,7 @@ root.os = nil
 
 '.file_get_contents('cgidemo-examplestate.np').chr(10).$_REQUEST['code']);
   $err = '';
-  cmd_exec('timeout --preserve-status 0.01s ../bin/np '.$tmpFile, $out, $err);
+  cmd_exec('timeout --preserve-status 0.01s /srv/www/htdocs/openfu.com/dev/np/bin/np '.$tmpFile, $out, $err);
   if($err != '')
     $out = substr($err, strpos($err, '.np:')+4);
   #$out = shell_exec('whoami');

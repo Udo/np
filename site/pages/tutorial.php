@@ -35,7 +35,7 @@ PR['registerLangHandler'](
 
 </script>
 
-<div id="side"><iframe id="srcwnd" src="http://openfu.com/dev/np/addons/cgidemo.php" style="width: 100%; border: none; height: 100%;"></iframe></div>
+<div id="side"><iframe id="srcwnd" src="invoke/cgidemo.php" style="width: 100%; border: none; height: 100%;"></iframe></div>
 
 <div class="tutcol">
 
@@ -421,6 +421,11 @@ new bear = create(BugbearEvents, (: name = 'Bjorn' ))
 bear:say('Hello everybody!')
 </pre>
 
+  <p>
+  In this example, we use the <code>create</code> handler to give
+  Bjorn a species field. 
+  </p>
+	
 
 </div>
 
@@ -432,6 +437,6 @@ $c = ob_get_clean();
 
 print(str_replace('<pre class="sh_np">', '<a class="loadsrc" 
   onclick="document.getElementById(\'srcwnd\').setAttribute(\'src\', 
-    \'http://openfu.com/dev/np/addons/cgidemo.php?code=\'+escape($(this).next().text()));">&gt;&gt;&gt;</a><pre class="sh_np prettyprint lang-lua">', $c));
+    \'invoke/cgidemo.php?code=\'+escape($(this).next().text()));">&gt;&gt;&gt;</a><pre class="sh_np prettyprint lang-lua">', $c));
 
 ?>
