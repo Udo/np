@@ -232,13 +232,13 @@ static int luaB_pcall (lua_State *L) {
 
 static int luaB_create (lua_State *L) {
   // takes a table as an argument
-  luaL_checktype(L, 1, LUA_TTABLE);
-  lua_createtable(L, 0, 0);	
-  //lua_settop(L, -2);
-  //lua_setmetatable(L, 1);
-	lua_pushvalue(L, -2);
-	lua_setmetatable(L, -2);
-  //lua_settop(L, 1);
+	if(lua_type(L, 1) == LUA_TTABLE) {
+	  lua_createtable(L, 0, 0);	
+		lua_pushvalue(L, -2);
+		lua_setmetatable(L, -2);
+	} 
+	else
+		lua_createtable(L, 0, 0);
   return 1;
 }
 

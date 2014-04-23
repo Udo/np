@@ -5,7 +5,7 @@ new myBehavior = (:
 
 --create()
 
-new rl = create(myBehavior)
+new rl = create()
 rl += 1
 --events(rl, myBehavior)
 
@@ -14,4 +14,4 @@ for k,v in each(rl) {
 	print(k v)
 }
 
-print('test call ' rl:test('abc'))
+--print('test call ' rl:test('abc'))
