@@ -230,6 +230,18 @@ static int luaB_pcall (lua_State *L) {
   return finishpcall(L, (status == LUA_OK));
 }
 
+static int luaB_create (lua_State *L) {
+  // takes a table as an argument
+  luaL_checktype(L, 1, LUA_TTABLE);
+  lua_createtable(L, 0, 0);	
+  //lua_settop(L, -2);
+  //lua_setmetatable(L, 1);
+	lua_pushvalue(L, -2);
+	lua_setmetatable(L, -2);
+  //lua_settop(L, 1);
+  return 1;
+}
+
 static const luaL_Reg base_funcs[] = {
  // {"tostring", luaB_tostring},
   {"assert", luaB_assert},
@@ -247,6 +259,7 @@ static const luaL_Reg base_funcs[] = {
   {"print", luaB_print},
   {"select", luaB_select},
   {"events", luaB_setmetatable},
+  {"create", luaB_create},
   /*{"xpcall", luaB_xpcall},*/
   {NULL, NULL}
 };

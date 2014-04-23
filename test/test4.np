@@ -1,0 +1,17 @@
+new myBehavior = (: 
+  test = {(ctx str) =str }
+  add = list.add
+	);
+
+--create()
+
+new rl = create(myBehavior)
+rl += 1
+--events(rl, myBehavior)
+
+print('content -------------')
+for k,v in each(rl) {
+	print(k v)
+}
+
+print('test call ' rl:test('abc'))
