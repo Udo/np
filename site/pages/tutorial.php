@@ -392,9 +392,9 @@ new BugbearBehavior = (:
   say = {(creature text) 
     print(creature.name 'says:' text 'BURP!') }
 )
-new bjorn = (: name = 'Bjorn' )
-events(bjorn, BugbearBehavior)
-bjorn:say('Hello everybody!')
+new bear = create(BugbearBehavior)
+bear.name = 'Bjorn'
+bear:say('Hello everybody!')
 </pre>
 
   <p>

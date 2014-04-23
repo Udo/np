@@ -233,9 +233,16 @@ static int luaB_pcall (lua_State *L) {
 static int luaB_create (lua_State *L) {
   // takes a table as an argument
 	if(lua_type(L, 1) == LUA_TTABLE) {
-	  lua_createtable(L, 0, 0);	
+		if(lua_type(L, 2) != LUA_TTABLE)
+	  	lua_createtable(L, 0, 0);	
 		lua_pushvalue(L, -2);
 		lua_setmetatable(L, -2);
+		
+	  if (luaL_getmetafield(L, -1, "create")) {  /* no metamethod? */
+	    lua_pushvalue(L, -2);  /* argument 'self' to metamethod */
+	    lua_call(L, 1, 1);  /* get 3 values from metamethod */
+	  }
+
 	} 
 	else
 		lua_createtable(L, 0, 0);
