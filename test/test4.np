@@ -1,17 +1,3 @@
-new myBehavior = (: 
-  test = {(ctx str) =str }
-  add = list.add
-	);
+new myStr = 'abcde' << '12345'
 
---create()
-
-new rl = create()
-rl += 1
---events(rl, myBehavior)
-
-print('content -------------')
-for k,v in each(rl) {
-	print(k v)
-}
-
---print('test call ' rl:test('abc'))
+print(myStr)
