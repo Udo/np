@@ -13,7 +13,7 @@
 
 <div>
 
-  <!--<table width="280" align="left" style="margin-right: 12px; margin-top: 12px;">
+  <table width="280" align="left" style="margin-right: 12px; margin-top: 12px;">
     <tr><td><div style="text-align: center;">
          
          <h3>Curious?</h3>
@@ -25,7 +25,7 @@
          <br/><br/>
     
     </div></td></tr>
-  </table>-->
+  </table>
 
   <h3>What is it like?</h3>
   
