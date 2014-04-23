@@ -95,7 +95,7 @@ print(imAString imANumber
   </p>
   
   <pre class="sh_np">new places = (: 'earth' 'solar system' 'galaxy')
-for nr, thing in list(places) {
+for nr, thing in each(places) {
   print(nr 'Hello' thing)
 }</pre>
   
@@ -209,7 +209,7 @@ else (condition2)
   if (i % 3 == 0) fbResult = 'Fizz' 
   if (i % 5 == 0) fbResult .= 'Buzz' 
   if (!fbResult) fbResult = i 
-  = fbResult, i
+  => fbResult, i
 }
 
 print(fizzBuzzer(15))</pre>
@@ -335,9 +335,9 @@ f() </pre>
   new secretNumber = 42
   guessMe = {(guess)
     if guess == secretNumber
-      = 'Darn, you guessed it'
+      => 'Darn, you guessed it'
     otherwise
-      = 'Nope, fail haha'
+      => 'Nope, fail haha'
   }
 }
 print(guessMe(1))
@@ -359,14 +359,14 @@ print(guessMe(42))</pre>
     Constructors are functions that build and initialize objects.</p>
   
   <pre class="sh_np">new Bugbear = {(name)
-    = (: 
+    => (: 
       name = name  
       species = 'Bugbear' 
       health = 100 )
 } 
-new bjorn = Bugbear('Bjorn')
-print('Hey folks. My name is' bjorn.name 
-  'and I am a' bjorn.species)</pre>
+new bear = Bugbear('Bjorn')
+print('Hey folks. My name is' bear.name 
+  'and I am a' bear.species)</pre>
   
   <p>
     This inits a new Bugbear called Bjorn. He has a name, a species, and a health score.
@@ -375,10 +375,10 @@ print('Hey folks. My name is' bjorn.name
   </p>
   
   <p>
-    One of the ways to make objects do things is to define
+    One of the ways to make lists do things is to define
     events they can respond to. 
     There are some standard events that allow you to modify how
-    an object responds to common incidents - but you can also specify
+    a list responds to common incidents - but you can also specify
     your own. In this sense, event handlers in np are a lot like class
     methods in other languages.
   </p>
@@ -387,19 +387,40 @@ print('Hey folks. My name is' bjorn.name
   Let's make a Bugbear that can talk, by providing a <code>say</code> event:
   </p>
   
-  <pre class="sh_np">
-new BugbearBehavior = (:
+  <pre class="sh_np">new BugbearEvents = (:
   say = {(creature text) 
     print(creature.name 'says:' text 'BURP!') }
 )
-new bear = create(BugbearBehavior)
-bear.name = 'Bjorn'
+new bear = create(BugbearEvents, (: name = 'Bjorn' ))
 bear:say('Hello everybody!')
 </pre>
 
   <p>
-  
+  The <code>create()</code> function also works if you only give it the
+  events list, in that case an empty list will be created and returned.
   </p>
+  
+  <p>
+  That's all fine, but to make the whole thing more powerful <code>np</code> gives
+  you a standard event called <code>create</code> which provides a neat place
+  to initialize lists at the moment of creation:  
+  </p>
+
+  <pre class="sh_np">
+new BugbearEvents = (:
+  say = {(creature text) 
+    print(creature.name 'the' creature.species 
+      'says:' text 'BURP!') 
+    }
+  create = {(creature) 
+    creature.species = 'Bugbear'; 
+    => creature 
+    }
+)
+new bear = create(BugbearEvents, (: name = 'Bjorn' ))
+bear:say('Hello everybody!')
+</pre>
+
 
 </div>
 
