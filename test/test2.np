@@ -1,3 +1,13 @@
-new r = 31/3
+new l = (: 1 2 3 'blub' 4 5 z = 'abc' d = 123)
 
-print(math.frac(r))
+events(l, list+(: test = {(t) print('hello') }))
+
+print(':each:');
+print(l:each({(a1 a2 a3) print(a1 a2 a3)}))
+
+--print(':items:');
+--print(l:items({(a1 a2 a3) print(a1 a2 a3)}))
+
+l
+  :map({(k v l) print('mapping' k v l); => k,v..'u' })
+  :each({(k v) print(k v)})

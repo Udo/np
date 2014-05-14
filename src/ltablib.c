@@ -80,30 +80,26 @@ static int tremove (lua_State *L) {
 }
 
 
-static void addfield (lua_State *L, luaL_Buffer *b, int i) {
-  lua_rawgeti(L, 1, i);
-  if (lua_isstring(L, -1))
-  /*  luaL_error(L, "invalid value (%s) at index %d in table for "
-                  LUA_QL("concat"), luaL_typename(L, -1), i);*/
-  luaL_addvalue(b);
-}
-
-
-static int tconcat (lua_State *L) {
+static int tbl_join (lua_State *L) {
   luaL_Buffer b;
   size_t lsep;
-  int i, last;
+  int i, last, actualCount;
+	actualCount = -1;
   const char *sep = luaL_optlstring(L, 2, "", &lsep);
   luaL_checktype(L, 1, LUA_TTABLE);
   i = luaL_optint(L, 3, 1);
   last = luaL_opt(L, luaL_checkint, 4, luaL_len(L, 1));
   luaL_buffinit(L, &b);
-  for (; i < last; i++) {
-    addfield(L, &b, i);
-    luaL_addlstring(&b, sep, lsep);
+
+  for (; i <= last; i++) {
+		lua_rawgeti(L, 1, i);
+		if (lua_isstring(L, -1)) {
+			if(actualCount != -1) luaL_addlstring(&b, sep, lsep);
+			actualCount++;
+			luaL_addvalue(&b);
+		}
   }
-  if (i == last)  /* add last value (if interval was not empty) */
-    addfield(L, &b, i);
+
   luaL_pushresult(&b);
   return 1;
 }
@@ -253,21 +249,129 @@ static int sort (lua_State *L) {
   return 0;
 }
 
+static void tbl_copy_helper  (lua_State *L, int srcTable, int destTable) {
+  lua_pushnil(L);  /* first key */
+  while (lua_next(L, srcTable)) {
+		lua_pushvalue(L, 4);
+		lua_pushvalue(L, 5);
+		lua_settable(L, destTable);
+		lua_pop(L, 1);
+  }
+}
+
 static int tbl_add (lua_State *L) {
-	luaL_checktype(L, 1, LUA_TTABLE);
-  int pos = aux_getn(L, 1) + 1;  /* first empty element */
-  lua_rawseti(L, 1, pos);  /* t[pos] = v */
+  luaL_checktype(L, 1, LUA_TTABLE);
+  luaL_checktype(L, 2, LUA_TTABLE);
+	lua_settop(L, 2);
+	// create result table
+	lua_createtable(L, 0, 0);
+	
+	tbl_copy_helper(L, 1, 3);
+	tbl_copy_helper(L, 2, 3);
+
+  lua_pushvalue(L, 3);
+	if (lua_getmetatable(L, 1)) {
+		lua_setmetatable(L, 3);
+	}
   return 1;
 }
+
+// todo: this is horrible, see luaH_next for ideas on how to do it with less overhead
+static int tbl_each (lua_State *L) {
+  int i = 0;
+  luaL_checktype(L, 1, LUA_TTABLE);
+  luaL_checktype(L, 2, LUA_TFUNCTION);
+	lua_settop(L, 2);
+
+  lua_pushnil(L);  /* first key */
+  while (lua_next(L, 1)) {
+		i++;
+		lua_pushvalue(L, 2);
+		lua_pushvalue(L, 3);
+		lua_pushvalue(L, 4);
+		lua_pushnumber(L, i);
+		lua_call(L, 3, 1);
+		lua_pop(L, 1); // pop the function result
+		lua_pop(L, 1); // pop the hash value
+  }
+  lua_pushvalue(L, 1);
+  return 1;
+}
+
+// todo: this is horrible, see luaH_next for ideas on how to do it with less overhead
+static int tbl_map (lua_State *L) {
+  int i = 0;
+  luaL_checktype(L, 1, LUA_TTABLE);
+  luaL_checktype(L, 2, LUA_TFUNCTION);
+	lua_settop(L, 2);
+	// create result table
+	lua_createtable(L, 0, 0);
+	
+  lua_pushnil(L);  /* first key */
+  while (lua_next(L, 1)) {
+		i++;
+		lua_pushvalue(L, 2);
+		lua_pushvalue(L, 4);
+		lua_pushvalue(L, 5);
+		lua_pushnumber(L, i);
+		lua_call(L, 3, 2);
+		if(!lua_isnil(L, -2)) {
+			if(lua_isnil(L, -1)) { // if only one value was returned, treat it as a value
+				lua_pop(L, 1);
+				lua_pushvalue(L, 4); // and take the original element key as the new key
+				lua_insert(L, -2);
+			}
+			lua_settable(L, 3);
+		} else {
+			lua_pop(L, 2);
+		}
+		//lua_rawseti(L, 3, i);
+		//lua_setfield(L, 3, "add");
+		lua_pop(L, 1); // pop the hash value
+  }
+  lua_pushvalue(L, 3);
+	if (lua_getmetatable(L, 1)) {
+		lua_setmetatable(L, 3);
+	}
+  return 1;
+}
+
+// todo: this is horrible, see luaH_next for ideas on how to do it with less overhead
+static int tbl_items (lua_State *L) {
+  int i = 0;
+  luaL_checktype(L, 1, LUA_TTABLE);
+  luaL_checktype(L, 2, LUA_TFUNCTION);
+	lua_settop(L, 2);
+	
+  int n = aux_getn(L, 1);  /* get size of table */
+  for (i=1; i <= n; i++) {
+		lua_pushvalue(L, 2);
+		lua_pushnumber(L, i);
+		lua_rawgeti(L, 1, i);
+		if (!lua_isnil(L, -1)) {
+			lua_call(L, 2, 1);			
+			lua_pop(L, 1); // pop the return value
+		} else {
+			// clean up the stack
+			lua_pop(L, 3);
+		}
+  }
+  lua_pushvalue(L, 1);
+  return 1;
+}
+
 
 /* }====================================================== */
 
 
 static const luaL_Reg tab_funcs[] = {
-  {"join", tconcat},
+  {"join", tbl_join},
   {"count", maxn},
   {"insert", tinsert},
   {"condense", pack},
+  {"each", tbl_each},
+  {"map", tbl_map},
+  {"items", tbl_items},
   {"expand", unpack},
   {"remove", tremove},
   {"sort", sort},
