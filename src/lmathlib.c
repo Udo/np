@@ -33,6 +33,16 @@ static int math_sin (lua_State *L) {
   return 1;
 }
 
+static int math_erf (lua_State *L) {
+  lua_pushnumber(L, l_mathop(erf)(luaL_checknumber(L, 1)));
+  return 1;
+}
+
+static int math_gamma (lua_State *L) {
+  lua_pushnumber(L, l_mathop(tgamma)(luaL_checknumber(L, 1)));
+  return 1;
+}
+
 static int math_sinh (lua_State *L) {
   lua_pushnumber(L, l_mathop(sinh)(luaL_checknumber(L, 1)));
   return 1;
@@ -84,6 +94,11 @@ static int math_ceil (lua_State *L) {
   return 1;
 }
 
+static int math_round (lua_State *L) {
+  lua_pushnumber(L, l_mathop(round)(luaL_checknumber(L, 1)));
+  return 1;
+}
+
 static int math_floor (lua_State *L) {
   lua_pushnumber(L, l_mathop(floor)(luaL_checknumber(L, 1)));
   return 1;
@@ -129,12 +144,10 @@ static int math_log (lua_State *L) {
   return 1;
 }
 
-#if defined(LUA_COMPAT_LOG10)
 static int math_log10 (lua_State *L) {
   lua_pushnumber(L, l_mathop(log10)(luaL_checknumber(L, 1)));
   return 1;
 }
-#endif
 
 static int math_exp (lua_State *L) {
   lua_pushnumber(L, l_mathop(exp)(luaL_checknumber(L, 1)));
@@ -166,7 +179,6 @@ static int math_ldexp (lua_State *L) {
 }
 
 
-
 static int math_min (lua_State *L) {
   int n = lua_gettop(L);  /* number of arguments */
   lua_Number dmin = luaL_checknumber(L, 1);
@@ -194,6 +206,25 @@ static int math_max (lua_State *L) {
   return 1;
 }
 
+static int math_nan (lua_State *L) {
+  int n = lua_gettop(L);  /* number of arguments */
+	if(n == 0) {
+  	lua_pushnumber(L, NAN);
+	} else {
+		lua_pushboolean(L, isnan(luaL_checknumber(L, 1)));			
+	}
+  return 1;
+}
+
+static int math_inf (lua_State *L) {
+  int n = lua_gettop(L);  /* number of arguments */
+	if(n == 0) {
+  	lua_pushnumber(L, HUGE_VAL);
+	} else {
+		lua_pushboolean(L, isinf(luaL_checknumber(L, 1)));			
+	}
+  return 1;
+}
 
 static int math_random (lua_State *L) {
   /* the `%' avoids the (rare) case of r==1, and is needed also because on
@@ -240,22 +271,25 @@ static const luaL_Reg mathlib[] = {
   {"cosh",   math_cosh},
   {"cos",   math_cos},
   {"deg",   math_deg},
+  {"erf",   math_erf},
   {"exp",   math_exp},
+  {"gamma",   math_gamma},
   {"floor", math_floor},
-  {"fmod",   math_fmod},
+  {"mod",   math_fmod},
   {"frexp", math_frexp},
   {"ldexp", math_ldexp},
-#if defined(LUA_COMPAT_LOG10)
   {"log10", math_log10},
-#endif
   {"log",   math_log},
+  {"inf",   math_inf},
   {"max",   math_max},
   {"min",   math_min},
-  {"modf",   math_modf},
+  {"frac",   math_modf},
+  {"nan",   math_nan},
   {"pow",   math_pow},
   {"rad",   math_rad},
   {"random",     math_random},
   {"randomseed", math_randomseed},
+  {"round", math_round},
   {"sinh",   math_sinh},
   {"sin",   math_sin},
   {"sqrt",  math_sqrt},
@@ -272,8 +306,6 @@ LUAMOD_API int luaopen_math (lua_State *L) {
   luaL_newlib(L, mathlib);
   lua_pushnumber(L, PI);
   lua_setfield(L, -2, "pi");
-  lua_pushnumber(L, HUGE_VAL);
-  lua_setfield(L, -2, "huge");
   return 1;
 }
 

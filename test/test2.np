@@ -1,22 +1,3 @@
+new r = 31/3
 
-new l = (: 1 2 3 4)
-
-events(l, (:
-  event = {(tbl eventName)
-		= {(a) 
-		  = eventName
-	  }
-	}
-	bla = {(meTable) print('bla: ' meTable.name) }
-  )
-)
-	
-new s = 'abcde'
-
---bjorn:say('Hello everybody!')
-	
-print(s:upper())
-
-print(l:bla())
-
-print(l:blu(1))
+print(math.frac(r))
