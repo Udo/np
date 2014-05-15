@@ -249,14 +249,22 @@ static int sort (lua_State *L) {
   return 0;
 }
 
-static void tbl_copy_helper  (lua_State *L, int srcTable, int destTable) {
+static int tbl_copy_helper  (lua_State *L, int srcTable, int destTable, int countIdx) {
   lua_pushnil(L);  /* first key */
   while (lua_next(L, srcTable)) {
-		lua_pushvalue(L, 4);
+		if (lua_type(L, 4) == LUA_TNUMBER) {
+			// if it's a number index, add to the new array
+			countIdx++;
+			lua_pushnumber(L, countIdx);
+		} else {
+			// otherwise treat as key index
+			lua_pushvalue(L, 4);
+		}
 		lua_pushvalue(L, 5);
 		lua_settable(L, destTable);
 		lua_pop(L, 1);
   }
+	return countIdx;
 }
 
 static int tbl_add (lua_State *L) {
@@ -266,8 +274,8 @@ static int tbl_add (lua_State *L) {
 	// create result table
 	lua_createtable(L, 0, 0);
 	
-	tbl_copy_helper(L, 1, 3);
-	tbl_copy_helper(L, 2, 3);
+	int countIdx = tbl_copy_helper(L, 1, 3, 0);
+	tbl_copy_helper(L, 2, 3, countIdx);
 
   lua_pushvalue(L, 3);
 	if (lua_getmetatable(L, 1)) {
@@ -325,8 +333,6 @@ static int tbl_map (lua_State *L) {
 		} else {
 			lua_pop(L, 2);
 		}
-		//lua_rawseti(L, 3, i);
-		//lua_setfield(L, 3, "add");
 		lua_pop(L, 1); // pop the hash value
   }
   lua_pushvalue(L, 3);
@@ -336,7 +342,6 @@ static int tbl_map (lua_State *L) {
   return 1;
 }
 
-// todo: this is horrible, see luaH_next for ideas on how to do it with less overhead
 static int tbl_items (lua_State *L) {
   int i = 0;
   luaL_checktype(L, 1, LUA_TTABLE);
