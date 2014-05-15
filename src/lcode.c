@@ -793,10 +793,12 @@ void luaK_infix (FuncState *fs, BinOpr op, expdesc *v) {
       luaK_goiffalse(fs, v);
       break;
     }
+		case OPR_MCONCAT: 
     case OPR_CONCAT: {
       luaK_exp2nextreg(fs, v);  /* operand must be on the `stack' */
       break;
     }
+		case OPR_MADD: case OPR_MSUB: 
     case OPR_ADD: case OPR_SUB: case OPR_MUL: case OPR_DIV:
     case OPR_MOD: case OPR_POW: {
       if (!isnumeral(v)) luaK_exp2RK(fs, v);
@@ -827,6 +829,20 @@ void luaK_posfix (FuncState *fs, BinOpr op,
       *e1 = *e2;
       break;
     }
+    case OPR_MCONCAT: {
+      luaK_exp2val(fs, e2);
+      if (e2->k == VRELOCABLE && GET_OPCODE(getcode(fs, e2)) == OP_MCONCAT) {
+        lua_assert(e1->u.info == GETARG_B(getcode(fs, e2))-1);
+        freeexp(fs, e1);
+        SETARG_B(getcode(fs, e2), e1->u.info);
+        e1->k = VRELOCABLE; e1->u.info = e2->u.info;
+      }
+      else {
+        luaK_exp2nextreg(fs, e2);  /* operand must be on the 'stack' */
+        codearith(fs, OP_MCONCAT, e1, e2, line);
+      }
+      break;
+    }
     case OPR_CONCAT: {
       luaK_exp2val(fs, e2);
       if (e2->k == VRELOCABLE && GET_OPCODE(getcode(fs, e2)) == OP_CONCAT) {
@@ -841,6 +857,7 @@ void luaK_posfix (FuncState *fs, BinOpr op,
       }
       break;
     }
+		case OPR_MADD: case OPR_MSUB: 
     case OPR_ADD: case OPR_SUB: case OPR_MUL: case OPR_DIV:
     case OPR_MOD: case OPR_POW: {
       codearith(fs, cast(OpCode, op - OPR_ADD + OP_ADD), e1, e2, line);

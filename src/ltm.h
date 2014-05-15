@@ -25,7 +25,9 @@ typedef enum {
   TM_LEN,
   TM_EQ,  /* last tag method with `fast' access */
   TM_ADD,
+  TM_MADD,
   TM_SUB,
+  TM_MSUB,
   TM_MUL,
   TM_DIV,
   TM_MOD,
@@ -34,6 +36,7 @@ typedef enum {
   TM_LT,
   TM_LE,
   TM_CONCAT,
+  TM_MCONCAT,
   TM_CALL,
   TM_N		/* number of elements in the enum */
 } TMS;

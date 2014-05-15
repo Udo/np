@@ -36,7 +36,7 @@ LUAI_FUNC void luaV_settable (lua_State *L, const TValue *t, TValue *key,
                                             StkId val);
 LUAI_FUNC void luaV_finishOp (lua_State *L);
 LUAI_FUNC void luaV_execute (lua_State *L);
-LUAI_FUNC void luaV_concat (lua_State *L, int total);
+LUAI_FUNC void luaV_concat (lua_State *L, int total, TMS event);
 LUAI_FUNC void luaV_arith (lua_State *L, StkId ra, const TValue *rb,
                            const TValue *rc, TMS op);
 LUAI_FUNC void luaV_objlen (lua_State *L, StkId ra, const TValue *rb);

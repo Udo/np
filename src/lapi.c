@@ -1157,7 +1157,7 @@ LUA_API void lua_concat (lua_State *L, int n) {
   api_checknelems(L, n);
   if (n >= 2) {
     luaC_checkGC(L);
-    luaV_concat(L, n);
+    luaV_concat(L, n, TM_CONCAT);
   }
   else if (n == 0) {  /* push empty string */
     setsvalue2s(L, L->top, luaS_newlstr(L, "", 0));

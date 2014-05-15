@@ -1,5 +1,5 @@
-new l = (: 1 2 3 'blub' 4 5 z = 'abc' d = 123)
+l1 = (: 1 2 3 bla = 123)
 
-new l2 = l + (: 10 20 30 bla = 'blib' d = 246)
+new mr = {(a b) => a+b }
 
-l2:each({(k v) print(k v)})
+print(l1:reduce(mr))

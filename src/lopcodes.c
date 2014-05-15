@@ -29,7 +29,9 @@ LUAI_DDEF const char *const luaP_opnames[NUM_OPCODES+1] = {
   "NEWTABLE",
   "SELF",
   "ADD",
+  "MADD",
   "SUB",
+  "MSUB",
   "MUL",
   "DIV",
   "MOD",
@@ -38,6 +40,7 @@ LUAI_DDEF const char *const luaP_opnames[NUM_OPCODES+1] = {
   "NOT",
   "LEN",
   "CONCAT",
+	"MCONCAT",
   "JMP",
   "EQ",
   "LT",
@@ -77,7 +80,9 @@ LUAI_DDEF const lu_byte luaP_opmodes[NUM_OPCODES] = {
  ,opmode(0, 1, OpArgU, OpArgU, iABC)		/* OP_NEWTABLE */
  ,opmode(0, 1, OpArgR, OpArgK, iABC)		/* OP_SELF */
  ,opmode(0, 1, OpArgK, OpArgK, iABC)		/* OP_ADD */
+ ,opmode(0, 1, OpArgK, OpArgK, iABC)		/* OP_MADD */
  ,opmode(0, 1, OpArgK, OpArgK, iABC)		/* OP_SUB */
+ ,opmode(0, 1, OpArgK, OpArgK, iABC)		/* OP_MSUB */
  ,opmode(0, 1, OpArgK, OpArgK, iABC)		/* OP_MUL */
  ,opmode(0, 1, OpArgK, OpArgK, iABC)		/* OP_DIV */
  ,opmode(0, 1, OpArgK, OpArgK, iABC)		/* OP_MOD */
@@ -86,6 +91,7 @@ LUAI_DDEF const lu_byte luaP_opmodes[NUM_OPCODES] = {
  ,opmode(0, 1, OpArgR, OpArgN, iABC)		/* OP_NOT */
  ,opmode(0, 1, OpArgR, OpArgN, iABC)		/* OP_LEN */
  ,opmode(0, 1, OpArgR, OpArgR, iABC)		/* OP_CONCAT */
+ ,opmode(0, 1, OpArgR, OpArgR, iABC)		/* OP_MCONCAT */
  ,opmode(0, 0, OpArgR, OpArgN, iAsBx)		/* OP_JMP */
  ,opmode(1, 0, OpArgK, OpArgK, iABC)		/* OP_EQ */
  ,opmode(1, 0, OpArgK, OpArgK, iABC)		/* OP_LT */

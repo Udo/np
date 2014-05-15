@@ -336,18 +336,19 @@ int luaV_equalobj_ (lua_State *L, const TValue *t1, const TValue *t2) {
 }
 
 
-void luaV_concat (lua_State *L, int total) {
+void luaV_concat (lua_State *L, int total, TMS event) {
   lua_assert(total >= 2);
   do {
     StkId top = L->top;
     int n = 2;  /* number of elements handled in this pass (at least 2) */
-		// this effectively deactivates the concat metatable event, but I prefer the behavior we enable by doing it
-		/*
+		
 		if (!(ttisstring(top-2) || ttisnumber(top-2) || ttisnil(top-2))) {
-      if (!call_binTM(L, top-2, top-1, top-2, TM_CONCAT))
-        luaG_concaterror(L, top-2, top-1);
+      if (!call_binTM(L, top-2, top-1, top-2, event))
+				// try imutable concat if no mutable found
+				if(event != TM_MCONCAT || !call_binTM(L, top-2, top-1, top-2, TM_CONCAT))
+        	luaG_concaterror(L, top-2, top-1);
     }
-    else */
+    else 
 		if (tsvalue(top-1)->len == 0)  /* second operand is empty? */
       (void)tostring(L, top - 2);  /* result is first operand */
     else if (ttisnil(top-2) || (ttisstring(top-2) && tsvalue(top-2)->len == 0)) {
@@ -494,6 +495,7 @@ void luaV_finishOp (lua_State *L) {
         ci->u.l.savedpc++;  /* skip jump instruction */
       break;
     }
+		case OP_MCONCAT:
     case OP_CONCAT: {
       StkId top = L->top - 1;  /* top when 'call_binTM' was called */
       int b = GETARG_B(inst);      /* first element to concatenate */
@@ -501,7 +503,7 @@ void luaV_finishOp (lua_State *L) {
       setobj2s(L, top - 2, top);  /* put TM result in proper position */
       if (total > 1) {  /* are there elements to concat? */
         L->top = top - 1;  /* top is one after last element (at top-2) */
-        luaV_concat(L, total);  /* concat them (may yield again) */
+        luaV_concat(L, total, op == OP_CONCAT ? TM_CONCAT : TM_MCONCAT );  /* concat them (may yield again) */
       }
       /* move final result to final position */
       setobj2s(L, ci->u.l.base + GETARG_A(inst), L->top - 1);
@@ -666,7 +668,13 @@ void luaV_execute (lua_State *L) {
       vmcase(OP_ADD,
         arith_op(luai_numadd, TM_ADD);
       )
+      vmcase(OP_MADD,
+        arith_op(luai_numadd, TM_ADD);
+      )
       vmcase(OP_SUB,
+        arith_op(luai_numsub, TM_SUB);
+      )
+      vmcase(OP_MSUB,
         arith_op(luai_numsub, TM_SUB);
       )
       vmcase(OP_MUL,
@@ -704,7 +712,19 @@ void luaV_execute (lua_State *L) {
         int c = GETARG_C(i);
         StkId rb;
         L->top = base + c + 1;  /* mark the end of concat operands */
-        Protect(luaV_concat(L, c - b + 1));
+        Protect(luaV_concat(L, c - b + 1, TM_CONCAT));
+        ra = RA(i);  /* 'luav_concat' may invoke TMs and move the stack */
+        rb = b + base;
+        setobjs2s(L, ra, rb);
+        checkGC(L, (ra >= rb ? ra + 1 : rb));
+        L->top = ci->top;  /* restore top */
+      )
+      vmcase(OP_MCONCAT,
+        int b = GETARG_B(i);
+        int c = GETARG_C(i);
+        StkId rb;
+        L->top = base + c + 1;  /* mark the end of concat operands */
+        Protect(luaV_concat(L, c - b + 1, TM_MCONCAT));
         ra = RA(i);  /* 'luav_concat' may invoke TMs and move the stack */
         rb = b + base;
         setobjs2s(L, ra, rb);

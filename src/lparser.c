@@ -1197,6 +1197,13 @@ static int compound_assignment(LexState *ls, struct LHS_assign *lh, int nvars) {
     }
     goto done;
   }
+	switch(op)
+	{
+		case(OPR_CONCAT): { op = OPR_MCONCAT; break; }
+		case(OPR_ADD): { op = OPR_MADD; break; }
+		case(OPR_SUB): { op = OPR_MSUB; break; }
+		default: { break; }
+	}
   checknext(ls, '=');
   do {
     if(!assign) {

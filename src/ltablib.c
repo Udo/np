@@ -21,21 +21,24 @@
 
 
 
-static int maxn (lua_State *L) {
+static int get_maxn (lua_State *L, int stackIdx) {
   lua_Number max = 0;
-  luaL_checktype(L, 1, LUA_TTABLE);
+  luaL_checktype(L, stackIdx, LUA_TTABLE);
   lua_pushnil(L);  /* first key */
-  while (lua_next(L, 1)) {
-    lua_pop(L, 1);  /* remove value */
+  while (lua_next(L, stackIdx)) {
+    lua_pop(L, stackIdx);  /* remove value */
     if (lua_type(L, -1) == LUA_TNUMBER) {
       lua_Number v = lua_tonumber(L, -1);
       if (v > max) max = v;
     }
   }
-  lua_pushnumber(L, max);
-  return 1;
+  return max;
 }
 
+static int maxn (lua_State *L) {
+	lua_pushnumber(L, get_maxn(L, 1));
+	return 1;
+}
 
 static int tinsert (lua_State *L) {
   int e = aux_getn(L, 1) + 1;  /* first empty element */
@@ -239,28 +242,30 @@ static void auxsort (lua_State *L, int l, int u) {
   }  /* repeat the routine for the larger one */
 }
 
-static int sort (lua_State *L) {
+static int tbl_sort (lua_State *L) {
   int n = aux_getn(L, 1);
   luaL_checkstack(L, 40, "");  /* assume array is smaller than 2^40 */
   if (!lua_isnoneornil(L, 2))  /* is there a 2nd argument? */
     luaL_checktype(L, 2, LUA_TFUNCTION);
   lua_settop(L, 2);  /* make sure there is two arguments */
   auxsort(L, 1, n);
-  return 0;
+	lua_pushvalue(L, 1);
+  return 1;
 }
 
 static int tbl_copy_helper  (lua_State *L, int srcTable, int destTable, int countIdx) {
-  lua_pushnil(L);  /* first key */
+  int vTop = lua_gettop(L);
+	lua_pushnil(L);  /* first key */
   while (lua_next(L, srcTable)) {
-		if (lua_type(L, 4) == LUA_TNUMBER) {
+		if (lua_type(L, vTop+1) == LUA_TNUMBER) {
 			// if it's a number index, add to the new array
 			countIdx++;
 			lua_pushnumber(L, countIdx);
 		} else {
 			// otherwise treat as key index
-			lua_pushvalue(L, 4);
+			lua_pushvalue(L, vTop+1);
 		}
-		lua_pushvalue(L, 5);
+		lua_pushvalue(L, vTop+2);
 		lua_settable(L, destTable);
 		lua_pop(L, 1);
   }
@@ -269,18 +274,71 @@ static int tbl_copy_helper  (lua_State *L, int srcTable, int destTable, int coun
 
 static int tbl_add (lua_State *L) {
   luaL_checktype(L, 1, LUA_TTABLE);
-  luaL_checktype(L, 2, LUA_TTABLE);
 	lua_settop(L, 2);
 	// create result table
 	lua_createtable(L, 0, 0);
 	
 	int countIdx = tbl_copy_helper(L, 1, 3, 0);
-	tbl_copy_helper(L, 2, 3, countIdx);
+	if (!lua_isnil(L, 2)) {
+		lua_pushnumber(L, countIdx+1);
+		lua_pushvalue(L, 2);
+		lua_settable(L, 3);
+	}
 
   lua_pushvalue(L, 3);
 	if (lua_getmetatable(L, 1)) {
 		lua_setmetatable(L, 3);
 	}
+  return 1;
+}
+
+static int tbl_concat_helper (lua_State *L, int isImmutable) {
+  luaL_checktype(L, 1, LUA_TTABLE);
+  luaL_checktype(L, 2, LUA_TTABLE);
+	lua_settop(L, 2);
+	int dstTable;
+	int countIdx = 0;
+	
+	if(isImmutable) {
+		// create result table
+		lua_createtable(L, 0, 0);
+		if (lua_getmetatable(L, 1)) {
+			lua_setmetatable(L, 3);
+		}
+		dstTable = 3;
+		countIdx = tbl_copy_helper(L, 1, 3, 0);
+	} else {
+		dstTable = 1;
+	  countIdx = get_maxn(L, 1);
+	}
+	
+	tbl_copy_helper(L, 2, dstTable, countIdx);
+
+  lua_pushvalue(L, dstTable);
+  return 1;
+}
+
+static int tbl_concat (lua_State *L) {
+	return tbl_concat_helper(L, 1);
+}
+
+static int tbl_mconcat (lua_State *L) {
+	return tbl_concat_helper(L, 0);
+}
+
+static int tbl_copy (lua_State *L) {
+  luaL_checktype(L, 1, LUA_TTABLE);
+	lua_settop(L, 1);
+	int countIdx = 0;
+	
+  // create result table
+	lua_createtable(L, 0, 0);
+	if (lua_getmetatable(L, 1)) {
+		lua_setmetatable(L, 2);
+	}
+	countIdx = tbl_copy_helper(L, 1, 2, 0);
+	
+  lua_pushvalue(L, 2);
   return 1;
 }
 
@@ -365,21 +423,50 @@ static int tbl_items (lua_State *L) {
   return 1;
 }
 
+static int tbl_reduce (lua_State *L) {
+  int i = 0;
+  luaL_checktype(L, 1, LUA_TTABLE);
+  luaL_checktype(L, 2, LUA_TFUNCTION);
+	lua_settop(L, 3);
+	if(lua_isnil(L, 3)) {
+		lua_pushnumber(L, 0);
+		lua_replace(L, 3);
+	}
+	
+  int n = aux_getn(L, 1);  /* get size of table */
+  for (i=1; i <= n; i++) {
+		lua_pushvalue(L, 2);
+		lua_rawgeti(L, 1, i);
+		if (!lua_isnil(L, -1)) {
+			lua_pushvalue(L, 3);
+			lua_call(L, 2, 1);			
+			lua_replace(L, 3);
+		} else {
+			lua_pop(L, 2);
+		}
+  }
+  lua_pushvalue(L, 3);
+  return 1;
+}
 
 /* }====================================================== */
 
 
 static const luaL_Reg tab_funcs[] = {
-  {"join", tbl_join},
-  {"count", maxn},
-  {"insert", tinsert},
+  {"join", tbl_join}, // join(seperator) puts all elements together in a string seperated by the seperator
+  {"count", maxn}, // sort-of counts the items by returning the highest numerical index used
+  {"insert", tinsert},  // insert(list, item) or insert(list, pos, item)
   {"condense", pack},
+  {"copy", tbl_copy},
   {"each", tbl_each},
   {"map", tbl_map},
   {"items", tbl_items},
   {"expand", unpack},
   {"remove", tremove},
-  {"sort", sort},
+  {"reduce", tbl_reduce},
+  {"sort", tbl_sort},
+  {"concat", tbl_concat},
+  {"mconcat", tbl_mconcat},
   {"add", tbl_add},
   {NULL, NULL}
 };
@@ -397,6 +484,10 @@ static void createmetatable (lua_State *L) {
 	
 	lua_getfield(L, -2, "add");
 	lua_setfield(L, -2, "add");
+	lua_getfield(L, -2, "concat");
+	lua_setfield(L, -2, "concat");
+	lua_getfield(L, -2, "mconcat");
+	lua_setfield(L, -2, "mconcat");
 	
   lua_pop(L, 1);			 /* pop metatable */
 }
