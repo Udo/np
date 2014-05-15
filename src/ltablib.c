@@ -272,24 +272,41 @@ static int tbl_copy_helper  (lua_State *L, int srcTable, int destTable, int coun
 	return countIdx;
 }
 
-static int tbl_add (lua_State *L) {
+static int tbl_add_helper (lua_State *L, int isImmutable) {
   luaL_checktype(L, 1, LUA_TTABLE);
 	lua_settop(L, 2);
-	// create result table
-	lua_createtable(L, 0, 0);
+	int countIdx = 0;
+	int dstTable = 0;
 	
-	int countIdx = tbl_copy_helper(L, 1, 3, 0);
+	if(isImmutable) {
+		// create result table
+		lua_createtable(L, 0, 0);
+		if (lua_getmetatable(L, 1)) {
+			lua_setmetatable(L, 3);
+		}
+		dstTable = 3;
+		countIdx = tbl_copy_helper(L, 1, 3, 0);
+	} else {
+		dstTable = 1;
+	  countIdx = get_maxn(L, 1);
+	}	
+	
 	if (!lua_isnil(L, 2)) {
 		lua_pushnumber(L, countIdx+1);
 		lua_pushvalue(L, 2);
-		lua_settable(L, 3);
+		lua_settable(L, dstTable);
 	}
 
-  lua_pushvalue(L, 3);
-	if (lua_getmetatable(L, 1)) {
-		lua_setmetatable(L, 3);
-	}
+  lua_pushvalue(L, dstTable);
   return 1;
+}
+
+static int tbl_add (lua_State *L) {
+	return tbl_add_helper(L, 1);
+}
+
+static int tbl_madd (lua_State *L) {
+	return tbl_add_helper(L, 0);
 }
 
 static int tbl_concat_helper (lua_State *L, int isImmutable) {
@@ -468,6 +485,7 @@ static const luaL_Reg tab_funcs[] = {
   {"concat", tbl_concat},
   {"mconcat", tbl_mconcat},
   {"add", tbl_add},
+  {"madd", tbl_madd},
   {NULL, NULL}
 };
 
@@ -484,6 +502,8 @@ static void createmetatable (lua_State *L) {
 	
 	lua_getfield(L, -2, "add");
 	lua_setfield(L, -2, "add");
+	lua_getfield(L, -2, "madd");
+	lua_setfield(L, -2, "madd");
 	lua_getfield(L, -2, "concat");
 	lua_setfield(L, -2, "concat");
 	lua_getfield(L, -2, "mconcat");

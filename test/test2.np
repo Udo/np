@@ -1,5 +1,9 @@
 l1 = (: 1 2 3 bla = 123)
 
-new mr = {(a b) => a+b }
+l2 = l1
 
-print(l1:reduce(mr))
+l1 = l1 + 10
+
+l1:each({(k v) print(k v)})
+print('---')
+l2:each({(k v) print(k v)})

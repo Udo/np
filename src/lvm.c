@@ -417,7 +417,8 @@ void luaV_arith (lua_State *L, StkId ra, const TValue *rb,
     setnvalue(ra, res);
   }
   else if (!call_binTM(L, rb, rc, ra, op))
-    luaG_aritherror(L, rb, rc);
+		if(op != TM_MADD || !call_binTM(L, rb, rc, ra, TM_ADD))
+    	luaG_aritherror(L, rb, rc);
 }
 
 
@@ -476,7 +477,7 @@ void luaV_finishOp (lua_State *L) {
   Instruction inst = *(ci->u.l.savedpc - 1);  /* interrupted instruction */
   OpCode op = GET_OPCODE(inst);
   switch (op) {  /* finish its execution */
-    case OP_ADD: case OP_SUB: case OP_MUL: case OP_DIV:
+    case OP_ADD: case OP_MADD: case OP_SUB: case OP_MSUB: case OP_MUL: case OP_DIV:
     case OP_MOD: case OP_POW: case OP_UNM: case OP_LEN:
     case OP_GETTABUP: case OP_GETTABLE: case OP_SELF: {
       setobjs2s(L, base + GETARG_A(inst), --L->top);
@@ -669,7 +670,7 @@ void luaV_execute (lua_State *L) {
         arith_op(luai_numadd, TM_ADD);
       )
       vmcase(OP_MADD,
-        arith_op(luai_numadd, TM_ADD);
+        arith_op(luai_numadd, TM_MADD);
       )
       vmcase(OP_SUB,
         arith_op(luai_numsub, TM_SUB);
