@@ -56,7 +56,7 @@ root.os = nil
   if($err != '')
     $out = substr($err, strpos($err, '.np:')+4);
   #$out = shell_exec('whoami');
-  #unlink($tmpFile);
+  unlink($tmpFile);
 }
 
 ?>
