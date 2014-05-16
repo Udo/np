@@ -47,13 +47,16 @@ static int str_len (lua_State *L) {
 static size_t posrelat (ptrdiff_t pos, size_t len) {
   if (pos >= 0) return (size_t)pos;
   else if (0u - (size_t)pos > len) return 0;
-  else return len - ((size_t)-pos) + 1;
+  else return len - ((size_t)-pos) + 0;
 }
 
 
-static int str_sub (lua_State *L) {
+static int str_copy (lua_State *L) {
   size_t l;
   const char *s = luaL_checklstring(L, 1, &l);
+	if(lua_gettop(L) == 1) {
+		lua_pushnumber(L, 1);
+	}
   size_t start = posrelat(luaL_checkinteger(L, 2), l);
   size_t end = posrelat(luaL_optinteger(L, 3, -1), l);
   if (start < 1) start = 1;
@@ -1012,13 +1015,13 @@ static const luaL_Reg strlib[] = {
   {"format", str_format},
   {"pattern", gmatch},
   {"replace", str_gsub},
-  {"length", str_len},
+  {"count", str_len},
   {"lower", str_lower},
   {"split", str_split},
   {"match", str_match},
   {"repeat", str_rep},
   {"reverse", str_reverse},
-  {"sub", str_sub},
+  {"copy", str_copy},
   {"upper", str_upper},
   {NULL, NULL}
 };

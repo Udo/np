@@ -493,21 +493,16 @@ static const luaL_Reg tab_funcs[] = {
 #undef JH_LUA_TABLECLASS
 #endif
 #if defined(JH_LUA_TABLECLASS)
+// it's a shame that we can't use the library as a metatable directly
 static void createmetatable (lua_State *L) {
+	int vTop = lua_gettop(L);
+
 	lua_createtable(L, 0, 1);  /* table to be type metatable for tables */
   lua_pushvalue(L, -1);      /* copy table */
   lua_settypemt(L, LUA_TTABLE);   /* set table as type metatable for tables */
-  lua_pushvalue(L, -2);      /* get table library */
-  lua_setfield(L, -2, "event");  /* metatable.__index = table */
-	
-	lua_getfield(L, -2, "add");
-	lua_setfield(L, -2, "add");
-	lua_getfield(L, -2, "madd");
-	lua_setfield(L, -2, "madd");
-	lua_getfield(L, -2, "concat");
-	lua_setfield(L, -2, "concat");
-	lua_getfield(L, -2, "mconcat");
-	lua_setfield(L, -2, "mconcat");
+
+	// instead of just making an event method (which doesn't work as a hook for VM events)
+	tbl_copy_helper(L, vTop, vTop+1, 0);
 	
   lua_pop(L, 1);			 /* pop metatable */
 }
