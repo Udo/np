@@ -8,4 +8,4 @@ new BugbearEvents = (:
 	}
 )
 new bear = create(BugbearEvents, (: name = 'Bjorn' ))
-bear:say('Hello everybody!')
+bear:say(to.format('%q', 'Hello everybody!'))
