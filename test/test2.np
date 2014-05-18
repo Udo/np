@@ -1,4 +1,11 @@
-new places = (: 'earth' 'solar system' 'galaxy')
-for nr, thing in each(places) {
-  print(nr 'Hello' thing)
-}
+new BugbearEvents = (:
+  say = {creature text | 
+    print(creature.name 'the' creature.species 
+      'says:' text 'BURP!') 
+    }
+  create = { creature | 
+    creature.species = 'Bugbear'; 
+	}
+)
+new bear = create(BugbearEvents, (: name = 'Bjorn' ))
+bear:say('Hello everybody!')

@@ -346,14 +346,13 @@ static int tbl_mconcat (lua_State *L) {
 static int tbl_copy (lua_State *L) {
   luaL_checktype(L, 1, LUA_TTABLE);
 	lua_settop(L, 1);
-	int countIdx = 0;
 	
   // create result table
 	lua_createtable(L, 0, 0);
 	if (lua_getmetatable(L, 1)) {
 		lua_setmetatable(L, 2);
 	}
-	countIdx = tbl_copy_helper(L, 1, 2, 0);
+	tbl_copy_helper(L, 1, 2, 0);
 	
   lua_pushvalue(L, 2);
   return 1;
