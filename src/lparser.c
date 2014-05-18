@@ -608,17 +608,17 @@ static void statlist (LexState *ls) {
   }
 }
 
-
+/*
 static void fieldsel (LexState *ls, expdesc *v) {
-  /* fieldsel -> ['.' | ':'] NAME */
+  // fieldsel -> ['.' | ':'] NAME 
   FuncState *fs = ls->fs;
   expdesc key;
   luaK_exp2anyregup(fs, v);
-  luaX_next(ls);  /* skip the dot or colon */
+  luaX_next(ls);  // skip the dot or colon 
   checkname(ls, &key);
   luaK_indexed(fs, v, &key);
 }
-
+*/
 
 static void yindex (LexState *ls, expdesc *v) {
   /* index -> '[' expr ']' */
@@ -758,7 +758,7 @@ static void parlist (LexState *ls) {
   Proto *f = fs->f;
   int nparams = 0;
   f->is_vararg = 0;
-  if (ls->t.token != ')') {  /* is `parlist' not empty? */
+  if (ls->t.token != '|') {  /* is `parlist' not empty? */
     do {
       switch (ls->t.token) {
         case TK_NAME: {  /* param -> NAME */
@@ -781,8 +781,9 @@ static void parlist (LexState *ls) {
 }
 
 // parse function definition
+/*
 static void body (LexState *ls, expdesc *e, int ismethod, int line) {
-  /* body ->  `(' parlist `)' block END */
+  // body ->  `(' parlist `)' block END 
   FuncState new_fs;
   BlockCnt bl;
   new_fs.f = addprototype(ls);
@@ -790,7 +791,7 @@ static void body (LexState *ls, expdesc *e, int ismethod, int line) {
   open_func(ls, &new_fs, &bl);
   checknext(ls, '(');
   if (ismethod) {
-    new_localvarliteral(ls, "self");  /* create 'self' parameter */
+    new_localvarliteral(ls, "self");  // create 'self' parameter 
     adjustlocalvars(ls, 1);
   }
   parlist(ls);
@@ -798,6 +799,26 @@ static void body (LexState *ls, expdesc *e, int ismethod, int line) {
   statlist(ls);
   new_fs.f->lastlinedefined = ls->linenumber;
   check_match(ls, TK_END, TK_FUNCTION, line);
+  codeclosure(ls, e);
+  close_func(ls);
+}
+*/
+
+// parse function definition
+static void functionDeclaration (LexState *ls, expdesc *e, int line) {
+  /* body ->  parlist `|' block END */
+  checknext(ls, TK_DO);
+	FuncState new_fs;
+  BlockCnt bl;
+  new_fs.f = addprototype(ls);
+  new_fs.f->linedefined = line;
+  open_func(ls, &new_fs, &bl);
+  //checknext(ls, '(');
+  parlist(ls);
+  checknext(ls, '|');
+  statlist(ls);
+  new_fs.f->lastlinedefined = ls->linenumber;
+  //check_match(ls, TK_END, '|', line);
   codeclosure(ls, e);
   close_func(ls);
 }
@@ -834,6 +855,10 @@ static void funcargs (LexState *ls, expdesc *f, int line) {
     }
     case TK_TBLSTART: {  /* funcargs -> constructor */
       constructor(ls, &args);
+      break;
+    }
+    case TK_DO: { // direct function parameter (shorthand)
+		  expr(ls, &args);
       break;
     }
 		// this is plain weird: what's the use case for this?
@@ -925,9 +950,13 @@ static void suffixedexp (LexState *ls, expdesc *v) {
         funcargs(ls, v, line);
         break;
       }
-      case '(': /*case TK_STRING: */case TK_TBLSTART: {  /* funcargs */
-        luaK_exp2nextreg(fs, v);
-        funcargs(ls, v, line);
+      case '(': case TK_TBLSTART: case TK_DO: {  /* funcargs */
+				if(ls->t.seminfo.precededByWhitespace == 0) {
+	        luaK_exp2nextreg(fs, v);
+	        funcargs(ls, v, line);
+				} else {
+					return;
+				}
         break;
       }
       default: return;
@@ -972,11 +1001,17 @@ static void simpleexp (LexState *ls, expdesc *v) {
       constructor(ls, v);
       return;
     }
+		case TK_DO: { // in this case, it's a function declaration
+			functionDeclaration(ls, v, ls->linenumber);
+			break;
+		}
+		/*
     case TK_FUNCTION: {
       luaX_next(ls);
       body(ls, v, 0, ls->linenumber);
       return;
     }
+		*/
     default: {
       suffixedexp(ls, v);
       return;
@@ -1598,15 +1633,17 @@ static void ifstat (LexState *ls, int line) {
 }
 
 
+/*
 static void localfunc (LexState *ls) {
   expdesc b;
   FuncState *fs = ls->fs;
-  new_localvar(ls, str_checkname(ls));  /* new local variable */
-  adjustlocalvars(ls, 1);  /* enter its scope */
-  body(ls, &b, 0, ls->linenumber);  /* function created in next register */
-  /* debug information will only see the variable after this point! */
+  new_localvar(ls, str_checkname(ls));  // new local variable 
+  adjustlocalvars(ls, 1);  // enter its scope 
+  body(ls, &b, 0, ls->linenumber);  // function created in next register 
+  // debug information will only see the variable after this point! 
   getlocvar(fs, b.u.info)->startpc = fs->pc;
 }
+*/
 
 
 static void localstat (LexState *ls) {
@@ -1656,8 +1693,9 @@ static void localstat (LexState *ls) {
 }
 
 
+/*
 static int funcname (LexState *ls, expdesc *v) {
-  /* funcname -> NAME {fieldsel} [`:' NAME] */
+  // funcname -> NAME {fieldsel} [`:' NAME] 
   int ismethod = 0;
   singlevar(ls, v);
   while (ls->t.token == '.')
@@ -1668,19 +1706,20 @@ static int funcname (LexState *ls, expdesc *v) {
   }
   return ismethod;
 }
+*/
 
-
+/*
 static void funcstat (LexState *ls, int line) {
-  /* funcstat -> FUNCTION funcname body */
+  // funcstat -> FUNCTION funcname body 
   int ismethod;
   expdesc v, b;
-  luaX_next(ls);  /* skip FUNCTION */
+  luaX_next(ls);  // skip FUNCTION 
   ismethod = funcname(ls, &v);
   body(ls, &b, ismethod, line);
   luaK_storevar(ls->fs, &v, &b);
-  luaK_fixline(ls->fs, line);  /* definition `happens' in the first line */
+  luaK_fixline(ls->fs, line); // definition `happens' in the first line 
 }
-
+*/
 
 static void exprstat (LexState *ls) {
   /* stat -> func | assignment */
@@ -1751,7 +1790,7 @@ static void statement (LexState *ls) {
   int line = ls->linenumber;  /* may be needed for error messages */
   enterlevel(ls);
   switch (ls->t.token) {
-    case ';': {  /* stat -> ';' (empty statement) */
+		case ';': {  /* stat -> ';' (empty statement) */
       luaX_next(ls);  /* skip ';' */
       break;
     }
@@ -1777,15 +1816,19 @@ static void statement (LexState *ls) {
       repeatstat(ls, line);
       break;
     }
-    case TK_FUNCTION: {  /* stat -> funcstat */
+    /*
+		case TK_FUNCTION: {  // stat -> funcstat 
       funcstat(ls, line);
       break;
     }
+		*/
     case TK_LOCAL: {  /* stat -> localstat */
       luaX_next(ls);  /* skip LOCAL */
-      if (testnext(ls, TK_FUNCTION))  /* local function? */
+			/*
+      if (testnext(ls, TK_FUNCTION))  // local function? 
         localfunc(ls);
       else
+			*/
         localstat(ls);
       break;
     }

@@ -1,5 +1,7 @@
-wisdom = {(words)
-  => words:copy(1, -10)
-	}
+new l = (: 1 2 3 4 5)
 
-print(wisdom('always bathe on fridays'))
+l:each{ k v | print(k v) }
+
+new f = { a b c | print(a b c)}
+
+print(f(a (1) 2))

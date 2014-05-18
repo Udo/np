@@ -408,10 +408,12 @@ static int llex (LexState *ls, SemInfo *seminfo) {
     switch (ls->current) {
       case '\n': case '\r': {  /* line breaks */
         inclinenumber(ls);
+				seminfo->precededByWhitespace = 1;
         break;
       }
       case ' ': case '\f': case '\t': case '\v': {  /* spaces */
         next(ls);
+				seminfo->precededByWhitespace = 1;
         break;
       }
       case '-': {  /* '-' or '--' (comment) */
@@ -556,8 +558,10 @@ void luaX_next (LexState *ls) {
     ls->t = ls->lookahead;  /* use this one */
     ls->lookahead.token = TK_EOS;  /* and discharge it */
   }
-  else
-    ls->t.token = llex(ls, &ls->t.seminfo);  /* read next token */
+  else {
+		ls->t.seminfo.precededByWhitespace = 0;
+  	ls->t.token = llex(ls, &ls->t.seminfo);  /* read next token */
+  }    
 }
 
 

@@ -38,6 +38,7 @@ enum RESERVED {
 
 typedef union {
   lua_Number r;
+	int precededByWhitespace;
   TString *ts;
 } SemInfo;  /* semantics information */
 
