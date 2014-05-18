@@ -114,7 +114,7 @@ static int luaB_rawalen (lua_State *L) {
 
 static int pairsmeta (lua_State *L, const char *method, int iszero,
                       lua_CFunction iter) {
-  if (!luaL_getmetafield(L, 1, method)) {  /* no metamethod? */
+  //if (!luaL_getmetafield(L, 1, method)) {  /* no metamethod? */
 		if(lua_type(L, 1) == LUA_TTABLE) {
 	    lua_pushcfunction(L, iter);  /* will return generator, */
 	    lua_pushvalue(L, 1);  /* state, */
@@ -124,11 +124,11 @@ static int pairsmeta (lua_State *L, const char *method, int iszero,
 		else {
 			lua_pushnil(L);
 		}
-  }
-  else {
-    lua_pushvalue(L, 1);  /* argument 'self' to metamethod */
-    lua_call(L, 1, 3);  /* get 3 values from metamethod */
-  }
+ // }
+ // else {
+ //   lua_pushvalue(L, 1);  /* argument 'self' to metamethod */
+ //   lua_call(L, 1, 3);  /* get 3 values from metamethod */
+ // }
   return 3;
 }
 
@@ -146,7 +146,7 @@ static int luaB_next (lua_State *L) {
 
 
 static int luaB_pairs (lua_State *L) {
-  return pairsmeta(L, "each", 0, luaB_next);
+  return pairsmeta(L, "keys", 0, luaB_next);
 }
 
 
@@ -161,7 +161,7 @@ static int ipairsaux (lua_State *L) {
 
 
 static int luaB_ipairs (lua_State *L) {
-  return pairsmeta(L, "ipairs", 1, ipairsaux);
+  return pairsmeta(L, "values", 1, ipairsaux);
 }
 
 
