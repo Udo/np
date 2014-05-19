@@ -411,10 +411,10 @@ static int tbl_each (lua_State *L) {
   lua_pushnil(L);  /* first key */
   while (lua_next(L, 1)) {
 		i++;
-		lua_pushvalue(L, 2);
-		lua_pushvalue(L, 3);
-		lua_pushvalue(L, 4);
-		lua_pushnumber(L, i);
+		lua_pushvalue(L, 2); // function
+		lua_pushvalue(L, 4); // value
+		lua_pushvalue(L, 3); // key
+		lua_pushnumber(L, i); // numindex
 		lua_call(L, 3, 1);
 		lua_pop(L, 1); // pop the function result
 		lua_pop(L, 1); // pop the hash value
@@ -435,10 +435,10 @@ static int tbl_map (lua_State *L) {
   lua_pushnil(L);  /* first key */
   while (lua_next(L, 1)) {
 		i++;
-		lua_pushvalue(L, 2);
-		lua_pushvalue(L, 4);
-		lua_pushvalue(L, 5);
-		lua_pushnumber(L, i);
+		lua_pushvalue(L, 2); // function
+		lua_pushvalue(L, 5); // value
+		lua_pushvalue(L, 4); // key
+		lua_pushnumber(L, i); // numindex
 		lua_call(L, 3, 2);
 		if(!lua_isnil(L, -2)) {
 			if(lua_isnil(L, -1)) { // if only one value was returned, treat it as a value
@@ -467,9 +467,9 @@ static int tbl_items (lua_State *L) {
 	
   int n = aux_getn(L, 1);  /* get size of table */
   for (i=1; i <= n; i++) {
-		lua_pushvalue(L, 2);
-		lua_pushnumber(L, i);
-		lua_rawgeti(L, 1, i);
+		lua_pushvalue(L, 2); // function
+		lua_rawgeti(L, 1, i); // value
+		lua_pushnumber(L, i); // index
 		if (!lua_isnil(L, -1)) {
 			lua_call(L, 2, 1);			
 			lua_pop(L, 1); // pop the return value
@@ -494,10 +494,10 @@ static int tbl_reduce (lua_State *L) {
 	
   int n = aux_getn(L, 1);  /* get size of table */
   for (i=1; i <= n; i++) {
-		lua_pushvalue(L, 2);
-		lua_rawgeti(L, 1, i);
+		lua_pushvalue(L, 2); // function
+		lua_rawgeti(L, 1, i); // value
 		if (!lua_isnil(L, -1)) {
-			lua_pushvalue(L, 3);
+			lua_pushvalue(L, 3); // start number
 			lua_call(L, 2, 1);			
 			lua_replace(L, 3);
 		} else {

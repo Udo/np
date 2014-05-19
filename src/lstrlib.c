@@ -105,6 +105,24 @@ static int str_split (lua_State *L) {
   return 1;
 }
 
+static int str_eachChar (lua_State *L) {
+  size_t length;
+	int i;
+	luaL_checktype(L, 2, LUA_TFUNCTION);
+	const char *string = luaL_checklstring(L, 1, &length);
+
+	for (i = 0; i < length; i++) {
+		lua_pushvalue(L, 2);
+		lua_pushlstring(L, string + i, 1);
+		lua_pushnumber(L, i);
+		lua_call(L, 2, 1);
+		lua_pop(L, 1);
+	}
+
+	lua_pushvalue(L, 1);
+  return 1;
+}
+
 static int str_chomp (lua_State *L) {
   size_t l;
 	char* token;
@@ -841,6 +859,7 @@ static const luaL_Reg strlib[] = {
   {"char", str_char},
   {"chomp", str_chomp},
   {"copy", str_copy},
+  {"eachChar", str_eachChar},
   //{"dump", str_dump},
   {"find", str_find},
   {"length", str_len},

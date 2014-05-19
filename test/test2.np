@@ -1,3 +1,3 @@
-new a = (: -10 1 310 6 2 6  2345 333)
+new s = 'abcdef!(/&$gf)'
 
-print(a:max() a:min())
+s:eachChar{ c | print(c) }
