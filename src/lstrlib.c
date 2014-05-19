@@ -81,21 +81,29 @@ static int str_reverse (lua_State *L) {
 
 
 static int str_trim (lua_State *L) {
-	size_t l;
-	const char *s = luaL_checklstring(L, 1, &l);
-  char *str = s;
-	char *end;
+	size_t len;
+	const char *str = luaL_checklstring(L, 1, &len);
+  int startPos = 0;
+	int endPos = len-1;
+	
+	if(len == 0) {
+		lua_pushstring(L, "");
+		return 1;
+	}
+	
+	while(isspace(*(str+startPos))) startPos++;
+	if(startPos >= len) {
+		lua_pushstring(L, "");
+		return 1;
+	}
+	
+	while(isspace(*(str+endPos))) endPos--;
+	if(startPos > endPos) {
+		lua_pushstring(L, "");
+		return 1;
+	}
 
-  // Trim leading space
-  while(isspace(*str)) str++;
-
-  if(*str > 0) {
-	  end = str + strlen(str) - 1;
-	  while(end > str && isspace(*end)) end--;
-	  *(end+1) = 0;
-  }
-
-	lua_pushstring(L, str);
+	lua_pushlstring(L, str+startPos, 1+endPos-startPos);
   return 1;
 }
 
