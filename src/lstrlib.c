@@ -105,6 +105,28 @@ static int str_split (lua_State *L) {
   return 1;
 }
 
+static int str_chomp (lua_State *L) {
+  size_t l;
+	char* token;
+	char* string;
+	char* tofree;
+	const char* sep;
+
+	string = strdup(luaL_checklstring(L, 1, &l));
+	sep = luaL_checklstring(L, 2, &l);
+
+	if (string != NULL) {
+	  tofree = string;
+	  if((token = strsep(&string, sep)) != NULL)
+	  {
+	    lua_pushstring(L, token);
+			lua_pushstring(L, string);
+		}
+	  free(tofree);
+	}
+
+  return 2;
+}
 
 static int str_lower (lua_State *L) {
   size_t l;
@@ -817,17 +839,18 @@ static int str_gsub (lua_State *L) {
 static const luaL_Reg strlib[] = {
   {"byte", str_byte},
   {"char", str_char},
+  {"chomp", str_chomp},
+  {"copy", str_copy},
+  {"count", str_len},
   //{"dump", str_dump},
   {"find", str_find},
-  {"pattern", gmatch},
-  {"replace", str_gsub},
-  {"count", str_len},
   {"lower", str_lower},
-  {"split", str_split},
   {"match", str_match},
+  {"pattern", gmatch},
   {"repeat", str_rep},
+  {"replace", str_gsub},
   {"reverse", str_reverse},
-  {"copy", str_copy},
+  {"split", str_split},
   {"upper", str_upper},
   {NULL, NULL}
 };

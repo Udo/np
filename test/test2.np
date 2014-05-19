@@ -1,11 +1,3 @@
-new BugbearEvents = (:
-  say = {creature text | 
-    print(creature.name 'the' creature.species 
-      'says:' text 'BURP!') 
-    }
-  create = { creature | 
-    creature.species = 'Bugbear'; 
-	}
-)
-new bear = create(BugbearEvents, (: name = 'Bjorn' ))
-bear:say(to.format('%q', 'Hello everybody!'))
+new s = 'this is a striiiiing'
+
+print(s:chomp(' '))
