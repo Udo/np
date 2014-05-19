@@ -105,7 +105,7 @@ static int str_split (lua_State *L) {
   return 1;
 }
 
-static int str_eachChar (lua_State *L) {
+static int str_characters (lua_State *L) {
   size_t length;
 	int i;
 	luaL_checktype(L, 2, LUA_TFUNCTION);
@@ -859,7 +859,7 @@ static const luaL_Reg strlib[] = {
   {"char", str_char},
   {"chomp", str_chomp},
   {"copy", str_copy},
-  {"eachChar", str_eachChar},
+  {"characters", str_characters},
   //{"dump", str_dump},
   {"find", str_find},
   {"length", str_len},
