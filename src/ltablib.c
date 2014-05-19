@@ -19,6 +19,49 @@
 
 #define aux_getn(L,n)	(luaL_checktype(L, n, LUA_TTABLE), luaL_len(L, n))
 
+static int tbl_max (lua_State *L) {
+  lua_Number max = 0;
+	int i;
+	int isFirst = 1;
+  luaL_checktype(L, 1, LUA_TTABLE);
+
+  int n = aux_getn(L, 1);  /* get size of table */
+  for (i=1; i <= n; i++) {
+		lua_rawgeti(L, 1, i);
+    lua_Number v = lua_tonumber(L, -1);
+		if (isFirst) {
+			max = v;
+			isFirst = 0;
+		}
+    if (v > max) max = v;
+		lua_pop(L, 1);
+  }
+
+	lua_pushnumber(L, max);
+  return 1;
+}
+
+static int tbl_min (lua_State *L) {
+  lua_Number max = 0;
+	int i;
+	int isFirst = 1;
+  luaL_checktype(L, 1, LUA_TTABLE);
+
+  int n = aux_getn(L, 1);  /* get size of table */
+  for (i=1; i <= n; i++) {
+		lua_rawgeti(L, 1, i);
+    lua_Number v = lua_tonumber(L, -1);
+		if (isFirst) {
+			max = v;
+			isFirst = 0;
+		}
+    if (v < max) max = v;
+		lua_pop(L, 1);
+  }
+
+	lua_pushnumber(L, max);
+  return 1;
+}
 
 
 static int get_maxn (lua_State *L, int stackIdx) {
@@ -469,22 +512,24 @@ static int tbl_reduce (lua_State *L) {
 
 
 static const luaL_Reg tab_funcs[] = {
-  {"join", tbl_join}, // join(seperator) puts all elements together in a string seperated by the seperator
-  {"count", maxn}, // sort-of counts the items by returning the highest numerical index used
-  {"insert", tinsert},  // insert(list, item) or insert(list, pos, item)
+  {"add", tbl_add},
+  {"concat", tbl_concat},
   {"condense", pack},
   {"copy", tbl_copy},
   {"each", tbl_each},
-  {"map", tbl_map},
-  {"items", tbl_items},
   {"expand", unpack},
-  {"remove", tremove},
+  {"insert", tinsert},  // insert(list, item) or insert(list, pos, item)
+  {"items", tbl_items},
+  {"join", tbl_join}, // join(seperator) puts all elements together in a string seperated by the seperator
+  {"maxIndex", maxn}, // sort-of counts the items by returning the highest numerical index used
+  {"map", tbl_map},
+  {"max", tbl_max},
+  {"min", tbl_min},
+  {"mAdd", tbl_madd},
+  {"mConcat", tbl_mconcat},
   {"reduce", tbl_reduce},
+  {"remove", tremove},
   {"sort", tbl_sort},
-  {"concat", tbl_concat},
-  {"mconcat", tbl_mconcat},
-  {"add", tbl_add},
-  {"madd", tbl_madd},
   {NULL, NULL}
 };
 

@@ -1,3 +1,3 @@
-new s = 'this is a striiiiing'
+new a = (: -10 1 310 6 2 6  2345 333)
 
-print(s:chomp(' '))
+print(a:max() a:min())

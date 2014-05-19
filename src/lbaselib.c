@@ -269,7 +269,7 @@ static const luaL_Reg base_funcs[] = {
   {"items", luaB_ipairs},
   //{"loadfile", luaB_loadfile},
   {"size", luaB_rawlen},
-  {"count", luaB_rawalen},
+  {"length", luaB_rawalen},
   {"next", luaB_next},
   {"try", luaB_pcall},
   {"condition", luaB_cond},
