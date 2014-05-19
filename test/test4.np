@@ -1,7 +1,7 @@
 new myBehavior = (: 
-  test = {(ctx str) =str }
+  test = {(ctx str) => str }
   add = list.add
-	create = {(obj) obj.name = 'testname'; print('CREATE'); =obj }
+	create = {(obj) obj.name = 'testname'; print('CREATE'); => obj }
 	);
 
 --create()
@@ -16,3 +16,9 @@ for k,v in each(rl) {
 }
 
 print('test call ' rl:test('abc'))
+
+f = {(a b c=9) 
+  print(a b c)
+  }
+
+f(1 2 3)

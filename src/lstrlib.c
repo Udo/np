@@ -80,6 +80,27 @@ static int str_reverse (lua_State *L) {
 }
 
 
+static int str_trim (lua_State *L) {
+	size_t l;
+	const char *s = luaL_checklstring(L, 1, &l);
+  char *str = s;
+	char *end;
+
+  // Trim leading space
+  while(isspace(*str)) str++;
+
+  if(*str > 0) {
+	  end = str + strlen(str) - 1;
+	  while(end > str && isspace(*end)) end--;
+	  *(end+1) = 0;
+  }
+
+	lua_pushstring(L, str);
+  return 1;
+}
+
+
+
 static int str_split (lua_State *L) {
   size_t l, i;
 	char* token;
@@ -870,6 +891,7 @@ static const luaL_Reg strlib[] = {
   {"replace", str_gsub},
   {"reverse", str_reverse},
   {"split", str_split},
+  {"trim", str_trim},
   {"upper", str_upper},
   {NULL, NULL}
 };
