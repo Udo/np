@@ -1,3 +1,1 @@
-new s = '        a     '
-
-print('-' << s:trim() << '-')
+print( ('abcdefghijklmnopqrs'):chomp('def') )

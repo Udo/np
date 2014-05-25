@@ -153,23 +153,26 @@ static int str_characters (lua_State *L) {
 }
 
 static int str_chomp (lua_State *L) {
-  size_t l;
-	char* token;
+  size_t slength, seplength;
 	char* string;
-	char* tofree;
 	const char* sep;
 
-	string = strdup(luaL_checklstring(L, 1, &l));
-	sep = luaL_checklstring(L, 2, &l);
+	string = strdup(luaL_checklstring(L, 1, &slength));
+	sep = luaL_checklstring(L, 2, &seplength);
 
 	if (string != NULL) {
-	  tofree = string;
-	  if((token = strsep(&string, sep)) != NULL)
-	  {
-	    lua_pushstring(L, token);
+		char * strPtr = strstr(string, sep);
+		if(!strPtr) {
 			lua_pushstring(L, string);
+			lua_pushnil(L);
+		} else if(strPtr == string) {
+			lua_pushliteral(L, "");
+			lua_pushnil(L);
+		} else {
+			int pos = strPtr - string;
+			lua_pushlstring(L, string, pos);
+			lua_pushstring(L, strPtr + seplength);
 		}
-	  free(tofree);
 	}
 
   return 2;
