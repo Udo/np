@@ -68,6 +68,39 @@ static int str_copy (lua_State *L) {
   return 1;
 }
 
+char *aux_replace(const char *str, const char *old, const char *new)
+{
+	char *ret, *r;
+	const char *p, *q;
+	size_t len_str = strlen(str);
+	size_t len_old = strlen(old);
+	size_t len_new = strlen(new);
+	size_t count;
+
+	for(count = 0, p = str; (p = strstr(p, old)); p += len_old)
+		count++;
+
+	ret = malloc(count * (len_new - len_old) + len_str + 1);
+	if(!ret) return "";
+
+	for(r = ret, p = str; (q = strstr(p, old)); p = q + len_old) {
+		count = q - p;
+		memcpy(r, p, count);
+		r += count;
+		strcpy(r, new);
+		r += len_new;
+	}
+	strcpy(r, p);
+	return ret;
+}
+
+static int str_replace (lua_State *L) {
+  const char *subjectString = luaL_checkstring(L, 1);
+  const char *replaceAll = luaL_checkstring(L, 2);
+  const char *replaceWith = luaL_checkstring(L, 3);
+	lua_pushstring(L, aux_replace(subjectString, replaceAll, replaceWith));
+  return 1;
+}
 
 static int str_reverse (lua_State *L) {
   size_t l, i;
@@ -970,9 +1003,10 @@ static const luaL_Reg strlib[] = {
   {"_obs_pattern", gmatch},
   {"parse", str_parse},
   {"repeat", str_rep},
-  {"replace", str_gsub},
+  {"replace", str_replace},
   {"reverse", str_reverse},
   {"split", str_split},
+  {"substitute", str_gsub},
   {"trim", str_trim},
   {"upper", str_upper},
   {NULL, NULL}
