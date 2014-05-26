@@ -1,1 +1,1 @@
-print( ('abcdefghijklmnopqrs'):chomp('def') )
+('a very simple siaple simple string is simxle string'):parse('s..[a-z]le' { s start end | print(s start end) }) 

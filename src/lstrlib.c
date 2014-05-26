@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <regex.h>
 
 #define lstrlib_c
 #define LUA_LIB
@@ -79,6 +80,74 @@ static int str_reverse (lua_State *L) {
   return 1;
 }
 
+static int str_parse (lua_State *L) {
+	size_t subjectStringLength, expressionStringLength;
+	const char *subjectString = luaL_checklstring(L, 1, &subjectStringLength);
+	const char *expressionString = luaL_checklstring(L, 2, &expressionStringLength);
+	luaL_checktype(L, 3, LUA_TFUNCTION);
+	
+  regex_t re;
+	
+  if (regcomp(&re, expressionString, REG_EXTENDED) != 0) {
+    lua_pushliteral(L, "error in regular expression");
+		return 1;      
+  }
+	
+	int status;
+	size_t nmatch = 2;
+	regmatch_t pmatch[2];
+	int subjectOffset = 0;
+	
+	do {
+	  status = regexec(&re, subjectString+subjectOffset, nmatch, pmatch, 0);
+		if(status == 0) {
+			lua_pushvalue(L, 3); // push iterator function 
+			lua_pushlstring(L, subjectString+subjectOffset+pmatch[0].rm_so, pmatch[0].rm_eo - pmatch[0].rm_so);
+			lua_pushnumber(L, subjectOffset+pmatch[0].rm_so);
+			lua_pushnumber(L, subjectOffset+pmatch[0].rm_eo);
+			lua_call(L, 3, 1);
+			lua_pop(L, 1);
+			subjectOffset += pmatch[0].rm_eo;
+	  }
+	} while( status == 0 && subjectOffset <= subjectStringLength );
+
+	regfree(&re);
+	return 0;
+}
+
+/*static int str_parse (lua_State *L) {
+	size_t subjectStringLength;
+	const char *string = luaL_checklstring(L, 1, &subjectStringLength);
+	const char *pattern = luaL_checkstring(L, 2);
+	luaL_checktype(L, 3, LUA_TFUNCTION);
+
+	regex_t    preg;
+	int        rc;
+	size_t     nmatch = 2;
+	regmatch_t pmatch[2];
+
+	if (0 != (rc = regcomp(&preg, pattern, REG_NOSUB))) {
+	  printf("regcomp() failed, returning nonzero (%d)\n", rc);
+	  exit(EXIT_FAILURE);
+	}
+
+	if (0 != (rc = regexec(&preg, string, nmatch, pmatch, 0))) {
+	  printf("Failed to match '%s' with '%s',returning %d.\n",
+	  string, pattern, rc);
+	}
+	else {
+	  printf("With the whole expression, "
+	         "a matched substring \"%.*s\" is found at position %d to %d.\n",
+	         pmatch[0].rm_eo - pmatch[0].rm_so, &string[pmatch[0].rm_so],
+	         pmatch[0].rm_so, pmatch[0].rm_eo - 1);
+	  printf("With the sub-expression, "
+	         "a matched substring \"%.*s\" is found at position %d to %d.\n",
+	         pmatch[1].rm_eo - pmatch[1].rm_so, &string[pmatch[1].rm_so],
+	         pmatch[1].rm_so, pmatch[1].rm_eo - 1);
+	}
+	regfree(&preg);
+	return 0;
+}*/
 
 static int str_trim (lua_State *L) {
 	size_t len;
@@ -106,8 +175,6 @@ static int str_trim (lua_State *L) {
 	lua_pushlstring(L, str+startPos, 1+endPos-startPos);
   return 1;
 }
-
-
 
 static int str_split (lua_State *L) {
   size_t l, i;
@@ -777,6 +844,9 @@ static int gmatch (lua_State *L) {
 }
 
 
+
+
+
 static void add_s (MatchState *ms, luaL_Buffer *b, const char *s,
                                                    const char *e) {
   size_t l, i;
@@ -897,7 +967,8 @@ static const luaL_Reg strlib[] = {
   {"length", str_len},
   {"lower", str_lower},
   {"match", str_match},
-  {"pattern", gmatch},
+  {"_obs_pattern", gmatch},
+  {"parse", str_parse},
   {"repeat", str_rep},
   {"replace", str_gsub},
   {"reverse", str_reverse},
