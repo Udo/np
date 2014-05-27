@@ -4,7 +4,7 @@ $docFiles = json_decode(file_get_contents('docs.json'), true);
 
 $typeDisplay = array(
   'function' => '&#131;',
-  'object' => 'o',
+  'object' => 'lib',
   );
 
 ?>
@@ -18,19 +18,20 @@ $typeDisplay = array(
       <ul>
       <?
       
-      foreach($docFiles as $f) if($f['info']['type'] == 'object')
+      foreach($docFiles as $f) if($f['info']['type'] == 'lib')
       {
         $url = '/docs/'.urlencode($f['file']);
         ?><li>
         
           <div>
-            <a href="<?= $url ?>"><?= $f['info']['title'] ?></a> <span style="color:gray"><?= $typeDisplay[$f['info']['type']] ?></span>
+            <a href="<?= $url ?>"><?= $f['info']['title'] ?></a> 
+            <span style="color:gray"><?= $f['info']['type'] ?></span>
           </div>
           
           <div class="col-3">
           <? if(sizeof($f['members']) > 0) foreach($f['members'] as $m) {
           
-            ?><div><a class="dea" href="<?= $url ?>#<?= $m ?>">.<?= $m ?></a></div><?
+            ?><div><a class="dea" href="<?= $url ?>#<?= $m ?>"><?= $m ?></a></div><?
           
           } ?>
           </div>
@@ -51,7 +52,8 @@ $typeDisplay = array(
       
       foreach($docFiles as $f) if($f['info']['type'] == 'function')
       {
-        ?><li><a href="/docs/<?= urlencode($f['file']) ?>"><?= $f['info']['title'] ?></a> <span style="color:gray"><?= $typeDisplay[$f['info']['type']] ?></span></li><?
+        ?><li><a href="/docs/<?= urlencode($f['file']) ?>"><?= $f['info']['title'] ?></a> 
+          <span style="color:gray"><?= $typeDisplay[$f['info']['type']] ?></span></li><?
       }
       
       ?>

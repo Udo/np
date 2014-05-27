@@ -55,7 +55,61 @@ function cfg($name, $default = null, $set = false)
 
 function formatCode($src)
 {
-  ?><pre class="sh_np"><?= htmlspecialchars($src) ?></pre><?
+  $src = htmlspecialchars($src);
+  $nsrc = '';
+  $isInString = false;  
+  $isInFunctionHead = false;
+  for($a = 0; $a < strlen($src); $a++)
+  {
+    $c = $src[$a];
+    if(!$isInString) switch($c)
+    {
+      case("'"): 
+      {
+        $nsrc .= '\'<i style="color:green;font-weight:normal;">';
+        $isInString = true; 
+        break;
+      }
+      case('{'):
+      {
+        $nsrc .= $c;
+        $pipePos = strpos($src, '|', $a);
+        $closePos = strpos($src, '}', $a);
+        if($pipePos < $closePos)
+        {
+          $isInFunctionHead = true;
+          $nsrc .= '<span style="color:blue">';
+        }
+        break;
+      }
+      case('|'): 
+      {
+        $nsrc .= $c;
+        if($isInFunctionHead)
+          $nsrc .= '</span>';
+        break;
+      }
+      default: 
+      {
+        $nsrc .= $c; break;
+      }
+    }
+    else
+    {
+      if($c == "'")
+      {
+        $nsrc .= '</i>';
+        $isInString = false; 
+      } 
+      $nsrc .= $c;
+    }
+  } 
+  $b = function($c) { return('<b style="color: gray;">'.$c.'</b>'); };
+  $a = function($c) { return('<b style="color: blue;">'.$c.'</b>'); };
+  ?><pre class="sh_np"><?= str_replace(
+    array('(', ')', '{', '}'),
+    array($b('('), $b(')'), $b('{'), $b('}'), ),
+    $nsrc) ?></pre><?
 }
 
 function formatOutput($src)
@@ -63,7 +117,7 @@ function formatOutput($src)
   ?><pre class="op"><?= htmlspecialchars($src) ?></pre><?
 }
 
-function displayFunctionHead($fname, $params = array())
+function displayFunctionHead($fname, $params = array(), $retVals = array())
 {
   $GLOBALS['hds'][] = $fname;
   $p = array();
@@ -73,7 +127,11 @@ function displayFunctionHead($fname, $params = array())
   }
 ?><a class="nameda" name="<?= $fname ?>"></a><div class="functionhead">
       
-      ( <span class="fname"><?= $fname ?></span>&nbsp; <span class="farg"><?= implode('&nbsp;&nbsp; ', $p) ?></span> )
+      <span class="fname"><?= $fname ?></span>( <span class="farg"><?= implode('&nbsp;&nbsp; ', $p) ?></span> )
+      
+      <? if(sizeof($retVals) > 0) { ?>
+      → <?= implode(', ', $retVals) ?>
+      <? } ?>
     
     </div><?
 }

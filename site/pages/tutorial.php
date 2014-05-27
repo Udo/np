@@ -95,9 +95,9 @@ print(imAString imANumber
   </p>
   
   <pre class="sh_np">new places = (: 'earth' 'solar system' 'galaxy')
-for nr, thing in each(places) {
-  print(nr 'Hello' thing)
-}</pre>
+places:each{ thing |
+  print('Hello' thing)
+  }</pre>
   
   <p>
   This already contains some juicy stuff: the <code>places</code> variable is filled with
@@ -204,13 +204,13 @@ else (condition2)
   may take one or more parameters in doing so. Consider for your amusement, the FizzBuzzer:
   </p>
   
-  <pre class="sh_np">new fizzBuzzer = {(i)
+  <pre class="sh_np">new fizzBuzzer = { i |
   new fbResult 
   if (i % 3 == 0) fbResult = 'Fizz' 
   if (i % 5 == 0) fbResult .= 'Buzz' 
   if (!fbResult) fbResult = i 
   => fbResult, i
-}
+  }
 
 print(fizzBuzzer(15))</pre>
   
@@ -245,9 +245,9 @@ print(fizzBuzzer(15))</pre>
   </p>
   
   <pre class="sh_np">new myPreciousss = list.condense(fizzBuzzer(150))
-for k,v in each(myPreciousss) {
-  print(k v)
-}</pre>
+myPreciousss:each{ v |
+  print(v)
+  }</pre>
 
   <p>
   Likewise, you can expand a list into several function parameters:
@@ -257,7 +257,7 @@ for k,v in each(myPreciousss) {
 new myPreciousss = list.condense(fizzBuzzer(150))
   
 -- and back again  
-new backAgain = {(fz org n)
+new backAgain = { fz org n |
   print('fizz:' fz 'original:' org 'params' nr)
 }
 
@@ -277,10 +277,10 @@ backAgain(list.expand(myPreciousss))</pre>
   
   <pre class="sh_np">new vegetable = 'Potato'
 print(vegetable)
-new f = {()
+new f = {|
   new vegetable = 'Bacon' 
   print(vegetable 'is my vegetable')
-}
+  }
 f()
 print(vegetable) </pre>
 
@@ -290,9 +290,9 @@ print(vegetable) </pre>
   </p>
 
   <pre class="sh_np">new vegetable = 'Potato'
-new f = {()
+new f = {|
   print(vegetable 'is my vegetable')
-}
+  }
 f() </pre>
 
   <h3>Block Scope</h3>
@@ -333,7 +333,7 @@ f() </pre>
   <pre class="sh_np">new guessMe 
 {
   new secretNumber = 42
-  guessMe = {(guess)
+  guessMe = { guess |
     if guess == secretNumber
       => 'Darn, you guessed it'
     otherwise
@@ -353,26 +353,8 @@ print(guessMe(42))</pre>
   of <code>secretNumber</code>'s existence once the block terminates.
   </p>
   
-  <h3>Constructors</h3>
   
-  <p>
-    Constructors are functions that build and initialize objects.</p>
-  
-  <pre class="sh_np">new Bugbear = {(name)
-    => (: 
-      name = name  
-      species = 'Bugbear' 
-      health = 100 )
-} 
-new bear = Bugbear('Bjorn')
-print('Hey folks. My name is' bear.name 
-  'and I am a' bear.species)</pre>
-  
-  <p>
-    This inits a new Bugbear called Bjorn. He has a name, a species, and a health score.
-    However, he just exists, he's pure data. To be alive, one must have the ability to
-    do things.
-  </p>
+  <h3>Events</h3>
   
   <p>
     One of the ways to make lists do things is to define
@@ -388,33 +370,32 @@ print('Hey folks. My name is' bear.name
   </p>
   
   <pre class="sh_np">new BugbearEvents = (:
-  say = {(creature text) 
+  say = { creature text | 
     print(creature.name 'says:' text 'BURP!') }
-)
+  )
 new bear = create(BugbearEvents, (: name = 'Bjorn' ))
 bear:say('Hello everybody!')
 </pre>
 
   <p>
   The <code>create()</code> function also works if you only give it the
-  events list, in that case an empty list will be created and returned.
+  events list, in that case an empty object will be created and returned.
   </p>
   
   <p>
-  That's all fine, but to make the whole thing more powerful <code>np</code> gives
+  That's all fine, but to make the whole thing more powerful <code>np</code> also gives
   you a standard event called <code>create</code> which provides a neat place
   to initialize lists at the moment of creation:  
   </p>
 
   <pre class="sh_np">
 new BugbearEvents = (:
-  say = {(creature text) 
+  say = {creature text | 
     print(creature.name 'the' creature.species 
       'says:' text 'BURP!') 
     }
-  create = {(creature) 
+  create = { creature | 
     creature.species = 'Bugbear'; 
-    => creature 
     }
 )
 new bear = create(BugbearEvents, (: name = 'Bjorn' ))
@@ -426,7 +407,14 @@ bear:say('Hello everybody!')
   Bjorn a species field. 
   </p>
 	
+<h3>Summary</h3>
 
+  <p>So in this tutorial, we covered a lot and illustrated it with contrived examples! 
+    You learned about basic functions, how to use functions and other syntax, how scope
+    works, that lists are the basic object type in np, and how objects can respond to
+    events.
+  </p>
+ 
 </div>
 
   <div style="height:200px"></div>
