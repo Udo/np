@@ -341,35 +341,35 @@ void luaV_concat (lua_State *L, int total, TMS event) {
   do {
     StkId top = L->top;
     int n = 2;  /* number of elements handled in this pass (at least 2) */
-		
+		tostring(L, top-1);
+		// is first operand not a primitive type?
 		if (!(ttisstring(top-2) || ttisnumber(top-2) || ttisnil(top-2))) {
       if (!call_binTM(L, top-2, top-1, top-2, event))
 				// try imutable concat if no mutable found
 				if(event != TM_MCONCAT || !call_binTM(L, top-2, top-1, top-2, TM_CONCAT))
         	luaG_concaterror(L, top-2, top-1);
     }
-    else 
-		if (tsvalue(top-1)->len == 0)  /* second operand is empty? */
-      (void)tostring(L, top - 2);  /* result is first operand */
-    else if (ttisnil(top-2) || (ttisstring(top-2) && tsvalue(top-2)->len == 0)) {
-      setobjs2s(L, top - 2, top - 1);  /* result is second op. */
+    else if (ttisnil(top-1) || tsvalue(top-1)->len == 0)  
+			(void)tostring(L, top - 2);  
+    else if (ttisstring(top-2) && tsvalue(top-2)->len == 0) {
+      setobjs2s(L, top - 2, top - 1);  
     }
     else {
-      /* at least two non-empty string values; get as many as possible */
+      // at least two non-empty string values; get as many as possible 
       size_t tl = tsvalue(top-1)->len;
       char *buffer;
       int i;
-      /* collect total length */
+      // collect total length 
       for (i = 1; i < total && tostring(L, top-i-1); i++) {
         size_t l = tsvalue(top-i-1)->len;
         if (l >= (MAX_SIZET/sizeof(char)) - tl)
-          luaG_runerror(L, "string length overflow");
+					  luaG_runerror(L, "string length overflow");
         tl += l;
       }
       buffer = luaZ_openspace(L, &G(L)->buff, tl);
       tl = 0;
       n = i;
-      do {  /* concat all strings */
+      do {  // concat all strings 
         size_t l = tsvalue(top-i)->len;
         memcpy(buffer+tl, svalue(top-i), l * sizeof(char));
         tl += l;

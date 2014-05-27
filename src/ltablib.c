@@ -470,7 +470,7 @@ static int tbl_items (lua_State *L) {
 		lua_pushvalue(L, 2); // function
 		lua_rawgeti(L, 1, i); // value
 		lua_pushnumber(L, i); // index
-		if (!lua_isnil(L, -1)) {
+		if (!lua_isnil(L, 4)) {
 			lua_call(L, 2, 1);			
 			lua_pop(L, 1); // pop the return value
 		} else {
@@ -480,6 +480,23 @@ static int tbl_items (lua_State *L) {
   }
   lua_pushvalue(L, 1);
   return 1;
+}
+
+static int tbl_toString (lua_State *L) {
+	luaL_checktype(L, 1, LUA_TTABLE);
+	//int lua_pcall (lua_State *L, int nargs, int nresults, int errfunc);
+	luaL_dostring(L, "=> { l | \
+  new o = '' \
+  l:each{ v k | \
+    if(to.type(v) == 'string') { v = to.format('\%q' v) otherwise v = to.string(v) } \
+		if(to.type(k) != 'number') { o <<= k << '=' } \
+	  o <<= v << ' '; \
+  } \
+  => '(: ' << o << ')' \
+}");
+  lua_pushvalue(L, 1);
+	lua_call(L, 1, 1);
+	return 1;
 }
 
 static int tbl_reduce (lua_State *L) {
@@ -530,6 +547,7 @@ static const luaL_Reg tab_funcs[] = {
   {"reduce", tbl_reduce},
   {"remove", tremove},
   {"sort", tbl_sort},
+  {"toString", tbl_toString},
   {NULL, NULL}
 };
 

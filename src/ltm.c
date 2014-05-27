@@ -35,7 +35,7 @@ void luaT_init (lua_State *L) {
     "gc", "weak", "size", "eq",
     "add", "mAdd", "sub", "mSub", "mul", "div", "mod",
     "pow", "unm", "lt", "le",
-    "concat", "mConcat", "call"
+    "concat", "mConcat", "call", "toString"
   };
   int i;
   for (i=0; i<TM_N; i++) {

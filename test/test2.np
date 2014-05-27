@@ -1,3 +1,5 @@
-print(  
-	('bananananana banana banana dkljhasd'):replace('nana', 'NaNa')
-  )
+b = (: 10 20 30)
+a = (: 1 2 3 4 'a' 'b' 'c' field1 = 'bla' b)
+
+
+print(a)

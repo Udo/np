@@ -615,7 +615,7 @@ static const luaL_Reg flib[] = {
   {"setvbuf", f_setvbuf},
   {"write", f_write},
   {"gc", f_gc},
-  {"tostring", f_tostring},
+  {"toString", f_tostring},
   {NULL, NULL}
 };
 
