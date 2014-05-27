@@ -485,7 +485,7 @@ static int tbl_items (lua_State *L) {
 static int tbl_toString (lua_State *L) {
 	luaL_checktype(L, 1, LUA_TTABLE);
 	//int lua_pcall (lua_State *L, int nargs, int nresults, int errfunc);
-	luaL_dostring(L, "=> { l | \
+	if(!luaL_dostring(L, "=> { l | \
   new o = '' \
   l:each{ v k | \
     if(to.type(v) == 'string') { v = to.format('\%q' v) otherwise v = to.string(v) } \
@@ -493,9 +493,13 @@ static int tbl_toString (lua_State *L) {
 	  o <<= v << ' '; \
   } \
   => '(: ' << o << ')' \
-}");
-  lua_pushvalue(L, 1);
-	lua_call(L, 1, 1);
+}")) {
+  	lua_pushvalue(L, 1);
+		lua_call(L, 1, 1);
+  }
+	else {
+		lua_pushliteral(L, "[list]");
+	}
 	return 1;
 }
 
