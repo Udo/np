@@ -260,7 +260,7 @@ static int luaB_create (lua_State *L) {
 }
 
 static const luaL_Reg base_funcs[] = {
- // {"tostring", luaB_tostring},
+ // {"toString", luaB_tostring},
   {"assert", luaB_assert},
   //{"dofile", luaB_dofile},
   {"each", luaB_pairs},
