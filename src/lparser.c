@@ -300,6 +300,7 @@ static void singlevar (LexState *ls, expdesc *var) {
   FuncState *fs = ls->fs;
   if (singlevaraux(fs, varname, var, 1) == VVOID) {  /* global name? */
     expdesc key;
+		var->isGlobalAccess = 1;
     singlevaraux(fs, ls->envn, var, 1);  /* get environment variable */
     lua_assert(var->k == VLOCAL || var->k == VUPVAL);
     codestring(ls, &key, varname);  /* key is variable name */
@@ -1725,10 +1726,13 @@ static void exprstat (LexState *ls) {
   /* stat -> func | assignment */
   FuncState *fs = ls->fs;
   struct LHS_assign v;
+	v.v.isGlobalAccess = 0;
   suffixedexp(ls, &v.v);
   if (v.v.k == VCALL) 
     SETARG_C(getcode(fs, &v.v), 1);  /* call statement uses no results */
   else { /* stat -> assignment ? */
+		if(v.v.isGlobalAccess)
+			luaX_syntaxerror(ls, "undeclared variable");
     v.prev = v.next = NULL;
     assignment(ls, &v, 1);
 		switch(ls->t.token) {

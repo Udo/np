@@ -1,4 +1,7 @@
-a = (: 1111 1 '1b' '1a' 100 3 4 'a' 'b' 'c' field1 = 'bla')
-
-print(a:sort())
-
+print('-----')
+new a = 123
+print('a' a)
+a = 234
+print('a' a)
+root.b = 12
+print(b)
