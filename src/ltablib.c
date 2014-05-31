@@ -228,13 +228,8 @@ static int l_strcmp_coercion (lua_State *L, int o1, int o2) {
 }
 
 static int l_numcmp_coercion (lua_State *L, int o1, int o2) {
-	int lIsNum, rIsNum;
-	//lua_pushvalue(L, o1);
   lua_Number l = lua_tonumber(L, o1);
-	//lua_pushvalue(L, o2);
 	lua_Number r = lua_tonumber(L, o2);
-	//if(!lIsNum) return(1);
-	//if(!rIsNum) return(0);
 	return(l < r);
 }
 static void set2 (lua_State *L, int i, int j) {
@@ -561,10 +556,14 @@ static int tbl_toString (lua_State *L) {
 	//int lua_pcall (lua_State *L, int nargs, int nresults, int errfunc);
 	if(!luaL_dostring(L, "=> { l | \
   new o = '' \
-  l:each{ v k | \
+  l:items{ v | \
     if(to.type(v) == 'string') { v = to.format('\%q' v) otherwise v = to.string(v) } \
-		if(to.type(k) != 'number') { o <<= k << '=' } \
 	  o <<= v << ' '; \
+  } \
+  l:each{ v k | \
+		if(to.type(k) != 'number') { \
+	    if(to.type(v) == 'string') { v = to.format('\%q' v) otherwise v = to.string(v) } \
+			o <<= k << '=' << v << ' ' } \
   } \
   => '(: ' << o << ')' \
 }")) {
