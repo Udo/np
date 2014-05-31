@@ -116,6 +116,8 @@ static int tinsert (lua_State *L) {
 static int tremove (lua_State *L) {
   int size = aux_getn(L, 1);
   int pos = luaL_optint(L, 2, size);
+	if (pos < 0)
+		pos = size + pos +1;
   if (pos != size)  /* validate 'pos' if given */
     luaL_argcheck(L, 1 <= pos && pos <= size + 1, 1, "position out of bounds");
   lua_rawgeti(L, 1, pos);  /* result = t[pos] */

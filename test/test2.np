@@ -1,7 +1,7 @@
-print('-----')
-new a = 123
-print('a' a)
-a = 234
-print('a' a)
-root.b = 12
-print(b)
+new l = (: 1 2 3 4)
+
+print('--each:')
+l:each{ v k | print(k v) }
+
+print('--items:')
+l:items{ v k | print(k v) }
