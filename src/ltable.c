@@ -80,7 +80,7 @@ static const Node dummynode_ = {
 static Node *hashnum (const Table *t, lua_Number n) {
   int i;
   luai_hashnum(i, n);
-  if (i < 0) {
+	if (i < 0) {
     if (cast(unsigned int, i) == 0u - i)  /* use unsigned to avoid overflows */
       i = 0;  /* handle INT_MIN */
     i = -i;  /* must be a positive value */
@@ -141,7 +141,7 @@ static int arrayindex (const TValue *key) {
 ** elements in the array part, then elements in the hash part. The
 ** beginning of a traversal is signaled by -1.
 */
-static int findindex (lua_State *L, Table *t, StkId key) {
+LUAI_FUNC int findindex (lua_State *L, Table *t, StkId key) {
   int i;
   if (ttisnil(key)) return -1;  /* first iteration */
   i = arrayindex(key);
@@ -168,7 +168,7 @@ static int findindex (lua_State *L, Table *t, StkId key) {
 
 int luaH_next (lua_State *L, Table *t, StkId key) {
   int i = findindex(L, t, key);  /* find original element */
-  for (i++; i < t->sizearray; i++) {  /* try first array part */
+	for (i++; i < t->sizearray; i++) {  /* try first array part */
     if (!ttisnil(&t->array[i])) {  /* a non-nil value? */
       setnvalue(key, cast_num(i+1));
       setobj2s(L, key+1, &t->array[i]);

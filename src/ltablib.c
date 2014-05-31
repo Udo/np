@@ -6,6 +6,7 @@
 
 
 #include <stddef.h>
+#include <string.h>
 
 #define ltablib_c
 #define LUA_LIB
@@ -15,7 +16,9 @@
 #include "lauxlib.h"
 #include "lualib.h"
 #include "ltm.h"
-
+#include "lvm.h"
+#include "lapi.h"
+#include "luaconf.h"
 
 #define aux_getn(L,n)	(luaL_checktype(L, n, LUA_TTABLE), luaL_len(L, n))
 
@@ -201,34 +204,95 @@ static int unpack (lua_State *L) {
 ** =======================================================
 */
 
+static int l_strcmp_coercion (lua_State *L, int o1, int o2) {
+  size_t ll, lr;
+	const char * l = lua_tolstring(L, o1, &ll);
+	const char * r = lua_tolstring(L, o2, &lr);
+	//printf("coerc %s,%i %s,%i\n", l, ll, r, lr);
+	if(ll == 0) return 1;
+	if(lr == 0) return 0; 
+  for (;;) {
+    int temp = strcoll(l, r);
+    if (temp != 0) return temp;
+    else {  /* strings are equal up to a `\0' */
+      size_t len = strlen(l);  /* index of first `\0' in both strings */
+      if (len == lr)  /* r is finished? */
+        return (len == ll) ? 0 : 1;
+      else if (len == ll)  /* l is finished? */
+        return -1;  /* l is smaller than r (because r is not finished) */
+      /* both strings longer than `len'; go on comparing (after the `\0') */
+      len++;
+      l += len; ll -= len; r += len; lr -= len;
+    }
+  }
+}
 
+static int l_numcmp_coercion (lua_State *L, int o1, int o2) {
+	int lIsNum, rIsNum;
+	//lua_pushvalue(L, o1);
+  lua_Number l = lua_tonumber(L, o1);
+	//lua_pushvalue(L, o2);
+	lua_Number r = lua_tonumber(L, o2);
+	//if(!lIsNum) return(1);
+	//if(!rIsNum) return(0);
+	return(l < r);
+}
 static void set2 (lua_State *L, int i, int j) {
   lua_rawseti(L, 1, i);
   lua_rawseti(L, 1, j);
 }
 
-static int sort_comp (lua_State *L, int a, int b) {
-  if (!lua_isnil(L, 2)) {  /* function? */
-    int res;
-    lua_pushvalue(L, 2);
-    lua_pushvalue(L, a-1);  /* -1 to compensate function */
-    lua_pushvalue(L, b-2);  /* -2 to compensate function and `a' */
-    lua_call(L, 2, 1);
-    res = lua_toboolean(L, -1);
-    lua_pop(L, 1);
-    return res;
-  }
-  else  /* a < b? */
-    return lua_compare(L, a, b, LUA_OPLT);
+static int sort_comp (lua_State *L, int a, int b, int sortMode) {
+	switch(sortMode)
+	{
+		case(-1): { // function mode
+	    int res;
+	    lua_pushvalue(L, 2);
+	    lua_pushvalue(L, a-1);  /* -1 to compensate function */
+	    lua_pushvalue(L, b-2);  /* -2 to compensate function and `a' */
+	    lua_call(L, 2, 1);
+	    res = lua_toboolean(L, -1);
+	    lua_pop(L, 1);
+	    return res;
+			break;
+		}
+		case(1): { // string coercion mode
+			StkId o1 = index2addr(L, a);
+			StkId o2 = index2addr(L, b);
+			if (ttisstring(o1) && ttisstring(o2)) {
+  	    return l_strcmp(rawtsvalue(o1), rawtsvalue(o2)) < 0;
+			}
+			else {
+				return l_strcmp_coercion(L, a, b) < 0;
+			}
+			break;
+		}
+		case(2): { // number coercion mode
+			StkId o1 = index2addr(L, a);
+			StkId o2 = index2addr(L, b);
+		  if (ttisnumber(o1) && ttisnumber(o2))
+		    return luai_numlt(L, nvalue(o1), nvalue(o2));
+			else {
+				return l_numcmp_coercion(L, a, b);
+			}
+			break;
+		}
+		default: { // lua mode
+	  	if (lua_isnil(L, a)) return(1);
+	  	if (lua_isnil(L, b)) return(0);
+			return lua_compare(L, a, b, LUA_OPLT);
+			break;
+		}
+	}
 }
 
-static void auxsort (lua_State *L, int l, int u) {
+static void auxsort (lua_State *L, int l, int u, int sortMode) {
   while (l < u) {  /* for tail recursion */
     int i, j;
     /* sort elements a[l], a[(l+u)/2] and a[u] */
     lua_rawgeti(L, 1, l);
     lua_rawgeti(L, 1, u);
-    if (sort_comp(L, -1, -2))  /* a[u] < a[l]? */
+    if (sort_comp(L, -1, -2, sortMode))  /* a[u] < a[l]? */
       set2(L, l, u);  /* swap a[l] - a[u] */
     else
       lua_pop(L, 2);
@@ -236,12 +300,12 @@ static void auxsort (lua_State *L, int l, int u) {
     i = (l+u)/2;
     lua_rawgeti(L, 1, i);
     lua_rawgeti(L, 1, l);
-    if (sort_comp(L, -2, -1))  /* a[i]<a[l]? */
+    if (sort_comp(L, -2, -1, sortMode))  /* a[i]<a[l]? */
       set2(L, i, l);
     else {
       lua_pop(L, 1);  /* remove a[l] */
       lua_rawgeti(L, 1, u);
-      if (sort_comp(L, -1, -2))  /* a[u]<a[i]? */
+      if (sort_comp(L, -1, -2, sortMode))  /* a[u]<a[i]? */
         set2(L, i, u);
       else
         lua_pop(L, 2);
@@ -255,12 +319,12 @@ static void auxsort (lua_State *L, int l, int u) {
     i = l; j = u-1;
     for (;;) {  /* invariant: a[l..i] <= P <= a[j..u] */
       /* repeat ++i until a[i] >= P */
-      while (lua_rawgeti(L, 1, ++i), sort_comp(L, -1, -2)) {
+      while (lua_rawgeti(L, 1, ++i), sort_comp(L, -1, -2, sortMode)) {
         if (i>=u) luaL_error(L, "invalid order function for sorting");
         lua_pop(L, 1);  /* remove a[i] */
       }
       /* repeat --j until a[j] <= P */
-      while (lua_rawgeti(L, 1, --j), sort_comp(L, -3, -1)) {
+      while (lua_rawgeti(L, 1, --j), sort_comp(L, -3, -1, sortMode)) {
         if (j<=l) luaL_error(L, "invalid order function for sorting");
         lua_pop(L, 1);  /* remove a[j] */
       }
@@ -281,17 +345,27 @@ static void auxsort (lua_State *L, int l, int u) {
     else {
       j=i+1; i=u; u=j-2;
     }
-    auxsort(L, j, i);  /* call recursively the smaller one */
+    auxsort(L, j, i, sortMode);  /* call recursively the smaller one */
   }  /* repeat the routine for the larger one */
 }
 
 static int tbl_sort (lua_State *L) {
   int n = aux_getn(L, 1);
+	int sortMode = 1; // default sort mode is: string
   luaL_checkstack(L, 40, "");  /* assume array is smaller than 2^40 */
-  if (!lua_isnoneornil(L, 2))  /* is there a 2nd argument? */
-    luaL_checktype(L, 2, LUA_TFUNCTION);
+  if (!lua_isnoneornil(L, 2)) {
+  	if (lua_isfunction(L, 2)) 
+			sortMode = -1; // function sort mode
+		else {
+			const char * sortModeArg = lua_tostring(L, 2);
+			if (strcmp(sortModeArg, "string") == 0) sortMode = 1; // string sort mode
+			else if (strcmp(sortModeArg, "number") == 0) sortMode = 2; // number sort mode
+			else sortMode = 0; // default to lua sort mode
+		}
+  }
+  //  luaL_checktype(L, 2, LUA_TFUNCTION);
   lua_settop(L, 2);  /* make sure there is two arguments */
-  auxsort(L, 1, n);
+  auxsort(L, 1, n, sortMode);
 	lua_pushvalue(L, 1);
   return 1;
 }

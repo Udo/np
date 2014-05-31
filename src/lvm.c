@@ -27,7 +27,6 @@
 #include "lvm.h"
 
 
-
 /* limit for table tag-method chains (to avoid loops) */
 #define MAXTAGLOOP	100
 
@@ -252,7 +251,7 @@ static int call_orderTM (lua_State *L, const TValue *p1, const TValue *p2,
 }
 
 
-static int l_strcmp (const TString *ls, const TString *rs) {
+LUAI_FUNC int l_strcmp (const TString *ls, const TString *rs) {
   const char *l = getstr(ls);
   size_t ll = ls->tsv.len;
   const char *r = getstr(rs);
@@ -272,7 +271,6 @@ static int l_strcmp (const TString *ls, const TString *rs) {
     }
   }
 }
-
 
 int luaV_lessthan (lua_State *L, const TValue *l, const TValue *r) {
   int res;

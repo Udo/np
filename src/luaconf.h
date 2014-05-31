@@ -438,7 +438,6 @@
 #endif
 
 /* these are quite standard operations */
-#if defined(LUA_CORE)
 #define luai_numadd(L,a,b)	((a)+(b))
 #define luai_numsub(L,a,b)	((a)-(b))
 #define luai_nummul(L,a,b)	((a)*(b))
@@ -448,7 +447,6 @@
 #define luai_numlt(L,a,b)	((a)<(b))
 #define luai_numle(L,a,b)	((a)<=(b))
 #define luai_numisnan(L,a)	(!luai_numeq((a), (a)))
-#endif
 
 
 

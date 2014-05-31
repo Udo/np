@@ -1,5 +1,4 @@
-b = (: 10 20 30)
-a = (: 1 2 3 4 'a' 'b' 'c' field1 = 'bla' b)
+a = (: 1111 1 '1b' '1a' 100 3 4 'a' 'b' 'c' field1 = 'bla')
 
+a:sort():items{ v | print(v)}
 
-print(a)
