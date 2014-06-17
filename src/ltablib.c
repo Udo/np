@@ -513,7 +513,7 @@ static int tbl_map (lua_State *L) {
 		lua_pushnumber(L, i); // numindex
 		lua_call(L, 3, 2);
 		if(!lua_isnil(L, -2)) {
-			if(lua_isnil(L, -1)) { // if only one value was returned, treat it as a value
+			if(lua_isnil(L, -1) || lua_isnumber(L, -1)) { // if only one value was returned, treat it as a value
 				numIndex++;
 				lua_pop(L, 1);
 				lua_pushnumber(L, numIndex); // and take the original element key as the new key
