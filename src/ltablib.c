@@ -497,7 +497,7 @@ static int tbl_each (lua_State *L) {
 
 // todo: this is horrible, see luaH_next for ideas on how to do it with less overhead
 static int tbl_map (lua_State *L) {
-  int i = 0;
+  int i = 0, numIndex = 0;
   luaL_checktype(L, 1, LUA_TTABLE);
   luaL_checktype(L, 2, LUA_TFUNCTION);
 	lua_settop(L, 2);
@@ -514,8 +514,9 @@ static int tbl_map (lua_State *L) {
 		lua_call(L, 3, 2);
 		if(!lua_isnil(L, -2)) {
 			if(lua_isnil(L, -1)) { // if only one value was returned, treat it as a value
+				numIndex++;
 				lua_pop(L, 1);
-				lua_pushvalue(L, 4); // and take the original element key as the new key
+				lua_pushnumber(L, numIndex); // and take the original element key as the new key
 				lua_insert(L, -2);
 			}
 			lua_settable(L, 3);
