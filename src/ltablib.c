@@ -517,8 +517,8 @@ static int tbl_map (lua_State *L) {
 				numIndex++;
 				lua_pop(L, 1);
 				lua_pushnumber(L, numIndex); // and take the original element key as the new key
-				lua_insert(L, -2);
 			}
+			lua_insert(L, -2); // switch stack order from value,key to key,value
 			lua_settable(L, 3);
 		} else {
 			lua_pop(L, 2);
