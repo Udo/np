@@ -97,7 +97,7 @@ static int tinsert (lua_State *L) {
     case 3: {
       int i;
       pos = luaL_checkint(L, 2);  /* 2nd argument is the position */
-			if(pos < 0) pos = e + pos;
+			if(pos <= 0) pos = e + pos;
       luaL_argcheck(L, 1 <= pos && pos <= e, 2, "position out of bounds");
       for (i = e; i > pos; i--) {  /* move up elements */
         lua_rawgeti(L, 1, i-1);
