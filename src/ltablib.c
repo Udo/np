@@ -358,7 +358,8 @@ static int tbl_sort (lua_State *L) {
 			const char * sortModeArg = lua_tostring(L, 2);
 			if (strcmp(sortModeArg, "string") == 0) sortMode = 1; // string sort mode
 			else if (strcmp(sortModeArg, "number") == 0) sortMode = 2; // number sort mode
-			else sortMode = 0; // default to lua sort mode
+			else if (strcmp(sortModeArg, "strict") == 0) sortMode = 0; // number sort mode
+			else sortMode = 1; // default to lua sort mode
 		}
   }
   //  luaL_checktype(L, 2, LUA_TFUNCTION);
@@ -585,9 +586,9 @@ static int tbl_reduce (lua_State *L) {
   luaL_checktype(L, 1, LUA_TTABLE);
   luaL_checktype(L, 2, LUA_TFUNCTION);
 	lua_settop(L, 3);
-	if(lua_isnil(L, 3)) {
-		lua_pushnumber(L, 0);
-		lua_replace(L, 3);
+	if(lua_isnil(L, 3)) { // if no start value is defined
+		lua_pushnumber(L, 0); // use 0
+		lua_replace(L, 3); 
 	}
 	
   int n = aux_getn(L, 1);  /* get size of table */
@@ -610,7 +611,7 @@ static int tbl_reduce (lua_State *L) {
 
 
 static const luaL_Reg tab_funcs[] = {
-  {"add", tbl_add},
+  {"add", tbl_add}, // todo: change these to iAdd instead
   {"concat", tbl_concat},
   {"condense", pack},
   {"copy", tbl_copy},
@@ -621,9 +622,9 @@ static const luaL_Reg tab_funcs[] = {
   {"join", tbl_join}, // join(seperator) puts all elements together in a string seperated by the seperator
   {"maxIndex", maxn}, // sort-of counts the items by returning the highest numerical index used
   {"map", tbl_map},
-  {"max", tbl_max},
-  {"min", tbl_min},
-  {"mAdd", tbl_madd},
+  {"max", tbl_max}, // todo: move to math
+  {"min", tbl_min}, // todo: move to math
+  {"mAdd", tbl_madd}, 
   {"mConcat", tbl_mconcat},
   {"reduce", tbl_reduce},
   {"remove", tremove},
