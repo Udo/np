@@ -24,7 +24,7 @@ static int luaB_print (lua_State *L) {
   int n = lua_gettop(L);  /* number of arguments */
   int i;
   lua_getglobal(L, LUA_CONVLIBNAME);
-	lua_getfield(L, -1, "toString");
+	lua_getfield(L, -1, "string");
 	for (i=1; i<=n; i++) {
     const char *s;
     size_t l;
