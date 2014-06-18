@@ -30,7 +30,10 @@ static int luaCV_tostring (lua_State *L) {
 }
 
 static int luaCV_tonumber (lua_State *L) {
-  if (lua_isnoneornil(L, 2)) {  /* standard conversion */
+	if(luaL_callmeta(L, 1, "toNumber")) {
+		return 1;
+	}
+  else if (lua_isnoneornil(L, 2)) {  /* standard conversion */
     int isnum;
     lua_Number n = lua_tonumberx(L, 1, &isnum);
     if (isnum) {
@@ -39,9 +42,6 @@ static int luaCV_tonumber (lua_State *L) {
     }  /* else not a number; must be something */
     luaL_checkany(L, 1);
   }
-	else if(luaL_callmeta(L, 1, "toNumber")) {
-		return 1;
-	}
   else {
     size_t l;
     const char *s = luaL_checklstring(L, 1, &l);
