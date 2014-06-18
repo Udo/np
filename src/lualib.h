@@ -14,7 +14,7 @@
 
 LUAMOD_API int (luaopen_base) (lua_State *L);
 
-#define LUA_CONVLIBNAME	"to"
+#define LUA_CONVLIBNAME	"convert"
 LUAMOD_API int (luaopen_conv) (lua_State *L);
 
 #define LUA_COLIBNAME	"coroutine"

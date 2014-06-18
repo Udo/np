@@ -271,8 +271,8 @@ static int str_format (lua_State *L) {
 
 
 static const luaL_Reg conv_funcs[] = {
-  {"number", luaCV_tonumber},
-  {"string", luaCV_tostring},
+  {"toNumber", luaCV_tonumber},
+  {"toString", luaCV_tostring},
   {"type", luaCV_type},
   {"format", str_format},
 	{NULL, NULL}
