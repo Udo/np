@@ -39,6 +39,9 @@ static int luaCV_tonumber (lua_State *L) {
     }  /* else not a number; must be something */
     luaL_checkany(L, 1);
   }
+	else if(luaL_callmeta(L, idx, "toNumber")) {
+		return 1;
+	}
   else {
     size_t l;
     const char *s = luaL_checklstring(L, 1, &l);
