@@ -765,7 +765,7 @@ static void parlist (LexState *ls) {
     new_localvarliteral(ls, "_3");
 		nparams += 3;
 	}
-  else if (ls->t.token != '|') {  /* is `parlist' not empty? */
+  else {  /* is `parlist' not empty? */
     do {
       switch (ls->t.token) {
         case TK_NAME: {  /* param -> NAME */
