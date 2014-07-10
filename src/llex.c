@@ -42,7 +42,7 @@ static const char *const luaX_tokens [] = {
 		"/*until*/", "while", "..", "...", "==", 
 		">=", "<=", "!=", "::", "<eof>",
     "<number>", "<name>", "<string>", "(:", ")",
-		"?", "=>"
+		"?", ":", "=>", 
 };
 
 
