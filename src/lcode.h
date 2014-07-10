@@ -24,11 +24,13 @@
 ** grep "ORDER OPR" if you change these enums  (ORDER OP)
 */
 typedef enum BinOpr {
-  OPR_ADD, OPR_MADD, OPR_SUB, OPR_MSUB, OPR_MUL, OPR_DIV, OPR_MOD, OPR_POW,
-  OPR_CONCAT, OPR_MCONCAT,
+  OPR_ADD, OPR_SUB, OPR_MUL, OPR_DIV, OPR_MOD, OPR_POW,
+  OPR_CONCAT, 
   OPR_EQ, OPR_LT, OPR_LE,
   OPR_NE, OPR_GT, OPR_GE,
-  OPR_AND, OPR_OR,
+  OPR_AND, OPR_OR, 
+	// the following are mutable operators
+	OPR_MADD, OPR_MSUB, OPR_MCONCAT,
   OPR_NOBINOPR 
 } BinOpr;
 

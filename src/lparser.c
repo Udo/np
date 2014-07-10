@@ -30,10 +30,10 @@
 
 /* maximum number of local variables per function (must be smaller
    than 250, due to the bytecode format) */
-#define MAXVARS		200
+#define MAXVARS    200
 
 
-#define hasmultret(k)		((k) == VCALL || (k) == VVARARG)
+#define hasmultret(k)    ((k) == VCALL || (k) == VVARARG)
 
 
 
@@ -120,7 +120,7 @@ static void checknext (LexState *ls, int c) {
 }
 
 
-#define check_condition(ls,c,msg)	{ if (!(c)) luaX_syntaxerror(ls, msg); }
+#define check_condition(ls,c,msg)  { if (!(c)) luaX_syntaxerror(ls, msg); }
 
 
 
@@ -193,7 +193,7 @@ static void new_localvarliteral_ (LexState *ls, const char *name, size_t sz) {
 }
 
 #define new_localvarliteral(ls,v) \
-	new_localvarliteral_(ls, "" v, (sizeof(v)/sizeof(char))-1)
+  new_localvarliteral_(ls, "" v, (sizeof(v)/sizeof(char))-1)
 
 
 static LocVar *getlocvar (FuncState *fs, int i) {
@@ -300,7 +300,7 @@ static void singlevar (LexState *ls, expdesc *var) {
   FuncState *fs = ls->fs;
   if (singlevaraux(fs, varname, var, 1) == VVOID) {  /* global name? */
     expdesc key;
-		var->isGlobalAccess = 1;
+    var->isGlobalAccess = 1;
     singlevaraux(fs, ls->envn, var, 1);  /* get environment variable */
     lua_assert(var->k == VLOCAL || var->k == VUPVAL);
     codestring(ls, &key, varname);  /* key is variable name */
@@ -336,7 +336,7 @@ static void enterlevel (LexState *ls) {
 }
 
 
-#define leavelevel(ls)	((ls)->L->nCcalls--)
+#define leavelevel(ls)  ((ls)->L->nCcalls--)
 
 
 static void closegoto (LexState *ls, int g, Labeldesc *label) {
@@ -809,7 +809,7 @@ static void body (LexState *ls, expdesc *e, int ismethod, int line) {
 static void functionDeclaration (LexState *ls, expdesc *e, int line) {
   /* body ->  parlist `|' block END */
   checknext(ls, TK_DO);
-	FuncState new_fs;
+  FuncState new_fs;
   BlockCnt bl;
   new_fs.f = addprototype(ls);
   new_fs.f->linedefined = line;
@@ -859,10 +859,10 @@ static void funcargs (LexState *ls, expdesc *f, int line) {
       break;
     }
     case TK_DO: { // direct function parameter (shorthand)
-		  expr(ls, &args);
+      expr(ls, &args);
       break;
     }
-		// this is plain weird: what's the use case for this?
+    // this is plain weird: what's the use case for this?
     /*case TK_STRING: {  // funcargs -> STRING 
       codestring(ls, &args, ls->t.seminfo.ts);
       luaX_next(ls);  // must use `seminfo' before `next' 
@@ -899,7 +899,7 @@ static void funcargs (LexState *ls, expdesc *f, int line) {
 
 static void primaryexp (LexState *ls, expdesc *v) {
   /* primaryexp -> NAME | '(' expr ')' */
-  switch (ls->t.token) {
+	switch (ls->t.token) {
     case '(': {
       int line = ls->linenumber;
       luaX_next(ls);
@@ -913,7 +913,7 @@ static void primaryexp (LexState *ls, expdesc *v) {
       return;
     }
     default: {
-			luaX_syntaxerror(ls, "unexpected symbol");
+      luaX_syntaxerror(ls, "unexpected symbol");
     }
   }
 }
@@ -924,17 +924,17 @@ static void suffixedexp (LexState *ls, expdesc *v) {
        primaryexp { '.' NAME | '[' exp ']' | ':' NAME funcargs | funcargs } */
   FuncState *fs = ls->fs;
   int line = ls->linenumber;
-  primaryexp(ls, v);
+	primaryexp(ls, v);
   for (;;) {
     switch (ls->t.token) {
       case '.': {  /* fieldsel */
-   	  	expdesc key;
-				luaK_exp2anyregup(fs, v);
-				luaX_next(ls);  /* skip the dot or colon */
-				checkname(ls, &key);
-				luaK_indexed(fs, v, &key);
+         expdesc key;
+        luaK_exp2anyregup(fs, v);
+        luaX_next(ls);  /* skip the dot or colon */
+        checkname(ls, &key);
+        luaK_indexed(fs, v, &key);
         // to do: put self value away for later
-				break;
+        break;
       }
       case '[': {  /* `[' exp1 `]' */
         expdesc key;
@@ -952,12 +952,12 @@ static void suffixedexp (LexState *ls, expdesc *v) {
         break;
       }
       case '(': case TK_TBLSTART: case TK_DO: {  /* funcargs */
-				if(ls->t.seminfo.precededByWhitespace == 0) {
-	        luaK_exp2nextreg(fs, v);
-	        funcargs(ls, v, line);
-				} else {
-					return;
-				}
+        if(ls->t.seminfo.precededByWhitespace == 0) {
+          luaK_exp2nextreg(fs, v);
+          funcargs(ls, v, line);
+        } else {
+          return;
+        }
         break;
       }
       default: return;
@@ -969,7 +969,7 @@ static void suffixedexp (LexState *ls, expdesc *v) {
 static void simpleexp (LexState *ls, expdesc *v) {
   /* simpleexp -> NUMBER | STRING | NIL | TRUE | FALSE | ... |
                   constructor | FUNCTION body | suffixedexp */
-  switch (ls->t.token) {
+	switch (ls->t.token) {
     case TK_NUMBER: {
       init_exp(v, VKNUM, 0);
       v->u.nval = ls->t.seminfo.r;
@@ -1002,17 +1002,17 @@ static void simpleexp (LexState *ls, expdesc *v) {
       constructor(ls, v);
       return;
     }
-		case TK_DO: { // in this case, it's a function declaration
-			functionDeclaration(ls, v, ls->linenumber);
-			break;
-		}
-		/*
+    case TK_DO: { // in this case, it's a function declaration
+      functionDeclaration(ls, v, ls->linenumber);
+      break;
+    }
+    /*
     case TK_FUNCTION: {
       luaX_next(ls);
       body(ls, v, 0, ls->linenumber);
       return;
     }
-		*/
+    */
     default: {
       suffixedexp(ls, v);
       return;
@@ -1066,7 +1066,7 @@ static const struct {
    {2, 2}, {1, 1}                   /* and, or */
 };
 
-#define UNARY_PRIORITY	8  /* priority for unary operators */
+#define UNARY_PRIORITY  8  /* priority for unary operators */
 
 
 /*
@@ -1079,15 +1079,17 @@ static BinOpr subexpr (LexState *ls, expdesc *v, int limit) {
   enterlevel(ls);
   uop = getunopr(ls->t.token);
   if (uop != OPR_NOUNOPR) {
-    int line = ls->linenumber;
+		int line = ls->linenumber;
     luaX_next(ls);
     subexpr(ls, v, UNARY_PRIORITY);
     luaK_prefix(ls->fs, uop, v, line);
   }
-  else simpleexp(ls, v);
+  else {
+		simpleexp(ls, v);
+	}
   /* expand while operators have priorities higher than `limit' */
   op = getbinopr(ls->t.token);
-  while (op != OPR_NOBINOPR && priority[op].left > limit) {
+	while (op != OPR_NOBINOPR && priority[op].left > limit) {
     expdesc v2;
     BinOpr nextop;
     int line = ls->linenumber;
@@ -1233,13 +1235,13 @@ static int compound_assignment(LexState *ls, struct LHS_assign *lh, int nvars) {
     }
     goto done;
   }
-	switch(op)
-	{
-		case(OPR_CONCAT): { op = OPR_MCONCAT; break; }
-		case(OPR_ADD): { op = OPR_MADD; break; }
-		case(OPR_SUB): { op = OPR_MSUB; break; }
-		default: { break; }
-	}
+  switch(op)
+  {
+    case(OPR_CONCAT): { op = OPR_MCONCAT; break; }
+    case(OPR_ADD): { op = OPR_MADD; break; }
+    case(OPR_SUB): { op = OPR_MSUB; break; }
+    default: { break; }
+  }
   checknext(ls, '=');
   do {
     if(!assign) {
@@ -1328,7 +1330,7 @@ static int assignment (LexState *ls, struct LHS_assign *lh, int nvars) {
   check_condition(ls, vkisvar(lh->v.k), "syntax error");
   if (testnext(ls, ',')) {  /* assignment -> ',' suffixedexp assignment */
     struct LHS_assign nv;
-		nv.prev = lh;
+    nv.prev = lh;
     nv.next = NULL;
     lh->next = &nv;
     suffixedexp(ls, &nv.v);
@@ -1342,14 +1344,14 @@ static int assignment (LexState *ls, struct LHS_assign *lh, int nvars) {
     int nexps;
     switch(ls->t.token) {
       /* hook for compound_assignment */
-			case '+': case '-': case '*': case '/': case TK_CONCAT:
-			{
-				return compound_assignment(ls,lh,nvars);
-			}
-			case TK_IN:
-			{
-				return get_table_unpack(ls,lh,&e);
-			}
+      case '+': case '-': case '*': case '/': case TK_CONCAT:
+      {
+        return compound_assignment(ls,lh,nvars);
+      }
+      case TK_IN:
+      {
+        return get_table_unpack(ls,lh,&e);
+      }
     }
     checknext(ls, '=');
     nexps = explist(ls, &e, 0);
@@ -1584,11 +1586,11 @@ static void test_then_block (LexState *ls, int *escapelist, int *shortIf, int re
   int jf;  /* instruction to skip 'then' code (if condition is false) */
   luaX_next(ls);  /* skip IF or ELSEIF */
   expr(ls, &v);  /* read condition */
-	if(requireDo == 1)
-	{
-		int doFound = testnext(ls, TK_DO);
-		if(doFound == 0) (*shortIf) = 1;
-	}
+  if(requireDo == 1)
+  {
+    int doFound = testnext(ls, TK_DO);
+    if(doFound == 0) (*shortIf) = 1;
+  }
   if (ls->t.token == TK_GOTO || ls->t.token == TK_BREAK) {
     luaK_goiffalse(ls->fs, &v);  /* will jump to label if condition is true */
     enterblock(fs, &bl, 0);  /* must enter block before 'goto' */
@@ -1606,10 +1608,10 @@ static void test_then_block (LexState *ls, int *escapelist, int *shortIf, int re
     enterblock(fs, &bl, 0);
     jf = v.f;
   }
-	if((*shortIf) == 1)
-		statement(ls);
-	else
-  	statlist(ls);  /* `then' part */
+  if((*shortIf) == 1)
+    statement(ls);
+  else
+    statlist(ls);  /* `then' part */
   leaveblock(fs);
   if (ls->t.token == TK_ELSE ||
       ls->t.token == TK_ELSEIF)  /* followed by 'else'/'elseif'? */
@@ -1622,14 +1624,14 @@ static void ifstat (LexState *ls, int line) {
   /* ifstat -> IF cond THEN block {ELSEIF cond THEN block} [ELSE block] END */
   FuncState *fs = ls->fs;
   int escapelist = NO_JUMP;  /* exit list for finished parts */
-	int shortIfStatement = 0;
+  int shortIfStatement = 0;
   test_then_block(ls, &escapelist, &shortIfStatement, 1);  /* IF cond THEN block */
   while (ls->t.token == TK_ELSEIF)
     test_then_block(ls, &escapelist, &shortIfStatement, 0);  /* ELSEIF cond THEN block */
   if (testnext(ls, TK_ELSE))
     block(ls);  /* `else' part */
-	if(shortIfStatement == 0)
-  	check_match(ls, TK_END, TK_IF, line);
+  if(shortIfStatement == 0)
+    check_match(ls, TK_END, TK_IF, line);
   luaK_patchtohere(fs, escapelist);  /* patch escape list to 'if' end */
 }
 
@@ -1656,7 +1658,7 @@ static void localstat (LexState *ls) {
     new_localvar(ls, str_checkname(ls));
     nvars++;
   } while (testnext(ls, ','));
-	
+  
   /* table unpack hook for the local variable case */
   if (testnext(ls,TK_IN)) { 
     lu_byte from_var;
@@ -1664,7 +1666,7 @@ static void localstat (LexState *ls) {
     int vars = ls->fs->nactvar;
     luaK_reserveregs(ls->fs, nvars);
     suffixedexp(ls, &e);
-		adjustlocalvars(ls, nvars);
+    adjustlocalvars(ls, nvars);
     new_localvarliteral(ls, "(in)");
     luaK_exp2nextreg(ls->fs, &e);
     from_var = ls->fs->nactvar;
@@ -1682,7 +1684,7 @@ static void localstat (LexState *ls) {
     removevars(ls->fs, from_var);
     return;
   }
-	
+  
   if (testnext(ls, '='))
     nexps = explist(ls, &e, 0);
   else {
@@ -1726,27 +1728,27 @@ static void exprstat (LexState *ls) {
   /* stat -> func | assignment */
   FuncState *fs = ls->fs;
   struct LHS_assign v;
-	v.v.isGlobalAccess = 0;
+  v.v.isGlobalAccess = 0;
   suffixedexp(ls, &v.v);
   if (v.v.k == VCALL) 
     SETARG_C(getcode(fs, &v.v), 1);  /* call statement uses no results */
   else { /* stat -> assignment ? */
-		if(v.v.isGlobalAccess)
-			luaX_syntaxerror(ls, "undeclared variable");
+    if(v.v.isGlobalAccess)
+      luaX_syntaxerror(ls, "undeclared variable");
     v.prev = v.next = NULL;
     assignment(ls, &v, 1);
-		switch(ls->t.token) {
-		   /* assignment cases */
-		  case '=': case ',': case TK_IN: {
-		    v.prev = NULL;
-		    assignment(ls, &v, 1);
-		    break;
-		  }
-		  /*default: {
-		    check_condition(ls, v.v.k == VCALL, "syntax error");
-		    SETARG_C(getcode(fs, &v.v), 1);  
-		  }*/
-		}
+    switch(ls->t.token) {
+       /* assignment cases */
+      case '=': case ',': case TK_IN: {
+        v.prev = NULL;
+        assignment(ls, &v, 1);
+        break;
+      }
+      /*default: {
+        check_condition(ls, v.v.k == VCALL, "syntax error");
+        SETARG_C(getcode(fs, &v.v), 1);  
+      }*/
+    }
   }
 }
 
@@ -1758,14 +1760,14 @@ static void retstat (LexState *ls, int single) {
   if (block_follow(ls, 1) || ls->t.token == ';')
     first = nret = 0;  /* return no values */
   else {
-	  if(single == 0) {
-			checknext(ls, '(');
-	    nret = explist(ls, &e, ')');  /* optional return values */
+    if(single == 0) {
+      checknext(ls, '(');
+      nret = explist(ls, &e, ')');  /* optional return values */
     }
-		else {
-	    nret = explist(ls, &e, 0);  /* optional return values */
-		}
-  	if (hasmultret(e.k)) {
+    else {
+      nret = explist(ls, &e, 0);  /* optional return values */
+    }
+    if (hasmultret(e.k)) {
       luaK_setmultret(fs, &e);
       if (e.k == VCALL && nret == 1) {  /* tail call? */
         SET_OPCODE(getcode(fs,&e), OP_TAILCALL);
@@ -1783,7 +1785,7 @@ static void retstat (LexState *ls, int single) {
         lua_assert(nret == fs->freereg - first);
       }
     }
-	  if(single == 0) checknext(ls, ')');
+    if(single == 0) checknext(ls, ')');
   }
   luaK_ret(fs, first, nret);
   testnext(ls, ';');  /* skip optional semicolon */
@@ -1794,7 +1796,7 @@ static void statement (LexState *ls) {
   int line = ls->linenumber;  /* may be needed for error messages */
   enterlevel(ls);
   switch (ls->t.token) {
-		case ';': {  /* stat -> ';' (empty statement) */
+    case ';': {  /* stat -> ';' (empty statement) */
       luaX_next(ls);  /* skip ';' */
       break;
     }
@@ -1821,18 +1823,18 @@ static void statement (LexState *ls) {
       break;
     }
     /*
-		case TK_FUNCTION: {  // stat -> funcstat 
+    case TK_FUNCTION: {  // stat -> funcstat 
       funcstat(ls, line);
       break;
     }
-		*/
+    */
     case TK_LOCAL: {  /* stat -> localstat */
       luaX_next(ls);  /* skip LOCAL */
-			/*
+      /*
       if (testnext(ls, TK_FUNCTION))  // local function? 
         localfunc(ls);
       else
-			*/
+      */
         localstat(ls);
       break;
     }

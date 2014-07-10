@@ -22,6 +22,7 @@
 #include "lstring.h"
 #include "ltable.h"
 #include "lzio.h"
+#include <stdio.h>
 
 
 
@@ -35,12 +36,13 @@
 /* ORDER RESERVED */
 static const char *const luaX_tokens [] = {
     "and", "break", "{", "otherwise", "else",
-    "}", "false", "for", "function", "/*goto*/", "if",
-    "in", "new", "nil", "not", "or", "/*repeat*/",
-    "return", "then", "true", "/*until*/", "while",
-    "..", "...", "==", ">=", "<=", "!=", "::", "<eof>",
-    "<number>", "<name>", "<string>",
-		"(:", ")", "?"
+    "}", "false", "for", "function", "/*goto*/", 
+		"if", "in", "new", "nil", "not", 
+		"or", "/*repeat*/", "return", "then", "true", 
+		"/*until*/", "while", "..", "...", "==", 
+		">=", "<=", "!=", "::", "<eof>",
+    "<number>", "<name>", "<string>", "(:", ")",
+		"?", "=>"
 };
 
 
@@ -489,6 +491,16 @@ static int llex (LexState *ls, SemInfo *seminfo) {
         if (ls->current != ':') return ':';
         else { next(ls); return TK_DBCOLON; }
       }
+      case '|': {
+        next(ls);
+        if (ls->current != '|') return '|';
+        else { next(ls); return TK_OR; }
+      }
+      case '&': {
+        next(ls);
+        if (ls->current != '&') return '&';
+        else { next(ls); return TK_AND; }
+      }
       case '{': {
         next(ls);
         if (ls->current == '(') return TK_FUNCTION;
@@ -562,6 +574,7 @@ void luaX_next (LexState *ls) {
 		ls->t.seminfo.precededByWhitespace = 0;
   	ls->t.token = llex(ls, &ls->t.seminfo);  /* read next token */
   }    
+	//printf(" %s |", luaX_token2str(ls, ls->t.token));
 }
 
 
