@@ -24,6 +24,7 @@
 #include "lstring.h"
 #include "ltable.h"
 #include "lvm.h"
+#include <stdio.h>
 
 
 #define hasjumps(e)	((e)->t != (e)->f)
@@ -727,6 +728,7 @@ static void codearith (FuncState *fs, OpCode op,
     return;
   else {
     int o2 = (op != OP_UNM && op != OP_LEN) ? luaK_exp2RK(fs, e2) : 0;
+		//printf("%i!", op);
     int o1 = luaK_exp2RK(fs, e1);
     if (o1 > o2) {
       freeexp(fs, e1);
@@ -798,8 +800,9 @@ void luaK_infix (FuncState *fs, BinOpr op, expdesc *v) {
       luaK_exp2nextreg(fs, v);  /* operand must be on the `stack' */
       break;
     }
+		case OPR_SUB: 
 		case OPR_MADD: case OPR_MSUB: 
-    case OPR_ADD: case OPR_SUB: case OPR_MUL: case OPR_DIV:
+    case OPR_ADD: case OPR_MUL: case OPR_DIV:
     case OPR_MOD: case OPR_POW: {
       if (!isnumeral(v)) luaK_exp2RK(fs, v);
       break;

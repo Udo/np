@@ -1069,7 +1069,8 @@ static const struct {
    {10, 9}, {5, 4},                 /* ^, .. (right associative) */
    {3, 3}, {3, 3}, {3, 3},          /* ==, <, <= */
    {3, 3}, {3, 3}, {3, 3},          /* ~=, >, >= */
-   {2, 2}, {1, 1}                   /* and, or */
+   {2, 2}, {1, 1},                   /* and, or */
+	 {1, 1}, {1, 1}, 
 };
 
 #define UNARY_PRIORITY  8  /* priority for unary operators */
@@ -1083,6 +1084,7 @@ static BinOpr subexpr (LexState *ls, expdesc *v, int limit) {
   BinOpr op;
   UnOpr uop;
   enterlevel(ls);
+	//printf(" (%s) ", luaX_token2str(ls, ls->t.token));
   uop = getunopr(ls->t.token);
   if (uop != OPR_NOUNOPR) {
 		int line = ls->linenumber;
@@ -1095,11 +1097,13 @@ static BinOpr subexpr (LexState *ls, expdesc *v, int limit) {
 	}
   /* expand while operators have priorities higher than `limit' */
   op = getbinopr(ls->t.token);
+	//printf(" (%s) ", luaX_token2str(ls, ls->t.token));
 	while (op != OPR_NOBINOPR && priority[op].left > limit) {
     expdesc v2;
     BinOpr nextop;
     int line = ls->linenumber;
     luaX_next(ls);
+		//printf(" infx(%i) ", op);
     luaK_infix(ls->fs, op, v);
     /* read sub-expression with higher priority */
     nextop = subexpr(ls, &v2, priority[op].right);

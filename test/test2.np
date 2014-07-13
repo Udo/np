@@ -1,4 +1,5 @@
-new f1 = { a b | print(a b) }
-new f2 = {| print(_1) }
-f1(1 2)
-f2(10 20)
+new fib; fib = { n |
+  if(n < 3) => n
+  otherwise => fib(n - 1) + fib(n - 2)
+  }
+print( fib(8) )
