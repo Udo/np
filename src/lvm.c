@@ -627,6 +627,12 @@ void luaV_execute (lua_State *L) {
           setnilvalue(ra++);
         } while (b--);
       )
+      vmcase(OP_LOADTHIS,
+        int b = GETARG_B(i);
+        do {
+					setobj2s(L, ra++, ci->func);
+        } while (b--);
+      )
       vmcase(OP_GETUPVAL,
         int b = GETARG_B(i);
         setobj2s(L, ra, cl->upvals[b]->v);

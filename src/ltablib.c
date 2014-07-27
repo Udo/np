@@ -562,12 +562,12 @@ static int tbl_toString (lua_State *L) {
 	if(!luaL_dostring(L, "=> { l | \
   new o = '' \
   l:items{ v | \
-    if(convert.type(v) == 'string') { v = convert.format('\%q' v) otherwise v = convert.toString(v) } \
+    if(convert.type(v) == 'string') { v = convert.format('\%q' v) else v = convert.toString(v) } \
 	  o <<= v << ' '; \
   } \
   l:each{ v k | \
 		if(convert.type(k) != 'number') { \
-	    if(convert.type(v) == 'string') { v = convert.format('\%q' v) otherwise v = convert.toString(v) } \
+	    if(convert.type(v) == 'string') { v = convert.format('\%q' v) else v = convert.toString(v) } \
 			o <<= k << '=' << v << ' ' } \
   } \
   => '(: ' << o << ')' \

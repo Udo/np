@@ -1,5 +1,15 @@
-new fib; fib = { n |
-  if(n < 3) => n
-  otherwise => fib(n - 1) + fib(n - 2)
+new memoize = { fn | 
+  new memList = (:)
+  => { n | 
+    if(memList[n]) => memList[n]
+    else => fn(n this)
+    }
   }
-print( fib(8) )
+  
+-- fast fibonacci generator
+new memFib = memoize{ n f |
+  if(n < 3) => n
+  else => f(n-1 f) + f(n-2 f)
+	}
+  
+print( memFib(20) )

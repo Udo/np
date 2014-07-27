@@ -56,6 +56,10 @@ void luaK_nil (FuncState *fs, int from, int n) {
   luaK_codeABC(fs, OP_LOADNIL, from, n - 1, 0);  /* else no optimization */
 }
 
+void luaK_this (FuncState *fs, int from, int n) {
+  luaK_codeABC(fs, OP_LOADTHIS, from, n - 1, 0);  /* else no optimization */
+}
+
 
 int luaK_jump (FuncState *fs) {
   int jpc = fs->jpc;  /* save list of jumps to here */
@@ -424,6 +428,10 @@ static void discharge2reg (FuncState *fs, expdesc *e, int reg) {
   switch (e->k) {
     case VNIL: {
       luaK_nil(fs, reg, 1);
+      break;
+    }
+    case VTHIS: {
+      luaK_this(fs, reg, 1);
       break;
     }
     case VFALSE: case VTRUE: {

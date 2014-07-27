@@ -997,6 +997,10 @@ static void simpleexp (LexState *ls, expdesc *v) {
       init_exp(v, VFALSE, 0);
       break;
     }
+    case TK_THIS: {
+      init_exp(v, VTHIS, 0);
+      break;
+    }
     case TK_DOTS: {  /* vararg */
       FuncState *fs = ls->fs;
       check_condition(ls, fs->f->is_vararg,
