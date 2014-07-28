@@ -1,5 +1,5 @@
-new fls = (: blu = 'b')
+new l = (:)
 
-fls.bla = '1'
-  
-print(fls)
+l += 'bla'
+
+print(l)
