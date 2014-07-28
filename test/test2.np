@@ -1,15 +1,10 @@
-new memoize = { fn | 
-  new memList = (:)
-  => { n | 
-    if(memList[n]) => memList[n]
-    else => fn(n this)
-    }
+new a = 10
+
+if(a==1) {
+  print('one')
   }
-  
--- fast fibonacci generator
-new memFib = memoize{ n f |
-  if(n < 3) => n
-  else => f(n-1 f) + f(n-2 f)
+elseif(a==10) {
+	print(10)
 	}
-  
-print( memFib(20) )
+else
+	print('else')

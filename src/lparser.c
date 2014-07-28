@@ -1592,7 +1592,7 @@ static void forstat (LexState *ls, int line) {
 }
 
 
-static void test_then_block (LexState *ls, int *escapelist, int *shortIf, int requireDo) {
+static void test_then_block (LexState *ls, int *escapelist) {
   /* test_then_block -> [IF | ELSEIF] cond THEN block */
   BlockCnt bl;
   FuncState *fs = ls->fs;
@@ -1600,11 +1600,9 @@ static void test_then_block (LexState *ls, int *escapelist, int *shortIf, int re
   int jf;  /* instruction to skip 'then' code (if condition is false) */
   luaX_next(ls);  /* skip IF or ELSEIF */
   expr(ls, &v);  /* read condition */
-  if(requireDo == 1)
-  {
-    int doFound = testnext(ls, TK_DO);
-    if(doFound == 0) (*shortIf) = 1;
-  }
+
+  int doFound = testnext(ls, TK_DO);
+
   if (ls->t.token == TK_GOTO || ls->t.token == TK_BREAK) {
     luaK_goiffalse(ls->fs, &v);  /* will jump to label if condition is true */
     enterblock(fs, &bl, 0);  /* must enter block before 'goto' */
@@ -1622,10 +1620,12 @@ static void test_then_block (LexState *ls, int *escapelist, int *shortIf, int re
     enterblock(fs, &bl, 0);
     jf = v.f;
   }
-  if((*shortIf) == 1)
+  if(doFound == 0)
     statement(ls);
-  else
-    statlist(ls);  /* `then' part */
+  else {
+    statlist(ls);  
+		testnext(ls, TK_END);
+  }
   leaveblock(fs);
   if (ls->t.token == TK_ELSE ||
       ls->t.token == TK_ELSEIF)  /* followed by 'else'/'elseif'? */
@@ -1638,14 +1638,12 @@ static void ifstat (LexState *ls, int line) {
   /* ifstat -> IF cond THEN block {ELSEIF cond THEN block} [ELSE block] END */
   FuncState *fs = ls->fs;
   int escapelist = NO_JUMP;  /* exit list for finished parts */
-  int shortIfStatement = 0;
-  test_then_block(ls, &escapelist, &shortIfStatement, 1);  /* IF cond THEN block */
+  test_then_block(ls, &escapelist);  /* IF cond THEN block */
   while (ls->t.token == TK_ELSEIF)
-    test_then_block(ls, &escapelist, &shortIfStatement, 0);  /* ELSEIF cond THEN block */
+    test_then_block(ls, &escapelist);  /* ELSEIF cond THEN block */
   if (testnext(ls, TK_ELSE))
     block(ls);  /* `else' part */
-  if(shortIfStatement == 0)
-    check_match(ls, TK_END, TK_IF, line);
+  //check_match(ls, TK_END, TK_IF, line);
   luaK_patchtohere(fs, escapelist);  /* patch escape list to 'if' end */
 }
 
