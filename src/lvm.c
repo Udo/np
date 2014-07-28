@@ -409,14 +409,19 @@ void luaV_arith (lua_State *L, StkId ra, const TValue *rb,
                  const TValue *rc, TMS op) {
   TValue tempb, tempc;
   const TValue *b, *c;
-  if ((b = luaV_tonumber(rb, &tempb)) != NULL &&
+
+  if(ttypenv(rb) == LUA_TTABLE) {
+		if (!call_binTM(L, rb, rc, ra, op))
+			luaG_aritherror(L, rb, rc);
+	}
+	else 
+		if ((b = luaV_tonumber(rb, &tempb)) != NULL &&
       (c = luaV_tonumber(rc, &tempc)) != NULL) {
     lua_Number res = luaO_arith(op - TM_ADD + LUA_OPADD, nvalue(b), nvalue(c));
     setnvalue(ra, res);
   }
-  else if (!call_binTM(L, rb, rc, ra, op))
-		if(op != TM_MADD || !call_binTM(L, rb, rc, ra, TM_ADD))
-    	luaG_aritherror(L, rb, rc);
+  else 
+		luaG_aritherror(L, rb, rc);
 }
 
 

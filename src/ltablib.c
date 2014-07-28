@@ -408,9 +408,8 @@ static int tbl_add_helper (lua_State *L, int isImmutable) {
 	}	
 	
 	if (!lua_isnil(L, 2)) {
-		lua_pushnumber(L, countIdx+1);
 		lua_pushvalue(L, 2);
-		lua_settable(L, dstTable);
+		lua_rawseti(L, dstTable, countIdx+1);
 	}
 
   lua_pushvalue(L, dstTable);
@@ -562,12 +561,12 @@ static int tbl_toString (lua_State *L) {
 	if(!luaL_dostring(L, "=> { l | \
   new o = '' \
   l:items{ v | \
-    if(convert.type(v) == 'string') { v = convert.format('\%q' v) else v = convert.toString(v) } \
+    if(convert.type(v) == 'string') v = convert.format('\%q' v) else v = convert.toString(v) \
 	  o <<= v << ' '; \
   } \
   l:each{ v k | \
 		if(convert.type(k) != 'number') { \
-	    if(convert.type(v) == 'string') { v = convert.format('\%q' v) else v = convert.toString(v) } \
+	    if(convert.type(v) == 'string') v = convert.format('\%q' v) else v = convert.toString(v) \
 			o <<= k << '=' << v << ' ' } \
   } \
   => '(: ' << o << ')' \

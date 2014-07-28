@@ -185,7 +185,9 @@ OP_NEWTABLE,/*	A B C	R(A) := {} (size = B,C)				*/
 OP_SELF,/*	A B C	R(A+1) := R(B); R(A) := R(B)[RK(C)]		*/
 
 OP_ADD,/*	A B C	R(A) := RK(B) + RK(C)				*/
+OP_MADD,/*	A B C	R(A) := RK(B) + RK(C)				*/
 OP_SUB,/*	A B C	R(A) := RK(B) - RK(C)				*/
+OP_MSUB,/*	A B C	R(A) := RK(B) - RK(C)				*/
 OP_MUL,/*	A B C	R(A) := RK(B) * RK(C)				*/
 OP_DIV,/*	A B C	R(A) := RK(B) / RK(C)				*/
 OP_MOD,/*	A B C	R(A) := RK(B) % RK(C)				*/
@@ -195,14 +197,11 @@ OP_NOT,/*	A B	R(A) := not R(B)				*/
 OP_LEN,/*	A B	R(A) := length of R(B)				*/
 
 OP_CONCAT,/*	A B C	R(A) := R(B).. ... ..R(C)			*/
+OP_MCONCAT,/*	A B C	R(A) := R(B).. ... ..R(C)			*/
 OP_JMP,/*	A sBx	pc+=sBx; if (A) close all upvalues >= R(A) + 1	*/
 OP_EQ,/*	A B C	if ((RK(B) == RK(C)) ~= A) then pc++		*/
 OP_LT,/*	A B C	if ((RK(B) <  RK(C)) ~= A) then pc++		*/
 OP_LE,/*	A B C	if ((RK(B) <= RK(C)) ~= A) then pc++		*/
-
-OP_MADD,/*	A B C	R(A) := RK(B) + RK(C)				*/
-OP_MSUB,/*	A B C	R(A) := RK(B) - RK(C)				*/
-OP_MCONCAT,/*	A B C	R(A) := R(B).. ... ..R(C)			*/
 
 OP_TEST,/*	A C	if not (R(A) <=> C) then pc++			*/
 OP_TESTSET,/*	A B C	if (R(B) <=> C) then R(A) := R(B) else pc++	*/
