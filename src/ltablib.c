@@ -131,6 +131,14 @@ static int tremove (lua_State *L) {
   return 1;
 }
 
+static int tbl_clear (lua_State *L) {
+  int size = aux_getn(L, 1);
+	for(int i = 1; i <= size; i++) {
+	  lua_pushnil(L);
+	  lua_rawseti(L, 1, i);  /* t[pos] = nil */
+	}
+  return 1;
+}
 
 static int tbl_join (lua_State *L) {
   luaL_Buffer b;
@@ -702,6 +710,7 @@ static int tbl_reduce (lua_State *L) {
 static const luaL_Reg tab_funcs[] = {
   {"iAdd", tbl_iadd}, // todo: change these to iAdd instead
   {"iConcat", tbl_iconcat},
+  {"clear", tbl_clear},
   {"condense", pack},
   {"copy", tbl_copy},
   {"each", tbl_each},
