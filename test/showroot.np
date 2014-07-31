@@ -1,4 +1,0 @@
-for k,v in each(root) {
-  print(k '=' v)
-}
-

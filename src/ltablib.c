@@ -416,7 +416,7 @@ static int tbl_add_helper (lua_State *L, int isImmutable) {
   return 1;
 }
 
-static int tbl_add (lua_State *L) {
+static int tbl_iadd (lua_State *L) {
 	return tbl_add_helper(L, 1);
 }
 
@@ -426,7 +426,8 @@ static int tbl_madd (lua_State *L) {
 
 static int tbl_concat_helper (lua_State *L, int isImmutable) {
   luaL_checktype(L, 1, LUA_TTABLE);
-  luaL_checktype(L, 2, LUA_TTABLE);
+	if(!lua_istable(L, 2))
+		return(tbl_add_helper(L, isImmutable));
 	lua_settop(L, 2);
 	int dstTable;
 	int countIdx = 0;
@@ -450,7 +451,7 @@ static int tbl_concat_helper (lua_State *L, int isImmutable) {
   return 1;
 }
 
-static int tbl_concat (lua_State *L) {
+static int tbl_iconcat (lua_State *L) {
 	return tbl_concat_helper(L, 1);
 }
 
@@ -580,6 +581,14 @@ static int tbl_toString (lua_State *L) {
 	return 1;
 }
 
+static int tbl_size (lua_State *L) {
+  int t = lua_type(L, 1);
+  luaL_argcheck(L, t == LUA_TTABLE || t == LUA_TSTRING, 1,
+                 "list or string expected");
+  lua_pushinteger(L, lua_rawlen(L, 1, 0));
+	return 1;
+}
+
 static int tbl_reduce (lua_State *L) {
   int i = 0;
   luaL_checktype(L, 1, LUA_TTABLE);
@@ -610,8 +619,8 @@ static int tbl_reduce (lua_State *L) {
 
 
 static const luaL_Reg tab_funcs[] = {
-  {"add", tbl_add}, // todo: change these to iAdd instead
-  {"concat", tbl_concat},
+  {"iAdd", tbl_iadd}, // todo: change these to iAdd instead
+  {"iConcat", tbl_iconcat},
   {"condense", pack},
   {"copy", tbl_copy},
   {"each", tbl_each},
@@ -623,10 +632,11 @@ static const luaL_Reg tab_funcs[] = {
   {"map", tbl_map},
   {"max", tbl_max}, // todo: move to math
   {"min", tbl_min}, // todo: move to math
-  {"mAdd", tbl_madd}, 
-  {"mConcat", tbl_mconcat},
+  {"add", tbl_madd}, 
+  {"concat", tbl_mconcat},
   {"reduce", tbl_reduce},
   {"remove", tremove},
+  {"size", tbl_size},
   {"sort", tbl_sort},
   {"toString", tbl_toString},
   {NULL, NULL}

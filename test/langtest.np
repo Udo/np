@@ -1,0 +1,18 @@
+#!bin/np
+
+new v1 = 1
+assert(v1 == 1 'variable assignment')
+{
+	new v1 = 2
+	assert(v1 == 2 'block-local scope')
+}
+assert(v1 == 1 'upval scope')
+
+new v2 = (:)
+assert(v2:size() == 0 'list:size() 0 length expected')
+assert(size(v2) == 0 'baselib size function expected' )
+v2:add(1)
+assert(v2:size() == 1 'list:size() 1 length expected ')
+assert(v2:iAdd(1):size() == 2 'immutable add size() 2 expected')
+v2:concat(: 10 20 30)
+assert(v2:size() == 4 ':size() 4 expected after concat')
