@@ -496,6 +496,55 @@ static int tbl_each (lua_State *L) {
   return 1;
 }
 
+static int tbl_find_constant (lua_State *L) {
+  int i = 0;
+  lua_pushnil(L);  /* first key */
+  while (lua_next(L, 1)) {
+		i++;
+		if(lua_compare(L, 2, 4, LUA_OPEQ)) {
+			lua_pushvalue(L, 3); // return the key
+			return 1;
+		}
+		lua_pop(L, 1); // pop the hash value
+  }
+  lua_pushnil(L);
+	return 1;
+}
+
+static int tbl_find_function (lua_State *L) {
+  int i = 0;
+  lua_pushnil(L);  /* first key */
+  while (lua_next(L, 1)) {
+		i++;
+		lua_pushvalue(L, 2); // function
+		lua_pushvalue(L, 4); // value
+		lua_pushvalue(L, 3); // key
+		lua_pushnumber(L, i); // numindex
+		lua_call(L, 3, 1);
+		if(!lua_isnil(L, -1)) {
+			return 1;
+		}
+		lua_pop(L, 1); // pop the function result
+		lua_pop(L, 1); // pop the hash value
+  }
+  lua_pushnil(L);
+	return 1;
+}
+
+// todo: this is horrible, see luaH_next for ideas on how to do it with less overhead
+static int tbl_find (lua_State *L) {
+  luaL_checktype(L, 1, LUA_TTABLE);
+  luaL_checkany(L, 2);
+	lua_settop(L, 2);
+
+	if(lua_isfunction(L, 2))
+		tbl_find_function(L);
+	else
+		tbl_find_constant(L);
+
+  return 1;
+}
+
 // todo: this is horrible, see luaH_next for ideas on how to do it with less overhead
 static int tbl_map (lua_State *L) {
   int i = 0, numIndex = 0;
@@ -625,6 +674,7 @@ static const luaL_Reg tab_funcs[] = {
   {"copy", tbl_copy},
   {"each", tbl_each},
   {"expand", unpack},
+  {"find", tbl_find},
   {"insert", tinsert},  // insert(list, item) or insert(list, pos, item)
   {"items", tbl_items},
   {"join", tbl_join}, // join(seperator) puts all elements together in a string seperated by the seperator

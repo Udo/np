@@ -997,7 +997,7 @@ static const luaL_Reg strlib[] = {
   {"characters", str_characters},
   //{"dump", str_dump},
   {"find", str_find},
-  {"length", str_len},
+  {"size", str_len},
   {"lower", str_lower},
   {"match", str_match},
   {"_obs_pattern", gmatch},
