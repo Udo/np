@@ -388,6 +388,26 @@ static int tbl_copy_helper  (lua_State *L, int srcTable, int destTable, int coun
 	return countIdx;
 }
 
+static int tbl_ireverse (lua_State *L) {
+	int i = 0;
+	luaL_checktype(L, 1, LUA_TTABLE);
+	lua_settop(L, 1);
+
+	lua_createtable(L, 0, 0);
+	if (lua_getmetatable(L, 1)) {
+		lua_setmetatable(L, 2);
+	}
+	
+	int n = aux_getn(L, 1);  /* get size of table */
+	for (i=1; i <= n; i++) {
+		lua_pushnumber(L, 1+n-i); // index
+		lua_rawgeti(L, 1, i); // value
+		lua_settable(L, 2);
+	}
+	lua_pushvalue(L, 2);
+	return 1;
+}
+
 static int tbl_isort (lua_State *L) {
 	luaL_checktype(L, 1, LUA_TTABLE);
   lua_settop(L, 2);  /* make sure there is two arguments */
@@ -701,6 +721,7 @@ static const luaL_Reg tab_funcs[] = {
   {"size", tbl_size},
   {"sort", tbl_sort},
   {"iSort", tbl_isort},
+  {"iReverse", tbl_ireverse},
   {"toString", tbl_toString},
   {NULL, NULL}
 };

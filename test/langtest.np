@@ -16,8 +16,6 @@ assert(v2:size() == 1 'list:size() 1 length expected ')
 assert(v2:iAdd(1):size() == 2 'immutable add size() 2 expected')
 v2:concat(: 100 20 30)
 assert(v2:size() == 4 ':size() 4 expected after concat')
-
-print(v2:find(20))
-
-v2:iSort('number')
+v2:sort('number')
 print(v2)
+print(v2:iReverse())
