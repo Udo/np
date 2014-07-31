@@ -14,9 +14,10 @@ assert(size(v2) == 0 'baselib size function expected' )
 v2:add(1)
 assert(v2:size() == 1 'list:size() 1 length expected ')
 assert(v2:iAdd(1):size() == 2 'immutable add size() 2 expected')
-v2:concat(: 10 20 30)
+v2:concat(: 100 20 30)
 assert(v2:size() == 4 ':size() 4 expected after concat')
 
 print(v2:find(20))
 
-print(v2:find{ v | if(v == 20) => 111 })
+v2:iSort('number')
+print(v2)

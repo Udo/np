@@ -388,6 +388,18 @@ static int tbl_copy_helper  (lua_State *L, int srcTable, int destTable, int coun
 	return countIdx;
 }
 
+static int tbl_isort (lua_State *L) {
+	luaL_checktype(L, 1, LUA_TTABLE);
+  lua_settop(L, 2);  /* make sure there is two arguments */
+	lua_createtable(L, 0, 0); // this will be on position 3
+	if (lua_getmetatable(L, 1)) {
+		lua_setmetatable(L, 3);
+	}
+	tbl_copy_helper(L, 1, 3, 0); // copy table 1 to 3
+	lua_replace(L, 1);
+	return(tbl_sort(L));
+}
+
 static int tbl_add_helper (lua_State *L, int isImmutable) {
   luaL_checktype(L, 1, LUA_TTABLE);
 	lua_settop(L, 2);
@@ -688,6 +700,7 @@ static const luaL_Reg tab_funcs[] = {
   {"remove", tremove},
   {"size", tbl_size},
   {"sort", tbl_sort},
+  {"iSort", tbl_isort},
   {"toString", tbl_toString},
   {NULL, NULL}
 };
