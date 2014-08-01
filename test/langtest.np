@@ -23,3 +23,4 @@ assert( v2:toString() == ((: 100 30 20 1 ble="ba" )):toString() )
 v2:clear()
 assert( v2:toString() == ((: ble = 'ba')):toString() )
 
+print(#bla)

@@ -403,6 +403,16 @@ static void read_string (LexState *ls, int del, SemInfo *seminfo) {
                                    luaZ_bufflen(ls->buff) - 2);
 }
 
+static void read_alpha_string (LexState *ls, SemInfo *seminfo) {
+  TString *ts;
+  do {
+    save_and_next(ls);
+  } while (lislalnum(ls->current));
+  ts = luaX_newstring(ls, luaZ_buffer(ls->buff)+1,
+                          luaZ_bufflen(ls->buff)-1);
+  seminfo->ts = ts;
+}
+
 
 static int llex (LexState *ls, SemInfo *seminfo) {
   luaZ_resetbuffer(ls->buff);
@@ -473,19 +483,6 @@ static int llex (LexState *ls, SemInfo *seminfo) {
         if (ls->current != ':') return '(';
         else { next(ls); return TK_TBLSTART; }
       }
-      case '?': {
-        next(ls);
-        if (ls->current != '(') return '?';
-        else { 
-					seminfo->ts = luaS_new(ls->L, "condition");
-					return TK_NAME; 
-				}
-      }
-      /*case '~': {
-        next(ls);
-        if (ls->current != '=') return '~';
-        else { next(ls); return TK_NE; }
-      }*/
       case ':': {
         next(ls);
         if (ls->current != ':') return ':';
@@ -516,6 +513,10 @@ static int llex (LexState *ls, SemInfo *seminfo) {
       }
       case '"': case '\'': {  /* short literal strings */
         read_string(ls, ls->current, seminfo);
+        return TK_STRING;
+      }
+      case '#': {  /* hashtag strings */
+        read_alpha_string(ls, seminfo);
         return TK_STRING;
       }
       case '.': {  /* '.', '..', '...', or number */
