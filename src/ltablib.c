@@ -133,7 +133,8 @@ static int tremove (lua_State *L) {
 
 static int tbl_clear (lua_State *L) {
   int size = aux_getn(L, 1);
-	for(int i = 1; i <= size; i++) {
+	int i;
+	for(i = 1; i <= size; i++) {
 	  lua_pushnil(L);
 	  lua_rawseti(L, 1, i);  /* t[pos] = nil */
 	}
