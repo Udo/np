@@ -918,6 +918,11 @@ static void primaryexp (LexState *ls, expdesc *v) {
       singlevar(ls, v);
       return;
     }
+    case TK_THIS: {
+      expr(ls, v);
+      luaK_dischargevars(ls->fs, v);
+      break;
+    }
     default: {
       luaX_syntaxerror(ls, "unexpected symbol");
     }
