@@ -1,5 +1,6 @@
-new fCount = { i |
-  print(i)
-  if i < 10 this(i+1)
+new f = { mul ... |
+  -- fill all params into a list, multiply the values, return back as single values 
+  => ( (:...) ):map{ v | => v*mul }:expand()
   }
-fCount()
+
+print( f( 10 2 3 4 5 ) )

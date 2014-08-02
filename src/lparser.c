@@ -752,7 +752,7 @@ static void constructor (LexState *ls, expdesc *t) {
 /* }====================================================================== */
 
 
-// parse function parameter list
+// parse function parameter list definition
 static void parlist (LexState *ls) {
   /* parlist -> [ param { `,' param } ] */
   FuncState *fs = ls->fs;
@@ -780,7 +780,8 @@ static void parlist (LexState *ls) {
         }
         default: luaX_syntaxerror(ls, "<name> or " LUA_QL("...") " expected");
       }
-    } while (!f->is_vararg && (testnext(ls, ',') || ls->t.token == TK_NAME));
+    } while (!f->is_vararg && 
+			(testnext(ls, ',') || ls->t.token == TK_NAME  || ls->t.token == TK_DOTS ));
   }
   adjustlocalvars(ls, nparams);
   f->numparams = cast_byte(fs->nactvar);
@@ -843,7 +844,7 @@ static int explist (LexState *ls, expdesc *v, int limitedBy) {
   return n;
 }
 
-// parse function call parameters
+// parse function call parameters 
 static void funcargs (LexState *ls, expdesc *f, int line) {
   FuncState *fs = ls->fs;
   expdesc args;
