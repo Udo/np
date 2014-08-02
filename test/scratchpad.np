@@ -2,4 +2,4 @@ new fCount = { i |
   print(i)
   if i < 10 this(i+1)
   }
-fCount(0)
+fCount()

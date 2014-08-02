@@ -919,7 +919,7 @@ static void primaryexp (LexState *ls, expdesc *v) {
       return;
     }
     case TK_THIS: {
-      expr(ls, v);
+      expr(ls, v); // we need to wrap this in an expression where TK_THIS will be recognized downstream
       luaK_dischargevars(ls->fs, v);
       break;
     }
