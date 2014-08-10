@@ -786,6 +786,7 @@ static int tbl_setevents (lua_State *L) {
 
 
 static const luaL_Reg tab_funcs[] = {
+  {"bind", tbl_setevents},
   {"iAdd", tbl_iadd}, // todo: change these to iAdd instead
   {"iConcat", tbl_iconcat},
   {"clear", tbl_clear},
@@ -794,7 +795,6 @@ static const luaL_Reg tab_funcs[] = {
   {"create", tbl_create},
   {"each", tbl_each},
   {"expand", unpack},
-  {"events", tbl_setevents},
   {"find", tbl_find},
   {"insert", tinsert},  // insert(list, item) or insert(list, pos, item)
   {"items", tbl_items},
