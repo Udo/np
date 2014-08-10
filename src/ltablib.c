@@ -757,6 +757,29 @@ static int tbl_create (lua_State *L) {
   return 1;
 }
 
+static int tbl_getevents (lua_State *L) {
+  luaL_checkany(L, 1);
+  if (!lua_getmetatable(L, 1)) {
+    lua_pushnil(L);
+    return 1;  /* no metatable */
+  }
+  luaL_getmetafield(L, 1, "events");
+  return 1;  /* returns either __metatable field (if present) or metatable */
+}
+
+
+static int tbl_setevents (lua_State *L) {
+  int n = lua_gettop(L);
+	if(n == 1)
+		return tbl_getevents(L);
+  luaL_checktype(L, 1, LUA_TTABLE);
+  if (luaL_getmetafield(L, 1, "events"))
+    return luaL_error(L, "cannot change a protected events list");
+  lua_settop(L, 2);
+  lua_setmetatable(L, 1);
+  return 1;
+}
+
 
 
 /* }====================================================== */
@@ -771,6 +794,7 @@ static const luaL_Reg tab_funcs[] = {
   {"create", tbl_create},
   {"each", tbl_each},
   {"expand", unpack},
+  {"events", tbl_setevents},
   {"find", tbl_find},
   {"insert", tinsert},  // insert(list, item) or insert(list, pos, item)
   {"items", tbl_items},
