@@ -23,4 +23,14 @@ assert( v2:toString() == ((: 100 30 20 1 ble="ba" )):toString() )
 v2:clear()
 assert( v2:toString() == ((: ble = 'ba')):toString() )
 
-print(#bla)
+new l1 = (: 1 2 3)
+new l1Events = (: bla = { l | => l:toString() }) << list
+new l2 = l1Events:create(l1)
+assert( l2:bla() == '(: 1 2 3 )' 'basic list:create()')
+l1 += 4
+assert( l2:bla() != l1:toString() 'list:create() data copy')
+
+
+
+
+print('- all tests passed');
