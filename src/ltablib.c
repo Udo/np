@@ -740,7 +740,7 @@ static int tbl_create (lua_State *L) {
 		lua_pushvalue(L, 1);
 		lua_setmetatable(L, 3);
 		
-	  if (luaL_getmetafield(L, -1, "create")) {  
+	  if (luaL_getmetafield(L, -1, "init")) {  
 	    lua_pushvalue(L, -2);  
 	    lua_call(L, 1, 1);  
 			lua_pop(L, 1);
