@@ -724,6 +724,37 @@ static int tbl_reduce (lua_State *L) {
   return 1;
 }
 
+static int tbl_create (lua_State *L) {
+  // takes a table as an argument
+	lua_settop(L, 2);
+	if(lua_type(L, 1) == LUA_TTABLE) {
+		
+		if(lua_type(L, 2) != LUA_TTABLE) {
+	  	lua_createtable(L, 0, 0);	
+			lua_replace(L, 2);
+		}
+		
+		lua_pushvalue(L, 1);
+		lua_setmetatable(L, 2);
+		
+	  if (luaL_getmetafield(L, -1, "create")) {  
+	    lua_pushvalue(L, -2);  
+	    lua_call(L, 1, 1);  
+			lua_pop(L, 1);
+	  }
+
+	} 
+	else {
+		lua_createtable(L, 0, 0);
+		lua_replace(L, 2);
+	}
+	
+	lua_pushvalue(L, 2);
+  return 1;
+}
+
+
+
 /* }====================================================== */
 
 
@@ -733,6 +764,7 @@ static const luaL_Reg tab_funcs[] = {
   {"clear", tbl_clear},
   {"condense", pack},
   {"copy", tbl_copy},
+  {"create", tbl_create},
   {"each", tbl_each},
   {"expand", unpack},
   {"find", tbl_find},
