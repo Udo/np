@@ -91,12 +91,6 @@ static int luaB_rawlen (lua_State *L) {
 }
 
 
-static int luaB_cond (lua_State *L) {
-	return luaL_dostring(L, "=true");
-  //return 1; TODO FIXME
-}
-
-
 static int luaB_rawalen (lua_State *L) {
   int t = lua_type(L, 1);
   luaL_argcheck(L, t == LUA_TTABLE || t == LUA_TSTRING, 1,
