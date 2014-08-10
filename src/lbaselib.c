@@ -75,18 +75,12 @@ static int luaB_setmetatable (lua_State *L) {
 	if(n == 1)
 		return luaB_getmetatable(L);
   luaL_checktype(L, 1, LUA_TTABLE);
-	if(n == 3) {
-	  
-		return 1;
-	}	
   if (luaL_getmetafield(L, 1, "events"))
     return luaL_error(L, "cannot change a protected events list");
   lua_settop(L, 2);
   lua_setmetatable(L, 1);
   return 1;
 }
-
-
 
 static int luaB_rawlen (lua_State *L) {
   int t = lua_type(L, 1);
@@ -230,35 +224,6 @@ static int luaB_pcall (lua_State *L) {
   return finishpcall(L, (status == LUA_OK));
 }
 
-static int luaB_create (lua_State *L) {
-  // takes a table as an argument
-	lua_settop(L, 2);
-	if(lua_type(L, 1) == LUA_TTABLE) {
-		
-		if(lua_type(L, 2) != LUA_TTABLE) {
-	  	lua_createtable(L, 0, 0);	
-			lua_replace(L, 2);
-		}
-		
-		lua_pushvalue(L, 1);
-		lua_setmetatable(L, 2);
-		
-	  if (luaL_getmetafield(L, -1, "create")) {  
-	    lua_pushvalue(L, -2);  
-	    lua_call(L, 1, 1);  
-			lua_pop(L, 1);
-	  }
-
-	} 
-	else {
-		lua_createtable(L, 0, 0);
-		lua_replace(L, 2);
-	}
-	
-	lua_pushvalue(L, 2);
-  return 1;
-}
-
 static const luaL_Reg base_funcs[] = {
  // {"toString", luaB_tostring},
   {"assert", luaB_assert},
@@ -272,11 +237,9 @@ static const luaL_Reg base_funcs[] = {
   {"length", luaB_rawalen},
   {"next", luaB_next},
   {"try", luaB_pcall},
-  {"condition", luaB_cond},
   {"print", luaB_print},
   {"select", luaB_select},
   {"events", luaB_setmetatable},
-  {"create", luaB_create},
   /*{"xpcall", luaB_xpcall},*/
   {NULL, NULL}
 };
