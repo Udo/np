@@ -59,29 +59,6 @@ static int luaB_error (lua_State *L) {
 }
 
 
-static int luaB_getmetatable (lua_State *L) {
-  luaL_checkany(L, 1);
-  if (!lua_getmetatable(L, 1)) {
-    lua_pushnil(L);
-    return 1;  /* no metatable */
-  }
-  luaL_getmetafield(L, 1, "events");
-  return 1;  /* returns either __metatable field (if present) or metatable */
-}
-
-
-static int luaB_setmetatable (lua_State *L) {
-  int n = lua_gettop(L);
-	if(n == 1)
-		return luaB_getmetatable(L);
-  luaL_checktype(L, 1, LUA_TTABLE);
-  if (luaL_getmetafield(L, 1, "events"))
-    return luaL_error(L, "cannot change a protected events list");
-  lua_settop(L, 2);
-  lua_setmetatable(L, 1);
-  return 1;
-}
-
 static int luaB_rawlen (lua_State *L) {
   int t = lua_type(L, 1);
   luaL_argcheck(L, t == LUA_TTABLE || t == LUA_TSTRING, 1,
@@ -233,7 +210,6 @@ static const luaL_Reg base_funcs[] = {
   {"try", luaB_pcall},
   {"print", luaB_print},
   {"select", luaB_select},
-  {"events", luaB_setmetatable},
   /*{"xpcall", luaB_xpcall},*/
   {NULL, NULL}
 };
