@@ -131,7 +131,7 @@ void luaV_gettable (lua_State *L, const TValue *t, TValue *key, StkId val) {
 }
 
 
-void luaV_selfop (lua_State *L, const TValue *to, TValue *key, StkId val) {
+int luaV_selfop (lua_State *L, const TValue *to, TValue *key, StkId val) {
   int loop;
 	const TValue *t = to;
   for (loop = 0; loop < MAXTAGLOOP; loop++) {
@@ -139,31 +139,33 @@ void luaV_selfop (lua_State *L, const TValue *to, TValue *key, StkId val) {
     if (ttistable(t)) {  /* `t' is a table? */
       Table *h = hvalue(t);
       const TValue *res;
-			if(t == to) {
-				if(h->metatable)
-					res = luaH_get(h->metatable, key);
-				else 
-					res = luaO_nilobject;
-			} else {
+			if(t == to) h = h->metatable;
+			if(h)
 				res = luaH_get(h, key);
-			}  
+			else 
+				res = luaO_nilobject;
 			
-      if (!ttisnil(res) ||  /* result is not nil? */
-          (tm = fasttm(L, h->metatable, TM_EVENT)) == NULL) { /* or no TM? */
+      if (!ttisnil(res)) {
         setobj2s(L, val, res);
-        return;
+        return 0;
       }
+			tm = fasttm(L, h, TM_EVENT);
+			if(ttisfunction(tm)) {
+        setobj2s(L, val, tm);
+        return 1; // shift parameter list by 1
+			}
       /* else will try the tag method */
     }
     else if (ttisnil(tm = luaT_gettmbyobj(L, t, TM_EVENT)))
-      luaG_typeerror(L, t, "index");
+      luaG_typeerror(L, t, "event");
     if (ttisfunction(tm)) {
-      callTM(L, tm, t, key, val, 1);
-      return;
+      callTM(L, tm, to, key, val, 1);
+      return 0;
     }
     t = tm;  /* else repeat with 'tm' */
   }
   luaG_runerror(L, "loop in gettable");
+	return 0;
 }
 
 
@@ -682,7 +684,20 @@ void luaV_execute (lua_State *L) {
       vmcase(OP_SELF,
         StkId rb = RB(i);
         setobjs2s(L, ra+1, rb);
-        Protect(luaV_selfop(L, rb, RKC(i), ra));
+        int raShift = 0;
+				Protect(raShift = luaV_selfop(L, rb, RKC(i), ra));
+				if(raShift > 0) { 
+					// if an "event" method was returned, we need to prime the first
+					// parameter to not only contain the list in question but also
+					// the event name
+					Table *t = luaH_new(L);
+					setsvalue2s(L, ra+2, luaS_new(L, "list"));
+					setobj2t(L, luaH_set(L, t, ra+2), rb);
+					setsvalue2s(L, ra+2, luaS_new(L, "function"));
+					setobj2t(L, luaH_set(L, t, ra+2), RKC(i));
+				  checkGC(L, ra + 1);
+					sethvalue(L, ra+1, t);
+				}
       )
       vmcase(OP_ADD,
         arith_op(luai_numadd, TM_ADD);

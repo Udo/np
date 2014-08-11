@@ -1,6 +1,4 @@
-new f = { mul ... |
-  -- fill all params into a list, multiply the values, return back as single values 
-  => ( (:...) ):map{ v | => v*mul }:expand()
-  }
-
-print( f( 10 2 3 4 5 ) )
+new l = (: 1 2 3)
+l:bind(: event = { info param | 
+  print('"' << info.function << '" was called with' param) })
+l:something(1)
