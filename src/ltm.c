@@ -32,7 +32,7 @@ LUAI_DDEF const char *const luaT_typenames_[LUA_TOTALTAGS] = {
 void luaT_init (lua_State *L) {
   static const char *const luaT_eventname[] = {  /* ORDER TM */
     "event", "index", "newIndex", "update",
-    "gc", "weak", "size", "equals",
+    "gc", "weak", "size", "equal",
     "iAdd", "add", "iSubtract", "subtract", "multiply", "divide", "modulo",
     "power", "minus", "lessThan", "lessOrEqual",
     "iConcat", "concat", "call"
