@@ -1,4 +1,1 @@
-new l = (: 1 2 3)
-l:bind(: event = { info param | 
-  print('"' << info.function << '" was called with' param) })
-l:something(1)
+print(__file__ __dir__)

@@ -23,8 +23,9 @@
 #include "ltable.h"
 #include "lzio.h"
 #include <stdio.h>
-
-
+#include <libgen.h>
+#include <limits.h>
+#include <stdlib.h>
 
 #define next(ls) (ls->current = zgetc(ls->z))
 
@@ -39,6 +40,7 @@ static const char *const luaX_tokens [] = {
     "}", "false", "for", "function", "/*goto*/", 
 		"if", "in", "new", "nil", "this", "not", 
 		"or", "/*repeat*/", "return", "then", "true", 
+		"__file__", "__dir__",
 		"/*until*/", "while", "..", "...", "==", 
 		">=", "<=", "!=", "::", "<eof>",
     "<number>", "<name>", "<string>", "(:", ")",
@@ -171,6 +173,14 @@ void luaX_setinput (lua_State *L, LexState *ls, ZIO *z, TString *source,
   ls->linenumber = 1;
   ls->lastline = 1;
   ls->source = source;
+	char *fn = (char *) getstr(ls->source);
+	char *fnclean = strdup(fn+1);
+	char *fnr = realpath(fnclean, NULL);
+	if(fnr == NULL) fnr = fnclean;
+	ls->filename = luaS_newlstr(L, fnclean, strlen(fnclean));
+	char *dn = dirname(fnr);
+	strcat(dn, "/");
+	ls->dirname = luaS_newlstr(L, dn, strlen(dn));
   ls->envn = luaS_new(L, LUA_ENV);  /* create env name */
   luaS_fix(ls->envn);  /* never collect this name */
   luaZ_resizebuffer(ls->L, ls->buff, LUA_MINBUFFER);  /* initialize buffer */
@@ -547,8 +557,18 @@ static int llex (LexState *ls, SemInfo *seminfo) {
           ts = luaX_newstring(ls, luaZ_buffer(ls->buff),
                                   luaZ_bufflen(ls->buff));
           seminfo->ts = ts;
-          if (ls->lastToken.token != '.' && isreserved(ts))  /* reserved word? */
-            return ts->tsv.extra - 1 + FIRST_RESERVED;
+					int treserved = ts->tsv.extra - 1 + FIRST_RESERVED;
+					if (ls->lastToken.token != '.' && isreserved(ts))  {
+						if(treserved == TK_FILENAME) {
+							seminfo->ts = ls->filename;
+							return(TK_STRING);
+						}
+						else if(treserved == TK_DIRNAME) {
+							seminfo->ts = ls->dirname;
+							return(TK_STRING);
+						}
+            else return treserved;
+					}
           else {
             return TK_NAME;
           }

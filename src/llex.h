@@ -25,6 +25,7 @@ enum RESERVED {
 	TK_END, TK_FALSE, TK_FOR, TK_FUNCTION, TK_GOTO, 
 	TK_IF, TK_IN, TK_LOCAL, TK_NIL, TK_THIS, TK_NOT, 
 	TK_OR, TK_REPEAT, TK_RETURN, TK_THEN, TK_TRUE, 
+	TK_FILENAME, TK_DIRNAME,
 	TK_UNTIL, TK_WHILE, TK_CONCAT, TK_DOTS, TK_EQ, 
 	TK_GE, TK_LE, TK_NE, TK_DBCOLON, TK_EOS, 
 	TK_NUMBER, TK_NAME, TK_STRING, TK_TBLSTART, TK_TBLEND, 
@@ -63,6 +64,8 @@ typedef struct LexState {
   Mbuffer *buff;  /* buffer for tokens */
   struct Dyndata *dyd;  /* dynamic structures used by the parser */
   TString *source;  /* current source name */
+	TString *filename;
+	TString *dirname;
   TString *envn;  /* environment variable name */
   char decpoint;  /* locale decimal point */
 } LexState;
