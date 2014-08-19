@@ -49,7 +49,7 @@ root.sys = nil
 root.lib = nil
 root.io = nil
 root.os = nil
-
+root.require = nil
 '.file_get_contents('cgidemo-examplestate.np').chr(10).$_REQUEST['code']);
   $err = '';
   cmd_exec('timeout --preserve-status 0.01s /srv/www/htdocs/openfu.com/dev/np/bin/np '.$tmpFile, $out, $err);

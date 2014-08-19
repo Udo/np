@@ -1,1 +1,2 @@
-print(__file__ __dir__)
+new testLib = require('test/libtest1')
+

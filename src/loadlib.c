@@ -470,7 +470,7 @@ static int searcher_preload (lua_State *L) {
   lua_getfield(L, LUA_REGISTRYINDEX, "_PRELOAD");
   lua_getfield(L, -1, name);
   if (lua_isnil(L, -1))  /* not found? */
-    lua_pushfstring(L, "\n\tno field package.preload['%s']", name);
+    lua_pushfstring(L, "\n\tno field lib.preload['%s']", name);
   return 1;
 }
 
@@ -656,14 +656,13 @@ static void setpath (lua_State *L, const char *fieldname, const char *envname1,
 static const luaL_Reg pk_funcs[] = {
   {"loadlib", ll_loadlib},
   {"searchpath", ll_searchpath},
-  {"require", ll_require},
 #if defined(LUA_COMPAT_MODULE)
   {"seeall", ll_seeall},
 #endif
   {NULL, NULL}
 };
 
-/*
+
 static const luaL_Reg ll_funcs[] = {
 #if defined(LUA_COMPAT_MODULE)
   {"module", ll_module},
@@ -671,7 +670,7 @@ static const luaL_Reg ll_funcs[] = {
   {"require", ll_require},
   {NULL, NULL}
 };
-*/
+
 
 static void createsearcherstable (lua_State *L) {
   static const lua_CFunction searchers[] =
@@ -717,12 +716,10 @@ LUAMOD_API int luaopen_package (lua_State *L) {
   /* set field `preload' */
   luaL_getsubtable(L, LUA_REGISTRYINDEX, "_PRELOAD");
   lua_setfield(L, -2, "preload");
-	/*
   lua_pushglobaltable(L);
-  lua_pushvalue(L, -2);  // set 'package' as upvalue for next lib 
-  luaL_setfuncs(L, ll_funcs, 1);  // open lib into global table 
-  lua_pop(L, 1);  // pop global table
-	*/ 
-  return 1;  // return 'package' table 
+  lua_pushvalue(L, -2);  /* set 'package' as upvalue for next lib */
+  luaL_setfuncs(L, ll_funcs, 1);  /* open lib into global table */
+  lua_pop(L, 1);  /* pop global table */
+  return 1;  /* return 'package' table */
 }
 

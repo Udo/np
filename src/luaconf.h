@@ -89,25 +89,26 @@
 ** In Windows, any exclamation mark ('!') in the path is replaced by the
 ** path of the directory of the executable file of the current process.
 */
-#define LUA_LDIR	"!\\lua\\"
+#define LUA_LDIR	"!\\np\\"
 #define LUA_CDIR	"!\\"
 #define LUA_PATH_DEFAULT  \
-		LUA_LDIR"?.lua;"  LUA_LDIR"?\\init.lua;" \
-		LUA_CDIR"?.lua;"  LUA_CDIR"?\\init.lua;" ".\\?.lua"
+		LUA_LDIR"?.np;"  LUA_LDIR"?\\init.np;" \
+		LUA_CDIR"?.np;"  LUA_CDIR"?\\init.np;" ".\\?.np"
 #define LUA_CPATH_DEFAULT \
 		LUA_CDIR"?.dll;" LUA_CDIR"loadall.dll;" ".\\?.dll"
 
 #else			/* }{ */
 
-#define LUA_VDIR	LUA_VERSION_MAJOR "." LUA_VERSION_MINOR "/"
+#define LUA_VDIR	NP_VERSION "/"
 #define LUA_ROOT	"/usr/local/"
-#define LUA_LDIR	LUA_ROOT "share/lua/" LUA_VDIR
-#define LUA_CDIR	LUA_ROOT "lib/lua/" LUA_VDIR
+#define LUA_LDIR	LUA_ROOT "share/np/" LUA_VDIR
+#define LUA_CDIR	LUA_ROOT "lib/np/" LUA_VDIR
 #define LUA_PATH_DEFAULT  \
-		LUA_LDIR"?.lua;"  LUA_LDIR"?/init.lua;" \
-		LUA_CDIR"?.lua;"  LUA_CDIR"?/init.lua;" "./?.lua"
+		"?.np;" \
+		LUA_LDIR"?.np;"  \
+		LUA_LDIR"?/_lib.np;" 
 #define LUA_CPATH_DEFAULT \
-		LUA_CDIR"?.so;" LUA_CDIR"loadall.so;" "./?.so"
+		"?.so;" LUA_CDIR"?.so;"  
 #endif			/* } */
 
 
