@@ -569,7 +569,8 @@ static int unbound_search (Table *t, unsigned int j) {
 */
 int luaH_getn (Table *t) {
   // return expected table size
-  return  t->sizearray+(isdummy(t->node) ? 0 : sizenode(t));
+  //return  t->sizearray+(isdummy(t->node) ? 0 : sizenode(t));
+	return luaH_getArrayCount(t);
 }
 
 int luaH_getArrayCount (Table *t) {

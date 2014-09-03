@@ -15,7 +15,7 @@ v2:add(1)
 assert( v2:size() == 1 'list:size() 1 length expected ' )
 assert( v2:iAdd(1):size() == 2 'immutable add size() 2 expected' )
 v2:concat(: 100 20 30 ble = 'ba')
-assert( v2:size() == 5 ':size() 5 expected after concat' )
+assert( v2:size() == 4 ':size() 4 expected after concat ' )
 v2:sort('number')
 assert( v2:toString() == ((: 1 20 30 100 ble="ba" )):toString() )
 v2:reverse()
@@ -30,7 +30,8 @@ assert( l2:bla() == '(: 1 2 3 )' 'basic list:create()')
 l1 += 4
 assert( l2:bla() != l1:toString() 'list:create() data copy')
 
-
-
+new lt1 = (:)
+for a = 1,10000 lt1:add(a);
+assert( lt1:size() == 10000 'lt1:size() 10000 expected' )
 
 print('- all tests passed');

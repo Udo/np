@@ -86,7 +86,7 @@ static int maxn (lua_State *L) {
 	return 1;
 }
 
-static int tinsert (lua_State *L) {
+static int tbl_insert (lua_State *L) {
   int e = aux_getn(L, 1) + 1;  /* first empty element */
   int pos;  /* where to insert new element */
   switch (lua_gettop(L)) {
@@ -464,7 +464,7 @@ static int tbl_add_helper (lua_State *L, int isImmutable) {
 		countIdx = tbl_copy_helper(L, 1, 3, 0);
 	} else {
 		dstTable = 1;
-	  countIdx = get_maxn(L, 1);
+	  countIdx = aux_getn(L, 1);
 	}	
 	
 	if (!lua_isnil(L, 2)) {
@@ -694,7 +694,8 @@ static int tbl_size (lua_State *L) {
   int t = lua_type(L, 1);
   luaL_argcheck(L, t == LUA_TTABLE || t == LUA_TSTRING, 1,
                  "list or string expected");
-  lua_pushinteger(L, lua_rawlen(L, 1, 0));
+	lua_pushinteger(L, lua_rawlen(L, 1, 0));
+	//lua_pushinteger(L, aux_getn(L, 1));
 	return 1;
 }
 
@@ -796,7 +797,7 @@ static const luaL_Reg tab_funcs[] = {
   {"each", tbl_each},
   {"expand", unpack},
   {"find", tbl_find},
-  {"insert", tinsert},  // insert(list, item) or insert(list, pos, item)
+  {"insert", tbl_insert},  // insert(list, item) or insert(list, pos, item)
   {"items", tbl_items},
   {"join", tbl_join}, // join(seperator) puts all elements together in a string seperated by the seperator
   {"maxIndex", maxn}, // sort-of counts the items by returning the highest numerical index used
