@@ -115,7 +115,7 @@ static int tbl_insert (lua_State *L) {
 }
 
 
-static int tremove (lua_State *L) {
+static int tbl_pop (lua_State *L) {
   int size = aux_getn(L, 1);
   int pos = luaL_optint(L, 2, size);
 	if (pos < 0)
@@ -817,7 +817,7 @@ static const luaL_Reg tab_funcs[] = {
   {"add", tbl_madd}, 
   {"concat", tbl_mconcat},
   {"reduce", tbl_reduce},
-  {"remove", tremove},
+  {"pop", tbl_pop},
   {"reverse", tbl_reverse},
   {"iReverse", tbl_ireverse},
   {"size", tbl_size},
