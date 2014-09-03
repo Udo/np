@@ -1,4 +1,5 @@
-new l = (: a = 1 1 2 3)
+new l = (:)
 
-print(l:keyCount())
-print(l:size())
+l.foo.bar = 1 
+
+print( l.bla.blu.foo )
