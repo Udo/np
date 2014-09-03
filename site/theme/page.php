@@ -13,7 +13,6 @@
         <link rel="stylesheet" href="/css/">
         <link rel="icon" type="image/png" href="favicon.png">
         
-        <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?autoload=true&lang=lua"></script>
         <script src="/js/"></script>
     </head>
     <body>
@@ -21,18 +20,14 @@
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
         <div class="header-container">
-            <header class="">
+            <header>
                 <nav>
-                    <ul>
-                        <li><a href="/">About</a></li>
-                        <!--<li><a href="/tutorial">Tutorial</a></li>-->
-                        <li><a href="/tutorial">Tutorial</a></li>
-                        <li><a href="/docs">Docs</a></li>
-                        <li><a href="https://github.com/Udo/np">Get</a></li>
-                        <li><a href="https://github.com/Udo/np/issues">Bugs</a></li>
-                    </ul>
+                  <a href="/">About</a>
+                  <a href="/tutorial">Tutorial</a>
+                  <a href="/docs">Docs</a>
+                  <a href="https://github.com/Udo/np">Get</a>
                 </nav>
-                <h1 class="title"><a href="/">np</a></h1>
+                <a href="/" style="padding-left:0;">np</a>
             </header>
         </div>
         

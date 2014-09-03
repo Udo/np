@@ -13,29 +13,48 @@
 
 <div>
 
-  <table width="280" align="left" style="margin-right: 12px; margin-top: 12px;">
-    <tr><td><div style="text-align: center;">
+  <table width="100%">
+    <tr><td width="280" valign="top"><div 
+      style="text-align: center; padding-right: 24px; margin-right: 24px; margin-top: 24px; min-height: 300px;
+        border-right: 1px solid rgba(0,0,0,0.1);">
          
          <h3>Curious?</h3>
          
-         <a class="megabutton" href="/tutorial">Try it out now &gt;</a><br/>
-         
-         pain free, in your browser 
-         
-         <br/><br/>
+         <a class="megabutton" href="/tutorial">Try it out now &gt;
+           <br/><span style="font-weight:normal;">pain free, in your browser</span>
+         </a>
     
-    </div></td></tr>
-  </table>
-
-  <h3>What is it like?</h3>
+    </div></td><td valign="top">
+    
+  <h3>What's np?</h3>
+    
+  <p>
+    np is a duck-typed scripting language that aims to be easy and productive to
+    work with. It tries to achieve that by being as minimal as possible while still
+    providing the amenities needed to write code that does a lot in a speedy manner.
+    np is object-oriented, but it's neither based on classes nor on prototypes. Instead,
+    objects can implement behaviors that respond to events.
+  </p>
   
   <p>
-    When writing code in np, you only have to think about each
+    This is still a work in progress and the language as well as its standard
+    libraries are not stable yet. However, there is enough substance to play 
+    around with it, and you can safely try it out in the browser by visiting the
+    <a href="/tutorial">tutorial</a>.
+  </p>
+    
+  <h3>np as a Web Platform</h3>
+  
+  <p>
+    When I'm done with the base runtime, I'd like to give np a
+    FastCGI server and library support to do web development with.
+    The idea here is, that you only have to think about each
     current request, as opposed to more heavy-weight application
     server frameworks such as Ruby on Rails or Tomcat where the
-    app is running the whole time. In this respect, np
-    is a stateless runtime environment. This allows for a very 
-    simple development process. 
+    app is running the whole time. In this respect, np server
+    will be a stateless environment, which eliminates a lot
+    of code and runtime complexity, and it should also make scaling
+    out easy.
   </p>
   
   <h3>It's just an experiment</h3>
@@ -47,18 +66,6 @@
     tutorial and get a feel for the language.  
   </p>
   
-  <h3>Why didn't you use XYZ framework?</h3>
-
-  <p>
-    That was not the point of the exercise. I wanted to explore what it feels
-    like to write a parser, a lexer, and an interpreter without using a framework
-    or some other ready-made solution - and I didn't really consult any literature
-    either. While that may sound foolhardy (and I'm sure the implementation pays the
-    price for it), the point was to discover and think about a new set of problems
-    I never experienced before. While this is clearly a learning project, I don't
-    think it turned out so bad. Hopefully. Maybe.
-  </p>
-
   <h3>So what are the dependencies?</h3>
 
   <p>
@@ -66,7 +73,7 @@
     is actually the second iteration of the language. The first one was written in Java,
     and while it was interesting and kind of worked, it became clear to me that I wanted
     to switch to a more minimal environment. So this second incarnation is based on the
-    Lua runtime which is fast, small, and easy to modify. 
+    Lua runtime which is fast, small, and easy to modify. The only dependency is glibc.
   </p>
 
   <h3>Does the world need another language?</h3>
@@ -75,5 +82,11 @@
     Probably not, but it's fun anyway. There are some things I wanted to explore with
     np, many of them have to do with dynamic typing and scope. 
   </p>
+    
+    
+    </td></tr>
+  </table>
+
+  
 
 </div>

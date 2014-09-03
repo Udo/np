@@ -1,9 +1,9 @@
 <?
   $mainColor2 = '#6f6';
   $mainColor = '#0e0';
-  $textColor1 = '#333';
-  $textColor2 = '#ccc';
-  $linkColor = '#22d';
+  $textColor1 = '#444';
+  $textColor2 = '#777';
+  $linkColor = '#000';
   $footerColor = '#333';
 ?>
 
@@ -12,10 +12,15 @@
    ========================================================================== */
 body { 
   color: <?= $textColor1 ?>;
-  font-family: Trebuchet MS, Helvetica, Arial;
+  font-family: 'jaf-facitweb', 'Hevetica Neue', 'Helvetica', 'Segoe UI', 'Roboto', 'Droid Sans', Arial, sans-serif !important;
   line-height: 150%;
   text-align: center; margin: 0 0 0 0; vertical-align: middle; 
+  font-size: 15px;
 } 
+
+code, pre, .pre {
+font-family: 'Pragmata Pro', 'Liberation Mono', 'Source Code Pro', 'Droid Sans', 'Envy Code R', Consolas, Menlo, monospace !important;  
+}
 
 .nameda{display: block; position: relative; top: -50px; visibility: hidden;}
 
@@ -29,13 +34,24 @@ body {
 			column-count: 3;
 			column-gap: 10px;
 }
+.col-5 {
+			-webkit-column-count: 5;
+			-webkit-column-gap: 10px;
 
-.dea {
-  color: #77f;
+			-moz-column-count: 5;
+			-moz-column-gap: 10px;
+
+			column-count: 5;
+			column-gap: 10px;
 }
 
-.dea:hover {
-  color: <?= $linkColor ?>;
+.docbody {
+  width: 640px;
+}
+
+.col-5 a {
+  color: rgba(0,0,0,0.5);  
+  text-shadow: none;
 }
 
 header, .main-container {
@@ -48,13 +64,11 @@ header, .main-container {
 .functionhead {
   font-size: 130%;
   padding-top: 12px;
+  color: #99e;
   padding-bottom: 12px;
   margin-top: 24px;
   margin-bottom: 12px;
-  background: #eee;
-  border-top: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
-  color: gray;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 
 .fname {
@@ -68,7 +82,6 @@ header, .main-container {
 
 .minihdr {
   color: gray;
-  font-size: 90%;
   font-weight: bold;
 }
 
@@ -98,6 +111,7 @@ code {
 a {
   color: <?= $linkColor ?>;
   text-decoration: none;
+  text-shadow: 0px 0px 3px rgba(0,0,0,0.2);
 }
 a:hover {
   text-decoration: underline;
@@ -105,41 +119,45 @@ a:hover {
 
 a.loadsrc {
   display: inline-block;
-  font-size: 60%;
-  padding: 4px;
-  background: #ffc;
+  padding: 8px;
   cursor: pointer;
   float: right;
-  border: 1px solid #ccc;
+  color: rgba(50,75,255, 0.5);
+  font-size: 200%;
+}
+a.loadsrc:hover {
+  background: rgba(0,0,0,0.05);
 }
 
 pre {
-  width: 92%;
-  border: 1px solid #ccc;
-  padding: 4px;
+  width: 85%;
+  padding: 12px;
   font-size: 13px !important;
-  font-family: Consolas, monospace, Courier New;
 }
 
 .sh_np {
-  background: #ffd !important;
   font-weight: bold;
+  border-left: 1px solid rgba(0,0,0,0.1);
+  xborder-right: 1px solid rgba(0,0,0,0.1);
 }
 
 .op {
-  background: #efe;
-  border: 1px solid #ccc;
-  padding: 4px;
+  border-top: 4px double rgba(0,0,0,0.1);
+  border-left: 1px solid rgba(0,0,0,0.1);
+  padding: 12px;
+  color: rgba(0,125,35,0.75);
+  margin-top: -12px;
 }
 
 .megabutton {
   display: inline-block;
   padding: 12px;
   width: 200px;
-  background: #0a3;
-  color: white;
   border-radius: 8px;
-  border: 3px solid #3f6;
+  background: #eee;
+  font-weight: bold;
+  border: 1px solid #ddd;
+  box-shadow: 0px 0px 14px rgba(0,0,0,0.1);
 }
 
 #side
@@ -147,10 +165,9 @@ pre {
   position: fixed;
   width: 400px;
   left: 50%;
-  top: 38px;
+  top: 31px;
   margin-left: 70px;
   padding: 6px;
-  background: #eee;
   height: 90%;
 }
 
@@ -159,19 +176,18 @@ pre {
   left: 0;
   top: 0;
   right: 0;
-  background: url('/img/random_grey_variations.png') #666;
-  border-bottom: 1px solid #bbb;
-  box-shadow: 0 0 16px #888;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  background: #fff;
+  box-shadow: 0px 15px 15px rgba(255,255,255,0.75);
 }
 
 .footer-container {
-  position: fixed;
+  position: static;
+  background: #fff;
   bottom: 0;
   left: 0;
   right: 0;
-  background: url('/img/random_grey_variations.png') <?= $footerColor ?>;
-  border-top: 1px solid #bbb;
-  box-shadow: 0 0 16px #888;
+  border-top: 1px solid rgba(0,0,0,0.1);
   padding: 0;
   font-size: 12px;
 }
@@ -182,17 +198,20 @@ footer {
   padding-left: 8px;
   padding-right: 8px;
   margin: 0;
-  color: <?= $textColor2 ?>;
   font-weight: normal;
 }
  
 footer a {
-  color: <?= $textColor2 ?>;
   font-weight: bold;
 }
 
 .tutcol {
   width: 540px;
+}
+
+h1,h2,h3 {
+  color: <?= $textColor2 ?>;
+  text-shadow: 0px 0px 8px rgba(0,0,0,0.1);
 }
 
 h1.title {
@@ -202,16 +221,11 @@ h1.title {
   padding: 4px;
 }
 
-h1 a, nav a {
-  color: white;
-}
-
-nav a {
+header a {
   display: inline-block;
-  padding: 4px;
+  padding: 8px;
+  padding-bottom: 6px;
   padding-left: 12px;
-  font-size: 90%;
-  color: <?= $textColor2 ?>;
 }
 
 nav {
@@ -220,16 +234,5 @@ nav {
   margin: 0;
 }
 
-nav > ul {
-  padding: 0;
-  margin: 0;
-  text-align: right;
-}
 
-nav > ul > li {
-  margin-right: -4px;
-  display: inline-block;
-}
 
-.com { color: #888 !important }
-.kwd { color: #333 !important; font-weight: bold !important; }

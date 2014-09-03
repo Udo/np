@@ -9,52 +9,8 @@ function displayHeader($info)
   if(!is_array($info['nparams'])) $info['nparams'] = array();
   asort($info['nparams']);
   if(!is_array($info['tags'])) $info['tags'] = array();
-  $GLOBALS['title'] = ''.$info['title'];
-  ?><div class="info"><?= $info['type'] ?> | <?= implode(' &middot; ', $info['tags']) ?></div><?
-  if($info['type'] == 'function')
-  {
-    displayFunctionHead($info['title'], array_keys($info['params']));
-
-    ?>    
-    <table width="100%"><tr><td valign="top" width="50%">
-    
-    <div class="minihdr">Parameters:</div>
-    <table width="100%" class="paramdescription">
-    
-      <? foreach($info['params'] as $k => $v)
-      {
-        ?><tr>
-        
-          <td width="12%"><span class="farg"><?= $k ?></span></td>
-          <td><?= $v ?></td>
-        
-        </tr><?
-      }     
-      ?>
-    
-    </table></td><td valign="top">
-    
-    <div class="minihdr">Optional named parameters:</div>
-    <table width="100%" class="paramdescription"><? 
-    
-      if(sizeof($info['nparams']) == 0)
-        $info['nparams'][' '] = '-';
-    
-      foreach($info['nparams'] as $k => $v)
-      {
-        ?><tr>
-        
-          <td width="12%"><span class="farg"><?= trim($k) != '' ? '#' : '' ?><?= $k ?></span></td>
-          <td><?= $v ?></td>
-        
-        </tr><?
-      }     
-      ?>
-    
-    </table>
-    
-    </td></tr></table><?
-  }
+  $GLOBALS['title'] = ''.$info['title'].' ('.$info['type'].') ';
+  ?><div class="info"><?= implode(' &middot; ', $info['tags']) ?></div><?
 }
 
 $article = first($_REQUEST['df'], 'default.page');

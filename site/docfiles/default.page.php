@@ -7,59 +7,43 @@ $typeDisplay = array(
   'object' => 'lib',
   );
 
-?>
+function displayDocs($docFiles, $type, $title)
+{
+if(!is_array($type)) $type = array($type);
+?><h3><?= $title ?></h3>
 
-<table width="100%">
-  <tr>
-    <td valign="top" width="50">
+  <ul>
+  <?
+  
+  foreach($docFiles as $f) if(array_search($f['info']['type'], $type) !== false)
+  {
+    $url = '/docs/'.urlencode($f['file']);
+    ?><li>
     
-      <h3>Objects</h3>
-
-      <ul>
-      <?
+      <div>
+        <a href="<?= $url ?>"><?= $f['info']['title'] ?> 
+        <span style="color:rgba(0,0,0,0.5);"><?= $f['info']['type'] ?></span></a>
+      </div>
       
-      foreach($docFiles as $f) if($f['info']['type'] == 'lib')
-      {
-        $url = '/docs/'.urlencode($f['file']);
-        ?><li>
+      <div class="col-5">
+      <? if(sizeof($f['members']) > 0) foreach($f['members'] as $m) {
+      
+        ?><div><a class="dea" href="<?= $url ?>#<?= $m ?>"><?= $m ?></a></div><?
+      
+      } ?>
+      </div>
+      
+    </li><?
+  }
+  
+  ?>
+  </ul><?
+}
+
+
         
-          <div>
-            <a href="<?= $url ?>"><?= $f['info']['title'] ?></a> 
-            <span style="color:gray"><?= $f['info']['type'] ?></span>
-          </div>
-          
-          <div class="col-3">
-          <? if(sizeof($f['members']) > 0) foreach($f['members'] as $m) {
-          
-            ?><div><a class="dea" href="<?= $url ?>#<?= $m ?>"><?= $m ?></a></div><?
-          
-          } ?>
-          </div>
-          
-        </li><?
-      }
-      
-      ?>
-      </ul>
-    
-    </td>  
-    <td valign="top" width="50">
+displayDocs($docFiles, array('type', 'concept', 'statement'), 'Language');
 
-      <h3>Functions</h3>
-
-      <ul>
-      <?
-      
-      foreach($docFiles as $f) if($f['info']['type'] == 'function')
-      {
-        ?><li><a href="/docs/<?= urlencode($f['file']) ?>"><?= $f['info']['title'] ?></a> 
-          <span style="color:gray"><?= $typeDisplay[$f['info']['type']] ?></span></li><?
-      }
-      
-      ?>
-      </ul>
-    
-    </td>  
-  </tr>
-</table>
+displayDocs($docFiles, 'lib', 'Libraries and Behaviors');
+        
 

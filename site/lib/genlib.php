@@ -52,22 +52,50 @@ function cfg($name, $default = null, $set = false)
 	return(first($vr, $default));
 }
 
-
+$GLOBALS['keywords'] = explode(',', 'new,for,if,else,elseif');
+foreach($GLOBALS['keywords'] as $k) $GLOBALS['keywordsColors'][] = '<span style="color:#36a">'.$k.'</span>';
+$GLOBALS['operators'] = array('(', ')', '{', '}', ' = ', '.=', '=&gt;', '!');
+foreach($GLOBALS['operators'] as $k) $GLOBALS['operatorsColors'][] = '<span style="color:#36a">'.$k.'</span>';
+$GLOBALS['symbols'] = array_merge($GLOBALS['keywords'], $GLOBALS['operators']);
+$GLOBALS['symbolsColors'] = array_merge($GLOBALS['keywordsColors'], $GLOBALS['operatorsColors']);
 function formatCode($src)
 {
-  $src = htmlspecialchars($src);
-  $nsrc = '';
-  $isInString = false;  
+  $src = str_replace('&quot;', '"', htmlspecialchars($src));
+  $result = '';
+  $isInMode = false;  
   $isInFunctionHead = false;
+  $lastChar = false;
+  $currentWord = '';
   for($a = 0; $a < strlen($src); $a++)
   {
     $c = $src[$a];
-    if(!$isInString) switch($c)
+    if(!$isInMode) switch($c)
     {
-      case("'"): 
+      case('-'): 
       {
-        $nsrc .= '\'<i style="color:green;font-weight:normal;">';
-        $isInString = true; 
+        $nsrc .= $c;
+        if($lastChar == '-')
+        {
+          $isInMode = "\n";
+          $nsrc = substr($nsrc, 0, -2).'<span style="color:#999;font-weight:normal;">--';
+        }
+        break;
+      }
+      case('['):
+      {
+        $nsrc .= $c;
+        if($lastChar == '[' || $lastChar == '=')
+        {
+          $isInMode = ']';
+          $nsrc .= '<i style="color:green;font-weight:normal;">';
+        }
+        break;
+      }
+      case("'"): 
+      case('"'): 
+      {
+        $nsrc .= '<i style="color:green;font-weight:normal;">'.$c;
+        $isInMode = $c; 
         break;
       }
       case('{'):
@@ -75,10 +103,10 @@ function formatCode($src)
         $nsrc .= $c;
         $pipePos = strpos($src, '|', $a);
         $closePos = strpos($src, '}', $a);
-        if($pipePos < $closePos)
+        if($pipePos !== false && $pipePos < $closePos && $pipePos - $a < 20)
         {
           $isInFunctionHead = true;
-          $nsrc .= '<span style="color:blue">';
+          $nsrc .= '<span style="color:#36a;">';
         }
         break;
       }
@@ -96,20 +124,23 @@ function formatCode($src)
     }
     else
     {
-      if($c == "'")
+      if($c === $isInMode)
       {
-        $nsrc .= '</i>';
-        $isInString = false; 
+        $nsrc .= $c;
+        if($isInMode == "\n")
+          $nsrc .= '</span>';
+        else
+          $nsrc .= '</i>';
+        $isInMode = false; 
       } 
-      $nsrc .= $c;
+      else 
+      {
+        $nsrc .= $c;
+      }
     }
+    $lastChar = $c;
   } 
-  $b = function($c) { return('<b style="color: gray;">'.$c.'</b>'); };
-  $a = function($c) { return('<b style="color: blue;">'.$c.'</b>'); };
-  ?><pre class="sh_np"><?= str_replace(
-    array('(', ')', '{', '}'),
-    array($b('('), $b(')'), $b('{'), $b('}'), ),
-    $nsrc) ?></pre><?
+  ?><pre class="sh_np"><?= str_replace($GLOBALS['symbols'], $GLOBALS['symbolsColors'], $nsrc) ?></pre><?
 }
 
 function formatOutput($src)

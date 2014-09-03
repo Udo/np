@@ -5,35 +5,6 @@ $GLOBALS['title'] = 'np Tutorial';
 ob_start();
 
 ?>
-<script>
-
-PR['registerLangHandler'](
-    PR['createSimpleLexer'](
-        [
-         // Whitespace
-         [PR['PR_PLAIN'],       /^[\t\n\r \xA0]+/, null, '\t\n\r \xA0'],
-         // A double or single quoted, possibly multi-line, string.
-         [PR['PR_STRING'],      /^(?:\"(?:[^\"\\]|\\[\s\S])*(?:\"|$)|\'(?:[^\'\\]|\\[\s\S])*(?:\'|$))/, null, '"\'']
-        ],
-        [
-         // A comment is either a line comment that starts with two dashes, or
-         // two dashes preceding a long bracketed block.
-         [PR['PR_COMMENT'], /^--(?:\[(=*)\[[\s\S]*?(?:\]\1\]|$)|[^\r\n]*)/],
-         // A long bracketed block not preceded by -- is a string.
-         [PR['PR_STRING'],  /^\[(=*)\[[\s\S]*?(?:\]\1\]|$)/],
-         [PR['PR_KEYWORD'], /^(?:and|break|do|else|otherwise|end|false|for|if|in|new|nil|not|or|return|true|while)\b/, null],
-         // A number is a hex integer literal, a decimal real literal, or in
-         // scientific notation.
-         [PR['PR_LITERAL'],
-          /^[+-]?(?:0x[\da-f]+|(?:(?:\.\d+|\d+(?:\.\d*)?)(?:e[+\-]?\d+)?))/i],
-         // An identifier
-         [PR['PR_PLAIN'], /^[a-z_]\w*/i],
-         // A run of punctuation
-         [PR['PR_PUNCTUATION'], /^[^\w\t\n\r \xA0][^\w\t\n\r \xA0\"\'\-\+=]*/]
-        ]),
-    ['lua']);
-
-</script>
 
 <div id="side"><iframe id="srcwnd" src="invoke/cgidemo.php" style="width: 100%; border: none; height: 100%;"></iframe></div>
 
@@ -47,7 +18,7 @@ PR['registerLangHandler'](
     The easiest way to try out np is by simply using this handy tutorial, which allows you to
     enter and execute code right from the convenience of your own browser. This tutorial is intended
     for people who already know one or more other programming languages.
-    <div align="right">try it out -----&gt;</div>
+    <div align="right">try it out ⇥</div>
     </p>
     
   </div>
@@ -60,7 +31,7 @@ PR['registerLangHandler'](
     Here's a very simple np program:    
   </p>
     
-  <pre class="sh_np">print('Hello World!')</pre>
+  <?= formatCode("print('Hello World!')") ?>
   
   <p>
     will print out:
@@ -72,8 +43,8 @@ PR['registerLangHandler'](
   Now, that's not very interesting. Let's make use of variables:
   </p>
     
-  <pre class="sh_np">new greeting = 'Hello from a variable'
-print(greeting)</pre>
+  <?= formatCode("new greeting = 'Hello from a variable'
+print(greeting)") ?>
   
   <p>
   Variables are declared with the keyword <code>new</code>, at which
@@ -81,23 +52,23 @@ print(greeting)</pre>
   values in np, but these are the basic ones: 
   </p>
 
-  <pre class="sh_np">new imAString = 'Striiiing'
+  <?= formatCode("new imAString = 'Striiiing'
 new imANumber = 42
 new imABoolean = true
 new imAList = (: 1 2 3)
 new imANothing = nil
 
-print(imAString imANumber 
-  imABoolean imAList imANothing)</pre>
+print(imAString imANumber imABoolean imANothing)
+print(imAList)") ?>
 
   <p>
   Let's have a closer look at the list type.
   </p>
   
-  <pre class="sh_np">new places = (: 'earth' 'solar system' 'galaxy')
-places:each{ thing |
+  <?= formatCode("new places = (: 'earth' 'solar system' 'galaxy')
+places:each { thing |
   print('Hello' thing)
-  }</pre>
+  }") ?>
   
   <p>
   This already contains some juicy stuff: the <code>places</code> variable is filled with
@@ -106,7 +77,7 @@ places:each{ thing |
   </p>
     
   </div>
-
+  
   <h2>FizzBuzz</h2>
   
   <div>
@@ -119,14 +90,14 @@ places:each{ thing |
     to help you with this.
   </p>
   
-  <pre class="sh_np">print('Commencing FizzBuzz Sequence...')
+  <?= formatCode("print('Commencing FizzBuzz Sequence...')
 for i = 1, 100 {
   new fbResult 
   if (i % 3 == 0) fbResult = 'Fizz' 
-  if (i % 5 == 0) fbResult .= 'Buzz' 
+  if (i % 5 == 0) fbResult <<= 'Buzz' 
   if (!fbResult) fbResult = i 
   print(fbResult)
-}</pre>
+}") ?>
   
   <h3>for Loops</h3>
   
@@ -192,27 +163,27 @@ else (condition2)
   </p>
   
   <p>The following <b>compound assignments</b> are supported: <code>+=</code> (add to), <code>-=</code> (subtract from), 
-    <code>*=</code> (multiply by), <code>/=</code> (divide by), <code>.=</code> (append to).
+    <code>*=</code> (multiply by), <code>/=</code> (divide by), <code><<=</code> (append to).
   </p>
   
   </div>
   
-  <h2>Functions and Scope</h2>
+  <h2>Functions</h2>
   
   <p>
   Functions are pieces of code you can call. They may return one or more results, and they
   may take one or more parameters in doing so. Consider for your amusement, the FizzBuzzer:
   </p>
   
-  <pre class="sh_np">new fizzBuzzer = { i |
+  <?= formatCode("new fizzBuzzer = { i |
   new fbResult 
   if (i % 3 == 0) fbResult = 'Fizz' 
-  if (i % 5 == 0) fbResult .= 'Buzz' 
+  if (i % 5 == 0) fbResult <<= 'Buzz' 
   if (!fbResult) fbResult = i 
   => fbResult, i
   }
 
-print(fizzBuzzer(15))</pre>
+print(fizzBuzzer(15))") ?>
   
   <p>
   What we've done here is package the FizzBuzz logic from the previous example
@@ -224,13 +195,13 @@ print(fizzBuzzer(15))</pre>
   Say you wanted to store the function result in a variable for later:
   </p>
   
-  <pre class="sh_np">new myFavoriteResult = fizzBuzzer(150)</pre>
+  <?= formatCode("new myFavoriteResult = fizzBuzzer(150)") ?>
   
   <p>
   This stores only the first value of the result. You can store both, like this:
   </p>
   
-  <pre class="sh_np">new myFavoriteResult, original = fizzBuzzer(150)</pre>
+  <?= formatCode("new myFavoriteResult, original = fizzBuzzer(150)") ?>
   
   <p>
   np has some handy features that deal with multiple return values and function
@@ -238,22 +209,22 @@ print(fizzBuzzer(15))</pre>
   out of the fizzBuzzer(): 
   </p>
   
-  <pre class="sh_np">print(select(2, fizzBuzzer(150)))</pre>
+  <?= formatCode("print(select(2, fizzBuzzer(150)))") ?>
   
   <p>
   Or you can condense all results into a list:
   </p>
   
-  <pre class="sh_np">new myPreciousss = list.condense(fizzBuzzer(150))
-myPreciousss:each{ v |
+  <?= formatCode("new myPreciousss = list.condense(fizzBuzzer(150))
+myPreciousss:each { v |
   print(v)
-  }</pre>
+  }") ?>
 
   <p>
   Likewise, you can expand a list into several function parameters:
   </p>
   
-  <pre class="sh_np">-- there
+  <?= formatCode("-- there
 new myPreciousss = list.condense(fizzBuzzer(150))
   
 -- and back again  
@@ -261,7 +232,7 @@ new backAgain = { fz org n |
   print('fizz:' fz 'original:' org 'params' nr)
 }
 
-backAgain(list.expand(myPreciousss))</pre>
+backAgain(list.expand(myPreciousss))") ?>
 
   <p>
   But whatever happened to "n"? Well, <code>list.expand()</code>
@@ -269,31 +240,60 @@ backAgain(list.expand(myPreciousss))</pre>
   features later!
   </p>
 
-  <h3>Scope</h3>
+  <h2>Scope</h2>
 
   <p>
-  In np, every function is in its own little world:
+  Every variable you use must be declared beforehand. An error is triggered if you attempt
+  to assign a value to a non-existant variable.
+  </p>
+
+  <?= formatCode("bla = 1") ?>
+  
+  <p>
+  When you declare a variable, you can assign a value to it immediately, or you can leave
+  it empty for future use:
+  </p>
+
+  <?= formatCode("new someNumber = 2
+new downForWhatever
+
+print(someNumber downForWhatever)") ?>
+
+  <p>
+  Functions have access to variables declared in the parent context, thereby creating closures.
   </p>
   
-  <pre class="sh_np">new vegetable = 'Potato'
+  <?= formatCode("new outerVar = 100
+
+new myFunc = {| 
+  print(outerVar) 
+  }
+
+myFunc()") ?>
+  
+  <p>
+  In np, every function is in its own little world, and local variables can overshadow outer ones.
+  </p>
+  
+  <?= formatCode("new vegetable = 'Potato'
 print(vegetable)
 new f = {|
   new vegetable = 'Bacon' 
   print(vegetable 'is my vegetable')
   }
 f()
-print(vegetable) </pre>
+print(vegetable)") ?>
 
   <p>
   However, if no local variable by a certain name can be found, np
   will try and look if it's available in the outer context:
   </p>
 
-  <pre class="sh_np">new vegetable = 'Potato'
+  <?= formatCode("new vegetable = 'Potato'
 new f = {|
   print(vegetable 'is my vegetable')
   }
-f() </pre>
+f()") ?>
 
   <h3>Block Scope</h3>
   
@@ -314,12 +314,12 @@ f() </pre>
   </ul>
   </p>
   
-  <pre class="sh_np">if true {
+  <?= formatCode("if true {
   new hubris = 'superiority'
-  print("Look at me, I'm a block.")
-  print("I even got my own variable.")
-  print("It's a sign of my " hubris)
-}</pre>
+  print(\"Look at me, I'm a block.\")
+  print(\"I even got my own variable.\")
+  print(\"It's a sign of my \" hubris)
+}") ?>
   
   <h3>Scope Shenanigans</h3>
 
@@ -330,7 +330,7 @@ f() </pre>
   a secret:
   </p>  
   
-  <pre class="sh_np">new guessMe 
+  <?= formatCode("new guessMe 
 {
   new secretNumber = 42
   guessMe = { guess |
@@ -342,7 +342,7 @@ f() </pre>
 }
 print(guessMe(1))
 print(guessMe(13))
-print(guessMe(42))</pre>
+print(guessMe(42))") ?>
   
   <p>
   This example shows how easy it is to give functions and objects an internal
@@ -369,38 +369,27 @@ print(guessMe(42))</pre>
   Let's make a Bugbear that can talk, by providing a <code>say</code> event:
   </p>
   
-  <pre class="sh_np">new BugbearEvents = (:
+  <?= formatCode("new BugbearEvents = (:
   say = { creature text | 
     print(creature.name 'says:' text 'BURP!') }
   )
-new bear = create(BugbearEvents, (: name = 'Bjorn' ))
-bear:say('Hello everybody!')
-</pre>
+new bear = BugbearEvents:create(: name = 'Bjorn' )
+bear:say('Hello everybody!')") ?>
 
   <p>
-  The <code>create()</code> function also works if you only give it the
-  events list, in that case an empty object will be created and returned.
-  </p>
-  
-  <p>
-  That's all fine, but to make the whole thing more powerful <code>np</code> also gives
-  you a standard event called <code>create</code> which provides a neat place
-  to initialize lists at the moment of creation:  
+  np also gives you a standard event called <code>init</code> which provides a neat place to initialize lists at the moment of creation: 
   </p>
 
-  <pre class="sh_np">
+  <?= formatCode("
 new BugbearEvents = (:
-  say = {creature text | 
-    print(creature.name 'the' creature.species 
-      'says:' text 'BURP!') 
-    }
-  create = { creature | 
-    creature.species = 'Bugbear'; 
-    }
-)
-new bear = create(BugbearEvents, (: name = 'Bjorn' ))
-bear:say('Hello everybody!')
-</pre>
+  say = { creature text | 
+    print(creature.name #the creature.species 
+      'says:' text 'BURP!') }
+  init = { creature | 
+    creature.species = #Bugbear }
+  )
+new bear = BugbearEvents:create(: name = 'Bjorn' )
+bear:say('Hello everybody!')") ?>
 
   <p>
   In this example, we use the <code>create</code> handler to give
@@ -423,8 +412,8 @@ bear:say('Hello everybody!')
 
 $c = ob_get_clean();
 
-print(str_replace('<pre class="sh_np">', '<a class="loadsrc" 
+print(str_replace('<pre class="sh_np">', '<a class="loadsrc" title="execute this code example"
   onclick="document.getElementById(\'srcwnd\').setAttribute(\'src\', 
-    \'invoke/cgidemo.php?code=\'+escape($(this).next().text()));">&gt;&gt;&gt;</a><pre class="sh_np prettyprint lang-lua">', $c));
+    \'invoke/cgidemo.php?code=\'+escape($(this).next().text()));">⇥</a><pre class="sh_np">', $c));
 
 ?>

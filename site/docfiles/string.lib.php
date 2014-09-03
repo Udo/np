@@ -8,7 +8,7 @@
       ),
     'nparams' => array(
       ),
-    'see' => array('math.lib', 'list.lib')
+    'see' => array('string.type')
     );
 
 ?>
@@ -16,7 +16,7 @@
 
 <p>
   The <code>string</code> library contains functions intended for the manipulation of strings.
-  This library is also the default event list for strings.
+  This library is also the default event list for <a href="http://np-lang.org/docs/string.type">strings</a>.
 </p>
 
 <h2>Behaviors</h2>
