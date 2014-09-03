@@ -562,6 +562,12 @@ static int unbound_search (Table *t, unsigned int j) {
   return i;
 }
 
+LUAI_FUNC int luaH_keycount (Table *t) {
+	if(isdummy(t->node))
+		return(0);
+	else
+		return sizenode(t);
+}
 
 /*
 ** Try to find a boundary in table `t'. A `boundary' is an integer index

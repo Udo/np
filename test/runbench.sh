@@ -1,3 +1,4 @@
+cd test/
 echo "Node:"
 time node bench.js
 echo "Lua:"

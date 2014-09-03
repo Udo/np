@@ -12,6 +12,7 @@
 #include "lstate.h"
 
 LUAI_FUNC TValue *index2addr (lua_State *L, int idx);
+LUA_API size_t lua_keycount (lua_State *L, int idx);
 
 #define api_incr_top(L)   {L->top++; api_check(L, L->top <= L->ci->top, \
 				"stack overflow");}

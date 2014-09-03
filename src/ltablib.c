@@ -19,6 +19,7 @@
 #include "lvm.h"
 #include "lapi.h"
 #include "luaconf.h"
+#include "lobject.h"
 
 #define aux_getn(L,n)	(luaL_checktype(L, n, LUA_TTABLE), luaL_len(L, n))
 
@@ -699,6 +700,15 @@ static int tbl_size (lua_State *L) {
 	return 1;
 }
 
+static int tbl_keyCount (lua_State *L) {
+  int t = lua_type(L, 1);
+  luaL_argcheck(L, t == LUA_TTABLE, 1,
+                 "list expected");
+	lua_pushinteger(L, lua_keycount(L, 1));
+	//lua_pushinteger(L, aux_getn(L, 1));
+	return 1;
+}
+
 static int tbl_reduce (lua_State *L) {
   int i = 0;
   luaL_checktype(L, 1, LUA_TTABLE);
@@ -811,6 +821,7 @@ static const luaL_Reg tab_funcs[] = {
   {"reverse", tbl_reverse},
   {"iReverse", tbl_ireverse},
   {"size", tbl_size},
+  {"keyCount", tbl_keyCount},
   {"sort", tbl_sort},
   {"iSort", tbl_isort},
   {"toString", tbl_toString},

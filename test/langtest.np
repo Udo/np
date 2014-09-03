@@ -34,4 +34,6 @@ new lt1 = (:)
 for a = 1,10000 lt1:add(a);
 assert( lt1:size() == 10000 'lt1:size() 10000 expected' )
 
+
+
 print('- all tests passed');

@@ -420,6 +420,17 @@ LUA_API size_t lua_rawlen (lua_State *L, int idx, int onlyArrayVals) {
   }
 }
 
+LUA_API size_t lua_keycount (lua_State *L, int idx) {
+  StkId o = index2addr(L, idx);
+  switch (ttypenv(o)) {
+    case LUA_TTABLE: 
+		{
+			return luaH_keycount(hvalue(o));
+		}
+    default: return 0;
+  }
+}
+
 
 LUA_API lua_CFunction lua_tocfunction (lua_State *L, int idx) {
   StkId o = index2addr(L, idx);

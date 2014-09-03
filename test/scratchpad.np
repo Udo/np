@@ -1,2 +1,4 @@
-new testLib = require('test/libtest1')
+new l = (: a = 1 1 2 3)
 
+print(l:keyCount())
+print(l:size())
