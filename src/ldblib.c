@@ -569,7 +569,7 @@ static const luaL_Reg dblib[] = {
   {"get", db_rawget},
   {"set", db_rawset},
   {"compile", db_load},
-  {"errNilEvent", db_nilEvent},
+  {"trapNilEvent", db_nilEvent},
   {NULL, NULL}
 };
 

@@ -40,7 +40,7 @@ assert( lt1:size() == 10000 'lt1:size() 10000 expected' )
 new lt2 = (: 1 2 3)
 assert( lt2.foo.bar == nil 'nil chain should evaluate to nil' )
 lt2.nonExistent:someBogusCall() -- should be OK
-root.sys.errNilEvent = { | lt2.nilEventHandled = true }
+root.sys.trapNilEvent = { | lt2.nilEventHandled = true }
 lt2.nonExistent2:someBogusCall2() -- should be going through the new nilEvent handler
 assert( lt2.nilEventHandled 'sys.nilEvent not handled' )
 

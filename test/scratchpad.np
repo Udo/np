@@ -7,7 +7,7 @@ l:bind(list << (:
 
 --list.each(l:bind() { v k | print(k) })
 
-root.sys.errNilEvent = { a b c | 
+root.sys.trapNilEvent = { a b c | 
   print(a b c)
 	print(sys.traceback()) 
   }
