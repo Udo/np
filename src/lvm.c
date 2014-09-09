@@ -157,8 +157,8 @@ int luaV_selfop (lua_State *L, const TValue *to, TValue *key, StkId val) {
     }
     else if (ttisnil(tm = luaT_gettmbyobj(L, t, TM_EVENT))) {
       //luaG_typeerror(L, t, "call event on");
-		  lua_getglobal(L, LUA_DBLIBNAME);
-			lua_getfield(L, -1, "trapNilEvent");
+		  lua_getglobal(L, LUA_TRAPLIBNAME);
+			lua_getfield(L, -1, "nilEvent");
 			if(ttisfunction(L->top - 1)) {		
 				setobj2s(L, val, L->top - 1);
 			} else {

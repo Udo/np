@@ -522,10 +522,6 @@ static int db_load (lua_State *L) {
   return load_aux(L, status, env);
 }
 
-static int db_nilEvent (lua_State *L) {
-	lua_pushnil(L);
-	return(1);
-}
 /* }====================================================== */
 
 
@@ -569,7 +565,6 @@ static const luaL_Reg dblib[] = {
   {"get", db_rawget},
   {"set", db_rawset},
   {"compile", db_load},
-  {"trapNilEvent", db_nilEvent},
   {NULL, NULL}
 };
 

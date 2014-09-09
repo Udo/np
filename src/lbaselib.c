@@ -214,6 +214,16 @@ static const luaL_Reg base_funcs[] = {
   {NULL, NULL}
 };
 
+static int trap_nilEvent (lua_State *L) {
+	lua_pushnil(L);
+	return(1);
+}
+
+static const luaL_Reg trap_lib[] = {
+  {"nilEvent", trap_nilEvent},
+  {NULL, NULL}
+};
+
 
 LUAMOD_API int luaopen_base (lua_State *L) {
   /* set global _G */
@@ -222,6 +232,11 @@ LUAMOD_API int luaopen_base (lua_State *L) {
   lua_setfield(L, -2, "_G");
   /* open lib into global table */
   luaL_setfuncs(L, base_funcs, 0);
+	
+	lua_createtable(L, 0, 1);
+	luaL_setfuncs(L, trap_lib, 0);
+	lua_setglobal(L, "trap");
+	
   return 1;
 }
 

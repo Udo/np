@@ -1,16 +1,1 @@
-new l = (: 1)
-new l2 = (: 2)
-
-l:bind(list << (: 
-  event = {a b c| print('event' a b c)}
-	))
-
---list.each(l:bind() { v k | print(k) })
-
-root.sys.trapNilEvent = nil
-new b = { a b c | 
-  print(a b c)
-	print(sys.traceback()) 
-  }
-
-l.foo:bla()
+list.each(root.trap { v k | print(k) })
