@@ -1,1 +1,5 @@
-list.each(root.trap { v k | print(k) })
+new l = (: 1 2)
+
+l <<= (: 3 4)
+
+print(l << (: 5 6))
