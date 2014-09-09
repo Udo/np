@@ -25,18 +25,18 @@
 #include "ltable.h"
 #include "ltm.h"
 #include "lvm.h"
-
+#include "lualib.h"
 
 /* limit for table tag-method chains (to avoid loops) */
-#define MAXTAGLOOP	100
+#define MAXTAGLOOP  100
 
 
 const TValue *luaV_tonumber (const TValue *obj, TValue *n) {
   lua_Number num = 0;
   if (ttisnumber(obj)) return obj;
   if (ttisstring(obj))
-	  luaO_str2d(svalue(obj), tsvalue(obj)->len, &num);
-	setnvalue(n, num);
+    luaO_str2d(svalue(obj), tsvalue(obj)->len, &num);
+  setnvalue(n, num);
   return n;
 }
 
@@ -111,7 +111,7 @@ void luaV_gettable (lua_State *L, const TValue *t, TValue *key, StkId val) {
     if (ttistable(t)) {  /* `t' is a table? */
       Table *h = hvalue(t);
       const TValue *res = luaH_get(h, key); /* do a primitive get */
-			
+      
       if (!ttisnil(res) ||  /* result is not nil? */
           (tm = fasttm(L, h->metatable, TM_INDEX)) == NULL) { /* or no TM? */
         setobj2s(L, val, res);
@@ -120,9 +120,9 @@ void luaV_gettable (lua_State *L, const TValue *t, TValue *key, StkId val) {
       /* else will try the tag method */
     }
     else if (ttisnil(tm = luaT_gettmbyobj(L, t, TM_INDEX))) {
-			//luaG_typeerror(L, t, "index");
-    	setnilvalue(val);
-			return;
+      //luaG_typeerror(L, t, "index");
+      setnilvalue(val);
+      return;
     }
     if (ttisfunction(tm)) {
       callTM(L, tm, t, key, val, 1);
@@ -136,39 +136,46 @@ void luaV_gettable (lua_State *L, const TValue *t, TValue *key, StkId val) {
 
 int luaV_selfop (lua_State *L, const TValue *to, TValue *key, StkId val) {
   int loop;
-	const TValue *t = to;
+  const TValue *t = to;
   for (loop = 0; loop < MAXTAGLOOP; loop++) {
     const TValue *tm;
     if (ttistable(t)) {  /* `t' is a table? */
       Table *h = hvalue(t);
-      const TValue *res;
-			if(t == to) h = h->metatable;
-			if(h)
-				res = luaH_get(h, key);
-			else 
-				res = luaO_nilobject;
-			
-      if (!ttisnil(res)) {
+      const TValue *res = luaO_nilobject;
+      if(t == to) {
+        if(h->metatable) res = luaH_get(h->metatable, key);
+      } else {
+        res = luaH_get(h, key);
+      }  
+      
+      if (!ttisnil(res) ||  /* result is not nil? */
+          (tm = fasttm(L, h->metatable, TM_EVENT)) == NULL) { /* or no TM? */
         setobj2s(L, val, res);
         return 0;
       }
-			tm = fasttm(L, h, TM_EVENT);
-			if(ttisfunction(tm)) {
-        setobj2s(L, val, tm);
-        return 1; // shift parameter list by 1
-			}
       /* else will try the tag method */
     }
-    else if (ttisnil(tm = luaT_gettmbyobj(L, t, TM_EVENT)))
-      luaG_typeerror(L, t, "event");
+    else if (ttisnil(tm = luaT_gettmbyobj(L, t, TM_EVENT))) {
+      //luaG_typeerror(L, t, "call event on");
+		  lua_getglobal(L, LUA_DBLIBNAME);
+			lua_getfield(L, -1, "errNilEvent");
+			if(ttisfunction(L->top - 1)) {		
+				setobj2s(L, val, L->top - 1);
+			} else {
+				luaG_typeerror(L, t, "call event on");
+			}				
+			L->top--;
+			return 1;
+    }
     if (ttisfunction(tm)) {
-      callTM(L, tm, to, key, val, 1);
-      return 0;
+      //callTM(L, tm, t, key, val, 1);
+      //return 0;
+			setobj2s(L, val, tm);
+			return 1;
     }
     t = tm;  /* else repeat with 'tm' */
   }
   luaG_runerror(L, "loop in gettable");
-	return 0;
 }
 
 
@@ -178,15 +185,15 @@ void luaV_settable (lua_State *L, const TValue *t, TValue *key, StkId val) {
     const TValue *tm;
     if (ttistable(t)) {  /* `t' is a table? */
       Table *h = hvalue(t);
-			
-			tm = fasttm(L, h->metatable, TM_UPDATE);
-			if(tm != NULL)  {
-					if (ttisfunction(tm)) {
-					  callTM(L, tm, t, key, val, 0);
-					  return;
-					}
-			}
-			
+      
+      tm = fasttm(L, h->metatable, TM_UPDATE);
+      if(tm != NULL)  {
+          if (ttisfunction(tm)) {
+            callTM(L, tm, t, key, val, 0);
+            return;
+          }
+      }
+      
       TValue *oldval = cast(TValue *, luaH_get(h, key));
       /* if previous value is not nil, there must be a previous entry
          in the table; moreover, a metamethod has no relevance */
@@ -282,11 +289,11 @@ int luaV_lessthan (lua_State *L, const TValue *l, const TValue *r) {
   else if (ttisstring(l) && ttisstring(r))
     return l_strcmp(rawtsvalue(l), rawtsvalue(r)) < 0;
   else if ((res = call_orderTM(L, l, r, TM_LT)) < 0) {
-	  TValue tempb, tempc;
-	  const TValue *ln, *rn;
-		ln = luaV_tonumber(l, &tempb);
-		rn = luaV_tonumber(r, &tempc);
-		return luai_numlt(L, nvalue(ln), nvalue(rn));
+    TValue tempb, tempc;
+    const TValue *ln, *rn;
+    ln = luaV_tonumber(l, &tempb);
+    rn = luaV_tonumber(r, &tempc);
+    return luai_numlt(L, nvalue(ln), nvalue(rn));
   }
   //  luaG_ordererror(L, l, r);
   return res;
@@ -302,11 +309,11 @@ int luaV_lessequal (lua_State *L, const TValue *l, const TValue *r) {
   else if ((res = call_orderTM(L, l, r, TM_LE)) >= 0)  /* first try `le' */
     return res;
   else if ((res = call_orderTM(L, r, l, TM_LT)) < 0)  {
-	  TValue tempb, tempc;
-	  const TValue *ln, *rn;
-		ln = luaV_tonumber(l, &tempb);
-		rn = luaV_tonumber(r, &tempc);
-		return luai_numle(L, nvalue(ln), nvalue(rn));
+    TValue tempb, tempc;
+    const TValue *ln, *rn;
+    ln = luaV_tonumber(l, &tempb);
+    rn = luaV_tonumber(r, &tempc);
+    return luai_numle(L, nvalue(ln), nvalue(rn));
   }
   return !res;
 }
@@ -353,15 +360,15 @@ void luaV_concat (lua_State *L, int total, TMS event) {
   do {
     StkId top = L->top;
     int n = 2;  /* number of elements handled in this pass (at least 2) */
-		
-		if (!(ttisstring(top-2) || ttisnumber(top-2) || ttisnil(top-2))) {
+    
+    if (!(ttisstring(top-2) || ttisnumber(top-2) || ttisnil(top-2))) {
       if (!call_binTM(L, top-2, top-1, top-2, event))
-				// try imutable concat if no mutable found
-				if(event != TM_MCONCAT || !call_binTM(L, top-2, top-1, top-2, TM_CONCAT))
-        	luaG_concaterror(L, top-2, top-1);
+        // try imutable concat if no mutable found
+        if(event != TM_MCONCAT || !call_binTM(L, top-2, top-1, top-2, TM_CONCAT))
+          luaG_concaterror(L, top-2, top-1);
     }
     else 
-		if (tsvalue(top-1)->len == 0)  /* second operand is empty? */
+    if (tsvalue(top-1)->len == 0)  /* second operand is empty? */
       (void)tostring(L, top - 2);  /* result is first operand */
     else if (ttisnil(top-2) || (ttisstring(top-2) && tsvalue(top-2)->len == 0)) {
       setobjs2s(L, top - 2, top - 1);  /* result is second op. */
@@ -425,17 +432,17 @@ void luaV_arith (lua_State *L, StkId ra, const TValue *rb,
   const TValue *b, *c;
 
   if(ttypenv(rb) == LUA_TTABLE) {
-		if (!call_binTM(L, rb, rc, ra, op))
-			luaG_aritherror(L, rb, rc);
-	}
-	else 
-		if ((b = luaV_tonumber(rb, &tempb)) != NULL &&
+    if (!call_binTM(L, rb, rc, ra, op))
+      luaG_aritherror(L, rb, rc);
+  }
+  else 
+    if ((b = luaV_tonumber(rb, &tempb)) != NULL &&
       (c = luaV_tonumber(rc, &tempc)) != NULL) {
     lua_Number res = luaO_arith(op - TM_ADD + LUA_OPADD, nvalue(b), nvalue(c));
     setnvalue(ra, res);
   }
   else 
-		luaG_aritherror(L, rb, rc);
+    luaG_aritherror(L, rb, rc);
 }
 
 
@@ -513,7 +520,7 @@ void luaV_finishOp (lua_State *L) {
         ci->u.l.savedpc++;  /* skip jump instruction */
       break;
     }
-		case OP_MCONCAT:
+    case OP_MCONCAT:
     case OP_CONCAT: {
       StkId top = L->top - 1;  /* top when 'call_binTM' was called */
       int b = GETARG_B(inst);      /* first element to concatenate */
@@ -551,18 +558,18 @@ void luaV_finishOp (lua_State *L) {
 */
 
 #if !defined luai_runtimecheck
-#define luai_runtimecheck(L, c)		/* void */
+#define luai_runtimecheck(L, c)    /* void */
 #endif
 
 
-#define RA(i)	(base+GETARG_A(i))
+#define RA(i)  (base+GETARG_A(i))
 /* to be used after possible stack reallocation */
-#define RB(i)	check_exp(getBMode(GET_OPCODE(i)) == OpArgR, base+GETARG_B(i))
-#define RC(i)	check_exp(getCMode(GET_OPCODE(i)) == OpArgR, base+GETARG_C(i))
-#define RKB(i)	check_exp(getBMode(GET_OPCODE(i)) == OpArgK, \
-	ISK(GETARG_B(i)) ? k+INDEXK(GETARG_B(i)) : base+GETARG_B(i))
-#define RKC(i)	check_exp(getCMode(GET_OPCODE(i)) == OpArgK, \
-	ISK(GETARG_C(i)) ? k+INDEXK(GETARG_C(i)) : base+GETARG_C(i))
+#define RB(i)  check_exp(getBMode(GET_OPCODE(i)) == OpArgR, base+GETARG_B(i))
+#define RC(i)  check_exp(getCMode(GET_OPCODE(i)) == OpArgR, base+GETARG_C(i))
+#define RKB(i)  check_exp(getBMode(GET_OPCODE(i)) == OpArgK, \
+  ISK(GETARG_B(i)) ? k+INDEXK(GETARG_B(i)) : base+GETARG_B(i))
+#define RKC(i)  check_exp(getCMode(GET_OPCODE(i)) == OpArgK, \
+  ISK(GETARG_C(i)) ? k+INDEXK(GETARG_C(i)) : base+GETARG_C(i))
 #define KBx(i)  \
   (k + (GETARG_Bx(i) != 0 ? GETARG_Bx(i) - 1 : GETARG_Ax(*ci->u.l.savedpc++)))
 
@@ -574,10 +581,10 @@ void luaV_finishOp (lua_State *L) {
     ci->u.l.savedpc += GETARG_sBx(i) + e; }
 
 /* for test instructions, execute the jump instruction that follows it */
-#define donextjump(ci)	{ i = *ci->u.l.savedpc; dojump(ci, i, 1); }
+#define donextjump(ci)  { i = *ci->u.l.savedpc; dojump(ci, i, 1); }
 
 
-#define Protect(x)	{ {x;}; base = ci->u.l.base; }
+#define Protect(x)  { {x;}; base = ci->u.l.base; }
 
 #define checkGC(L,c)  \
   Protect( luaC_condGC(L,{L->top = (c);  /* limit of live values */ \
@@ -596,9 +603,9 @@ void luaV_finishOp (lua_State *L) {
         else { Protect(luaV_arith(L, ra, rb, rc, tm)); } }
 
 
-#define vmdispatch(o)	switch(o)
-#define vmcase(l,b)	case l: {b}  break;
-#define vmcasenb(l,b)	case l: {b}		/* nb = no break */
+#define vmdispatch(o)  switch(o)
+#define vmcase(l,b)  case l: {b}  break;
+#define vmcasenb(l,b)  case l: {b}    /* nb = no break */
 
 void luaV_execute (lua_State *L) {
   CallInfo *ci = L->ci;
@@ -649,7 +656,7 @@ void luaV_execute (lua_State *L) {
       vmcase(OP_LOADTHIS,
         int b = GETARG_B(i);
         do {
-					setobj2s(L, ra++, ci->func);
+          setobj2s(L, ra++, ci->func);
         } while (b--);
       )
       vmcase(OP_GETUPVAL,
@@ -688,19 +695,19 @@ void luaV_execute (lua_State *L) {
         StkId rb = RB(i);
         setobjs2s(L, ra+1, rb);
         int raShift = 0;
-				Protect(raShift = luaV_selfop(L, rb, RKC(i), ra));
-				if(raShift > 0) { 
-					// if an "event" method was returned, we need to prime the first
-					// parameter to not only contain the list in question but also
-					// the event name
-					Table *t = luaH_new(L);
-					setsvalue2s(L, ra+2, luaS_new(L, "list"));
-					setobj2t(L, luaH_set(L, t, ra+2), rb);
-					setsvalue2s(L, ra+2, luaS_new(L, "function"));
-					setobj2t(L, luaH_set(L, t, ra+2), RKC(i));
-				  checkGC(L, ra + 1);
-					sethvalue(L, ra+1, t);
-				}
+        Protect(raShift = luaV_selfop(L, rb, RKC(i), ra));
+        if(raShift > 0) { 
+          // if an "event" method was returned, we need to prime the first
+          // parameter to not only contain the list in question but also
+          // the event name
+          Table *t = luaH_new(L);
+          setsvalue2s(L, ra+2, luaS_new(L, "object"));
+          setobj2t(L, luaH_set(L, t, ra+2), rb);
+          setsvalue2s(L, ra+2, luaS_new(L, "call"));
+          setobj2t(L, luaH_set(L, t, ra+2), RKC(i));
+          checkGC(L, ra + 1);
+          sethvalue(L, ra+1, t);
+        }
       )
       vmcase(OP_ADD,
         arith_op(luai_numadd, TM_ADD);

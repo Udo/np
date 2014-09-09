@@ -31,9 +31,18 @@ assert( l2:bla() == '(: 1 2 3 )' 'basic list:create()')
 l1 += 4
 assert( l2:bla() != l1:toString() 'list:create() data copy')
 
+-- list size tests
 new lt1 = (:)
 for a = 1,10000 lt1:add(a);
 assert( lt1:size() == 10000 'lt1:size() 10000 expected' )
+
+-- nil events and custom handlers
+new lt2 = (: 1 2 3)
+assert( lt2.foo.bar == nil 'nil chain should evaluate to nil' )
+lt2.nonExistent:someBogusCall() -- should be OK
+root.sys.errNilEvent = { | lt2.nilEventHandled = true }
+lt2.nonExistent2:someBogusCall2() -- should be going through the new nilEvent handler
+assert( lt2.nilEventHandled 'sys.nilEvent not handled' )
 
 
 

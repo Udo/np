@@ -1,5 +1,15 @@
-new l = (:)
+new l = (: 1)
+new l2 = (: 2)
 
-l.foo.bar = 1 
+l:bind(list << (: 
+  event = {a b c| print('event' a b c)}
+	))
 
-print( l.bla.blu.foo )
+--list.each(l:bind() { v k | print(k) })
+
+root.sys.errNilEvent = { a b c | 
+  print(a b c)
+	print(sys.traceback()) 
+  }
+
+l.foo:bla()
