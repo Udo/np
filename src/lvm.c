@@ -418,7 +418,8 @@ void luaV_objlen (lua_State *L, StkId ra, const TValue *rb) {
     default: {  /* try metamethod */
       tm = luaT_gettmbyobj(L, rb, TM_LEN);
       if (ttisnil(tm))  /* no metamethod? */
-        luaG_typeerror(L, rb, "get length of");
+				setnvalue(ra, 0);
+        //luaG_typeerror(L, rb, "get length of");
       break;
     }
   }
