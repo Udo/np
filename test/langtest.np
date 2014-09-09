@@ -42,7 +42,7 @@ assert( lt2.foo.bar == nil 'nil chain should evaluate to nil' )
 lt2.nonExistent:someBogusCall() -- should be OK
 root.trap.nilEvent = { | lt2.nilEventHandled = true }
 lt2.nonExistent2:someBogusCall2() -- should be going through the new nilEvent handler
-assert( lt2.nilEventHandled 'sys.nilEvent not handled' )
+assert( lt2.nilEventHandled 'trap.nilEvent not handled' )
 
 
 
