@@ -328,21 +328,61 @@ static int luaCV_unquote (lua_State *L) {
   return 1;
 }
 
+void pushBuffer(lua_State *L, luaL_Buffer *b, int arg, int *pos) {
+	if(b->n > 0) {
+		luaL_pushresult(b);
+		lua_rawseti(L, arg, *pos);
+		*pos += 1;
+		luaL_buffinit(L, b);
+	}
+}
+
 static int luaCV_tokenize (lua_State *L) {
   size_t l;
 	int pos = 1;
+  luaL_Buffer bToken;
+  luaL_buffinit(L, &bToken);
   const char *s = luaL_checklstring(L, 1, &l);
 	lua_createtable(L, 0, 1);
+	int modeAlpha = 0;
+	char lastChar = ' ';
 
   while (l--) {
 		
-		if(isalpha(*s)) {
-			lua_pushlstring(L, s, 1);
+		if(*s == '"') {
+			if(modeAlpha != 2) { // start string literal mode
+				modeAlpha = 2;
+				pushBuffer(L, &bToken, 2, &pos);
+				luaL_addchar(&bToken, *s);
+			} else { // end string literal mode
+				luaL_addchar(&bToken, *s);
+				modeAlpha = 0;
+				pushBuffer(L, &bToken, 2, &pos);
+			}
+		}
+		else if(modeAlpha == 2) {
+			luaL_addchar(&bToken, *s);
+		}
+		else if(isalnum(*s) || (*s == '.' && isdigit(lastChar))) {
+			if(modeAlpha != 1) {
+				modeAlpha = 1;
+				pushBuffer(L, &bToken, 2, &pos);
+			}
+			luaL_addchar(&bToken, *s);
+		}
+		else {
+			if(modeAlpha != 0) {
+				modeAlpha = 0;
+				pushBuffer(L, &bToken, 2, &pos);
+			}
+			const char tok[2] = { '$', *s }; 
+			lua_pushlstring(L, tok, 2);
 			lua_rawseti(L, 2, pos++);
 		}
-		
+		lastChar = *s;
 		s++;
   }
+	pushBuffer(L, &bToken, 2, &pos);
 	
   return 1;
 }

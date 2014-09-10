@@ -39,6 +39,4 @@ new jsonEncode = { obj |
   => doSerialize(obj)
   }
 
---print(jsonEncode(t))
-new q1 = '"this is" {a} (test)'
-print(convert.tokenize(q1))
+print(jsonEncode(t))
