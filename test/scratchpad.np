@@ -1,5 +1,44 @@
-new l = (: 1 2)
+new t = (: 1 2 3 4 n = 1 foo = false bar = 'bl"ub
+b' sub = (: 10 20 30) )
 
-l <<= (: 3 4)
+new jsonEncode = { obj |
+	new doSerialize
+	
+	new serializers = (:
+    
+		number = { n | => n }
+    
+		string = { s | => convert.quote(s) }
+		
+		[nil] = { | => 'null' }
+		
+		boolean = { b | if(b) => 'true' else => 'false' }
+		
+	  list = { l | 
+		  new items = (:)
+			if(l:keyCount() > 0) {
+			  l:each{ v k |
+				  items += convert.quote(k) << ':' << doSerialize(v)
+					}
+				=> '{ ' << items:join(', ') << ' }'	
+				}
+			else {
+			  l:items{ v |
+				  items += doSerialize(v)
+					}
+				=> '[ ' << items:join(', ') << ' ]'
+				}
+	    }
+			
+	  )
+	
+	doSerialize = { o |
+	  => serializers[type(o)](o)
+		}
+	
+  => doSerialize(obj)
+  }
 
-print(l << (: 5 6))
+--print(jsonEncode(t))
+new q1 = '"this is" {a} (test)'
+print(convert.tokenize(q1))

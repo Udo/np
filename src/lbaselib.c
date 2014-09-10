@@ -195,6 +195,12 @@ static int luaB_pcall (lua_State *L) {
   return finishpcall(L, (status == LUA_OK));
 }
 
+static int luaB_type (lua_State *L) {
+  luaL_checkany(L, 1);
+  lua_pushstring(L, luaL_typename(L, 1));
+  return 1;
+}
+
 static const luaL_Reg base_funcs[] = {
  // {"toString", luaB_tostring},
   {"assert", luaB_assert},
@@ -210,6 +216,7 @@ static const luaL_Reg base_funcs[] = {
   {"try", luaB_pcall},
   {"print", luaB_print},
   {"select", luaB_select},
+  {"type", luaB_type},
   /*{"xpcall", luaB_xpcall},*/
   {NULL, NULL}
 };

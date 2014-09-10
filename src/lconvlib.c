@@ -72,11 +72,6 @@ static int luaCV_tonumber (lua_State *L) {
   return 1;
 }
 
-static int luaCV_type (lua_State *L) {
-  luaL_checkany(L, 1);
-  lua_pushstring(L, luaL_typename(L, 1));
-  return 1;
-}
 
 /*
 ** {======================================================
@@ -133,24 +128,69 @@ static void addquoted (lua_State *L, luaL_Buffer *b, int arg) {
   const char *s = luaL_checklstring(L, arg, &l);
   luaL_addchar(b, '"');
   while (l--) {
-    if (*s == '"' || *s == '\\' || *s == '\n') {
-      luaL_addchar(b, '\\');
-      luaL_addchar(b, *s);
-    }
-    else if (*s == '\0' || iscntrl(uchar(*s))) {
-      char buff[10];
-      if (!isdigit(uchar(*(s+1))))
-        sprintf(buff, "\\%d", (int)uchar(*s));
-      else
-        sprintf(buff, "\\%03d", (int)uchar(*s));
-      luaL_addstring(b, buff);
-    }
-    else
-      luaL_addchar(b, *s);
+		switch(*s) {
+			case '\n': { luaL_addchar(b, '\\'); luaL_addchar(b, 'n'); break; }
+			case '\r': { luaL_addchar(b, '\\'); luaL_addchar(b, 'r'); break; }
+			case '"': { luaL_addchar(b, '\\'); luaL_addchar(b, '"'); break; }
+			case '\\': { luaL_addchar(b, '\\'); luaL_addchar(b, '\\'); break; }
+			case '/': { luaL_addchar(b, '\\'); luaL_addchar(b, '/'); break; }
+			case '\b': { luaL_addchar(b, '\\'); luaL_addchar(b, 'b'); break; }
+			case '\f': { luaL_addchar(b, '\\'); luaL_addchar(b, 'f'); break; }
+			case '\t': { luaL_addchar(b, '\\'); luaL_addchar(b, 't'); break; }
+			default: {
+				if (*s == '\0' || iscntrl(uchar(*s))) {
+		      char buff[10];
+        	sprintf(buff, "\\u%04x", (int)uchar(*s));
+		      luaL_addstring(b, buff);
+		    }
+		    else
+		      luaL_addchar(b, *s);
+			}
+		}
     s++;
   }
   luaL_addchar(b, '"');
 }
+
+static void addunquote (lua_State *L, luaL_Buffer *b, int arg) {
+  size_t l, ol;
+  const char *s = luaL_checklstring(L, arg, &l);
+	ol = l-1;
+	char prevChar = ' ';
+  while (l--) {
+		if((l == ol || l == 0) && *s == '"') {
+			// ignore leading and trailing quotation mark
+		}
+		else if(prevChar == '\\') {
+			// previous character was an escape marker
+			switch(*s) {
+				case 'n': { luaL_addchar(b, '\n'); break; }
+				case 'r': { luaL_addchar(b, '\r'); break; }
+				case '"': { luaL_addchar(b, '"'); break; }
+				case '\\': { luaL_addchar(b, '\\'); break; }
+				case 'b': { luaL_addchar(b, '\b'); break; }
+				case 'f': { luaL_addchar(b, '\f'); break; }
+				case 't': { luaL_addchar(b, '\t'); break; }
+				case 'a': { luaL_addchar(b, '\a'); break; }
+				case 'v': { luaL_addchar(b, '\v'); break; }
+				case '?': { luaL_addchar(b, '\?'); break; }
+				case '\'': { luaL_addchar(b, '\''); break; }
+				case 'u': {
+					int ch;
+					sscanf(s, "u%04x", &ch);
+					luaL_addchar(b, ch);
+					s += 4; l -= 4;
+					break;
+				}
+			}
+		} else {
+			if(*s != '\\') luaL_addchar(b, *s);
+		}
+		prevChar = *s;
+    s++;
+  }
+}
+
 
 static const char *scanformat (lua_State *L, const char *strfrmt, char *form) {
   const char *p = strfrmt;
@@ -272,12 +312,48 @@ static int str_format (lua_State *L) {
   return 1;
 }
 
+static int luaCV_quote (lua_State *L) {
+  luaL_Buffer b;
+  luaL_buffinit(L, &b);
+	addquoted(L, &b, 1);
+  luaL_pushresult(&b);
+  return 1;
+}
+
+static int luaCV_unquote (lua_State *L) {
+  luaL_Buffer b;
+  luaL_buffinit(L, &b);
+	addunquote(L, &b, 1);
+  luaL_pushresult(&b);
+  return 1;
+}
+
+static int luaCV_tokenize (lua_State *L) {
+  size_t l;
+	int pos = 1;
+  const char *s = luaL_checklstring(L, 1, &l);
+	lua_createtable(L, 0, 1);
+
+  while (l--) {
+		
+		if(isalpha(*s)) {
+			lua_pushlstring(L, s, 1);
+			lua_rawseti(L, 2, pos++);
+		}
+		
+		s++;
+  }
+	
+  return 1;
+}
 
 static const luaL_Reg conv_funcs[] = {
   {"toNumber", luaCV_tonumber},
   {"toString", luaCV_tostring},
-  {"type", luaCV_type},
   {"format", str_format},
+	{"quote", luaCV_quote},
+	{"unquote", luaCV_unquote},
+	{"tokenize", luaCV_tokenize},
 	{NULL, NULL}
 };
 
