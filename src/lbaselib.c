@@ -242,7 +242,7 @@ LUAMOD_API int luaopen_base (lua_State *L) {
 	
 	lua_createtable(L, 0, 1);
 	luaL_setfuncs(L, trap_lib, 0);
-	lua_setglobal(L, "trap");
+	lua_setglobal(L, LUA_POLICYLIBNAME);
 	
   return 1;
 }

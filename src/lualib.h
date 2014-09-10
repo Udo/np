@@ -11,7 +11,7 @@
 #include "lua.h"
 
 
-#define LUA_TRAPLIBNAME	"trap"
+#define LUA_POLICYLIBNAME	"policies"
 LUAMOD_API int (luaopen_base) (lua_State *L);
 
 #define LUA_CONVLIBNAME	"convert"
