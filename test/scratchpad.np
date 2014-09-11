@@ -39,7 +39,57 @@ new jsonEncode = { obj |
   => doSerialize(obj)
   }
 
+new jsonDecode = { str |
+	new items = convert.tokenize(str)
+	new itemIndex = 1
+	new current = items[1]
+	new next = { | new prev = current; 
+	  itemIndex += 1; current = items[itemIndex]; 
+		=> prev }
+	new consumeNext = { v | 
+	  next() 
+	  if(current!=v) 
+		  raise(v << ' expected in token ' << itemIndex << " but " << current << " found.") 
+		else 
+			=> next() 
+		}
+
+	new expr, exprObj, exprList, exprString
+	
+	exprString = { |
+	  => convert.unquote(next())
+		}
+	
+  exprList = { |
+		=> (:)
+	  }
+	
+	exprObj = { |
+		new result = (:)
+		while(current && current != '}') {
+		  new key = convert.unquote(current);
+			consumeNext(':')
+			result[key] = expr()
+			consumeNext(',')
+		}
+		=> result
+		}
+
+	expr = { |
+		if(current == '{') 
+		  => exprObj(next())
+		elseif(current == '[') 
+			=> exprList(next())
+		elseif(current:copy(1,1) == '"') 
+			=> exprString()
+		else 
+			=> next()
+		}
+	
+	=> expr()
+  }
+
 new json = jsonEncode(t)
 print(json)
-print(convert.tokenize(json))
+print(jsonDecode(json))
 

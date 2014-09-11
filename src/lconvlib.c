@@ -349,8 +349,11 @@ static int luaCV_tokenize (lua_State *L) {
 
   while (l--) {
 		
-		if(*s == '"') {
-			if(modeAlpha != 2) { // start string literal mode
+		if(*s == '"') { // begin or end string literal mode
+			if(lastChar == '\\') {
+				luaL_addchar(&bToken, *s);
+			}
+			else if(modeAlpha != 2) { // start string literal mode
 				modeAlpha = 2;
 				pushBuffer(L, &bToken, 2, &pos);
 				luaL_addchar(&bToken, *s);
@@ -360,8 +363,11 @@ static int luaCV_tokenize (lua_State *L) {
 				pushBuffer(L, &bToken, 2, &pos);
 			}
 		}
-		else if(modeAlpha == 2) {
+		else if(modeAlpha == 2) { // if in string literal mode
 			luaL_addchar(&bToken, *s);
+		}
+		else if(isspace(*s)) {
+			// ignore whitespace
 		}
 		else if(isalnum(*s) || (*s == '.' && isdigit(lastChar))) {
 			if(modeAlpha != 1) {
@@ -375,8 +381,8 @@ static int luaCV_tokenize (lua_State *L) {
 				modeAlpha = 0;
 				pushBuffer(L, &bToken, 2, &pos);
 			}
-			const char tok[2] = { '$', *s }; 
-			lua_pushlstring(L, tok, 2);
+			//const char tok[2] = { 'c', *s }; 
+			lua_pushlstring(L, s, 1);
 			lua_rawseti(L, 2, pos++);
 		}
 		lastChar = *s;
