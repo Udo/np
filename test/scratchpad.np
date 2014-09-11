@@ -39,5 +39,7 @@ new jsonEncode = { obj |
   => doSerialize(obj)
   }
 
-print(jsonEncode(t))
+new json = jsonEncode(t)
+print(json)
+print(convert.tokenize(json))
 
