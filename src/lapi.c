@@ -26,11 +26,11 @@
 #include "ltm.h"
 #include "lundump.h"
 #include "lvm.h"
-
+#include "lauxlib.h"
 
 
 const char lua_ident[] =
-  "$LuaVersion: " LUA_COPYRIGHT " $"
+  "$npVersion: " LUA_COPYRIGHT " $"
   "$LuaAuthors: " LUA_AUTHORS " $";
 
 
@@ -620,7 +620,6 @@ LUA_API int lua_pushthread (lua_State *L) {
 /*
 ** get functions (Lua -> stack)
 */
-
 
 LUA_API void lua_getglobal (lua_State *L, const char *var) {
   Table *reg = hvalue(&G(L)->l_registry);

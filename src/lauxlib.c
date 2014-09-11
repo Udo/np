@@ -840,6 +840,11 @@ LUALIB_API void luaL_openlib (lua_State *L, const char *libname,
 #endif
 /* }====================================================== */
 
+LUALIB_API void luaL_addinlinefunction(lua_State *L, const char *funcString, const char *funcName, int stackPos) {
+	luaL_dostring(L, funcString);
+	lua_setfield(L, stackPos, funcName);
+}
+
 /*
 ** set functions from list 'l' into table at top - 'nup'; each
 ** function gets the 'nup' elements at the top as upvalues.
