@@ -1,3 +1,7 @@
+#xxd -c 24 -i src/inline/list_tostring.np > src/inline/list_tostring.h
+#xxd -c 24 -i src/inline/json_encode.np > src/inline/json_encode.h
+#xxd -c 24 -i src/inline/json_decode.np > src/inline/json_decode.h
+
 OS=`uname`
 if [[ "$OS" == 'Darwin' ]]; then
     OS="macosx"

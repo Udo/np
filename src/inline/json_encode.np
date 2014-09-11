@@ -1,0 +1,37 @@
+=> { obj |
+	new doSerialize
+	
+	new serializers = (:
+    
+		number = { n | => n }
+    
+		string = { s | => convert.quote(s) }
+		
+		[nil] = { | => 'null' }
+		
+		boolean = { b | if(b) => 'true' else => 'false' }
+		
+	  list = { l | 
+		  new items = (:)
+			if(l:keyCount() > 0) {
+			  l:each{ v k |
+				  items += convert.quote(k) << ':' << doSerialize(v)
+					}
+				=> '{ ' << items:join(', ') << ' }'	
+				}
+			else {
+			  l:items{ v |
+				  items += doSerialize(v)
+					}
+				=> '[ ' << items:join(', ') << ' ]'
+				}
+	    }
+			
+	  )
+	
+	doSerialize = { o |
+	  => serializers[type(o)](o)
+		}
+	
+  => doSerialize(obj)
+  }

@@ -682,7 +682,7 @@ static int tbl_toString (lua_State *L) {
   } \
   => '(: ' << o << ')' \
 }")) {
-  	lua_pushvalue(L, 1);
+	  lua_pushvalue(L, 1);
 		lua_call(L, 1, 1);
   }
 	else {
@@ -824,7 +824,7 @@ static const luaL_Reg tab_funcs[] = {
   {"keyCount", tbl_keyCount},
   {"sort", tbl_sort},
   {"iSort", tbl_isort},
-  {"toString", tbl_toString},
+  //{"toString", tbl_toString},
   {NULL, NULL}
 };
 
@@ -847,8 +847,12 @@ static void createmetatable (lua_State *L) {
 }
 #endif
 
+#include "inline/list_tostring.h"
+
 LUAMOD_API int luaopen_table (lua_State *L) {
   luaL_newlib(L, tab_funcs);
+	luaL_dostring(L, src_inline_list_tostring_np);
+	lua_setfield(L, -2, "toString");
 #if defined(LUA_COMPAT_UNPACK)
   /* _G.unpack = table.unpack */
   lua_getfield(L, -1, "expand");

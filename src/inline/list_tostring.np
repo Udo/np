@@ -1,0 +1,13 @@
+=> { l | 
+  new o = '' 
+  l:items{ v | 
+    if(type(v) == 'string') { v = convert.format('%q' v) } else { v = convert.toString(v) } 
+	  o <<= v << ' '; 
+  } 
+  l:each{ v k | 
+		if(type(k) != 'number') { 
+	    if(type(v) == 'string') { v = convert.format('%q' v) } else { v = convert.toString(v) } 
+			o <<= k << '=' << v << ' ' } 
+  } 
+  => '(: ' << o << ')' 
+}
