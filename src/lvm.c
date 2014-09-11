@@ -362,8 +362,12 @@ void luaV_concat (lua_State *L, int total, TMS event) {
     int n = 2;  /* number of elements handled in this pass (at least 2) */
     
 		if (!(ttisstring(top-2) || ttisnumber(top-2)) || !tostring(L, top-1)) {
-      if (!call_binTM(L, top-2, top-1, top-2, event))
-        luaG_concaterror(L, top-2, top-1);
+      if (!call_binTM(L, top-2, top-1, top-2, event)) {
+			  lua_getglobal(L, LUA_POLICYLIBNAME);
+				lua_getfield(L, -1, "nilConcat");
+				callTM(L, L->top-1, top-2, top-1, top-2, 1);
+        //luaG_concaterror(L, top-2, top-1);
+      }
     }
     else if (tsvalue(top-1)->len == 0)  /* second operand is empty? */
       (void)tostring(L, top - 2);  /* result is first operand */

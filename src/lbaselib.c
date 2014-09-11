@@ -18,7 +18,7 @@
 
 #include "lauxlib.h"
 #include "lualib.h"
-
+#include "lstring.h"
 
 static int luaB_print (lua_State *L) {
   int n = lua_gettop(L);  /* number of arguments */
@@ -221,13 +221,19 @@ static const luaL_Reg base_funcs[] = {
   {NULL, NULL}
 };
 
-static int trap_nilEvent (lua_State *L) {
+static int trap_returnNil (lua_State *L) {
 	lua_pushnil(L);
 	return(1);
 }
 
+static int trap_returnEmpty (lua_State *L) {
+	lua_pushstring(L, "");
+	return(1);
+}
+
 static const luaL_Reg trap_lib[] = {
-  {"nilEvent", trap_nilEvent},
+  {"nilEvent", trap_returnNil},
+  {"nilConcat", trap_returnNil},
   {NULL, NULL}
 };
 
