@@ -666,7 +666,7 @@ static int tbl_items (lua_State *L) {
   return 1;
 }
 
-static int tbl_toString (lua_State *L) {
+/*static int tbl_toString (lua_State *L) {
 	luaL_checktype(L, 1, LUA_TTABLE);
 	//int lua_pcall (lua_State *L, int nargs, int nresults, int errfunc);
 	if(!luaL_dostring(L, "=> { l | \
@@ -689,7 +689,7 @@ static int tbl_toString (lua_State *L) {
 		lua_pushliteral(L, "[list]");
 	}
 	return 1;
-}
+}*/
 
 static int tbl_size (lua_State *L) {
   int t = lua_type(L, 1);
@@ -851,7 +851,7 @@ static void createmetatable (lua_State *L) {
 
 LUAMOD_API int luaopen_table (lua_State *L) {
   luaL_newlib(L, tab_funcs);
-	luaL_dostring(L, src_inline_list_tostring_np);
+	luaL_dostring(L, src_inline_list_tostring_np); // implemented in np
 	lua_setfield(L, -2, "toString");
 #if defined(LUA_COMPAT_UNPACK)
   /* _G.unpack = table.unpack */
