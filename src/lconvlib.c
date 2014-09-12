@@ -464,10 +464,8 @@ static const luaL_Reg conv_funcs[] = {
 
 LUAMOD_API int luaopen_conv (lua_State *L) {
   luaL_newlib(L, conv_funcs);
-	/*
 	luaL_addinlinefunction(L, src_inline_json_encode_np, "toJSON", -2);
 	luaL_addinlinefunction(L, src_inline_json_decode_np, "fromJSON", -2);
 	luaL_addinlinefunction(L, src_inline_to_querystring_np, "toQueryString", -2);
-	*/
   return 1;
 }

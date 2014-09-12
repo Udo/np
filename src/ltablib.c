@@ -851,7 +851,7 @@ static void createmetatable (lua_State *L) {
 
 LUAMOD_API int luaopen_table (lua_State *L) {
   luaL_newlib(L, tab_funcs);
-	//luaL_addinlinefunction(L, src_inline_list_tostring_np, "toString", -2);
+	luaL_addinlinefunction(L, src_inline_list_tostring_np, "toString", -2);
 #if defined(LUA_COMPAT_UNPACK)
   /* _G.unpack = table.unpack */
   lua_getfield(L, -1, "expand");

@@ -841,7 +841,7 @@ LUALIB_API void luaL_openlib (lua_State *L, const char *libname,
 /* }====================================================== */
 
 LUALIB_API void luaL_addinlinefunction(lua_State *L, const char *funcString, const char *funcName, int stackPos) {
-	luaL_dostring(L, funcString);
+	luaL_dostring(L, "=> {| => ''}");
 	lua_setfield(L, stackPos, funcName);
 }
 
