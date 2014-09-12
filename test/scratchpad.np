@@ -1,3 +1,1 @@
-new l = (: 1 2 3)
-
-print(convert.fromJSON(convert.toJSON(l)))
+print(convert.escapeURI('b=234'))

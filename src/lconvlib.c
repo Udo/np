@@ -152,6 +152,41 @@ static void addquoted (lua_State *L, luaL_Buffer *b, int arg) {
   luaL_addchar(b, '"');
 }
 
+static void addquotedHTML (lua_State *L, luaL_Buffer *b, int arg) {
+  size_t l;
+  const char *s = luaL_checklstring(L, arg, &l);
+  while (l--) {
+		switch(*s) {
+			case '"': { luaL_addstring(b, "&quot;"); break; }
+			case '\'': { luaL_addstring(b, "&apos;"); break; }
+			case '&': { luaL_addstring(b, "&amp;"); break; }
+			case '<': { luaL_addstring(b, "&lt;"); break; }
+			case '>': { luaL_addstring(b, "&gt;"); break; }
+			default: {
+	      luaL_addchar(b, *s);
+			}
+		}
+    s++;
+  }
+}
+
+static void addquotedURI (lua_State *L, luaL_Buffer *b, int arg) {
+  size_t l;
+  const char *s = luaL_checklstring(L, arg, &l);
+  while (l--) {
+		if(isalnum(*s)) {
+			luaL_addchar(b, *s);
+		}
+		else {
+			luaL_addchar(b, '%');
+			char enc[3];
+			sprintf(enc, "%0x", *s);
+			luaL_addlstring(b, enc, 2);
+		}
+    s++;
+  }
+}
+
 static void addunquote (lua_State *L, luaL_Buffer *b, int arg) {
   size_t l, ol;
   const char *s = luaL_checklstring(L, arg, &l);
@@ -320,6 +355,22 @@ static int luaCV_quote (lua_State *L) {
   return 1;
 }
 
+static int luaCV_escHTML (lua_State *L) {
+  luaL_Buffer b;
+  luaL_buffinit(L, &b);
+	addquotedHTML(L, &b, 1);
+  luaL_pushresult(&b);
+  return 1;
+}
+
+static int luaCV_escURI (lua_State *L) {
+  luaL_Buffer b;
+  luaL_buffinit(L, &b);
+	addquotedURI(L, &b, 1);
+  luaL_pushresult(&b);
+  return 1;
+}
+
 static int luaCV_unquote (lua_State *L) {
   luaL_Buffer b;
   luaL_buffinit(L, &b);
@@ -338,6 +389,7 @@ void pushBuffer(lua_State *L, luaL_Buffer *b, int arg, int *pos) {
 }
 
 static int luaCV_tokenize (lua_State *L) {
+	// todo: negative numbers and exponentials
   size_t l;
 	int pos = 1;
   luaL_Buffer bToken;
@@ -398,6 +450,8 @@ static const luaL_Reg conv_funcs[] = {
   {"toString", luaCV_tostring},
   {"format", str_format},
 	{"quote", luaCV_quote},
+	{"escapeHTML", luaCV_escHTML},
+	{"escapeURI", luaCV_escURI},
 	{"unquote", luaCV_unquote},
 	{"tokenize", luaCV_tokenize},
 	{NULL, NULL}
