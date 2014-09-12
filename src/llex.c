@@ -179,7 +179,7 @@ void luaX_setinput (lua_State *L, LexState *ls, ZIO *z, TString *source,
 	if(fnr == NULL) fnr = fnclean;
 	ls->filename = luaS_newlstr(L, fnclean, strlen(fnclean));
 	char *dn = dirname(fnr);
-	strcat(dn, "/");
+	//strcat(dn, "/"); fixme
 	ls->dirname = luaS_newlstr(L, dn, strlen(dn));
   ls->envn = luaS_new(L, LUA_ENV);  /* create env name */
   luaS_fix(ls->envn);  /* never collect this name */
