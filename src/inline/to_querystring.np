@@ -1,0 +1,7 @@
+=> { l |
+	new items = (:)
+	list.each(l { v k |
+		items += convert.escapeURI(k) << '=' << convert.escapeURI(v)
+	  })
+	=> items:join('&')
+  }

@@ -180,7 +180,8 @@ static void addquotedURI (lua_State *L, luaL_Buffer *b, int arg) {
 		else {
 			luaL_addchar(b, '%');
 			char enc[3];
-			sprintf(enc, "%0x", *s);
+			unsigned char cur = *s;
+			sprintf(enc, "%0x", cur);
 			luaL_addlstring(b, enc, 2);
 		}
     s++;
@@ -459,10 +460,12 @@ static const luaL_Reg conv_funcs[] = {
 
 #include "inline/json_encode.h"
 #include "inline/json_decode.h"
+#include "inline/to_querystring.h"
 
 LUAMOD_API int luaopen_conv (lua_State *L) {
   luaL_newlib(L, conv_funcs);
 	luaL_addinlinefunction(L, src_inline_json_encode_np, "toJSON", -2);
 	luaL_addinlinefunction(L, src_inline_json_decode_np, "fromJSON", -2);
+	luaL_addinlinefunction(L, src_inline_to_querystring_np, "toQueryString", -2);
   return 1;
 }

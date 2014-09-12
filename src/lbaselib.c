@@ -234,6 +234,7 @@ static int trap_returnEmpty (lua_State *L) {
 static const luaL_Reg trap_lib[] = {
   {"nilEvent", trap_returnNil},
   {"nilConcat", trap_returnNil},
+  {"emptyString", trap_returnEmpty},
   {NULL, NULL}
 };
 

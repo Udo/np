@@ -1,1 +1,3 @@
-print(convert.escapeURI('b=234'))
+new q = (: a = 1 b = 'blah;')
+
+print(convert.toQueryString(q))
