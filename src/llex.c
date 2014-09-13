@@ -44,7 +44,8 @@ static const char *const luaX_tokens [] = {
 		"/*until*/", "while", "..", "...", "==", 
 		">=", "<=", "!=", "::", "<eof>",
     "<number>", "<name>", "<string>", "(:", ")",
-		"?", ":", "=>"
+		"?", ":", "=>",
+		"<printstring>"
 };
 
 
@@ -423,6 +424,42 @@ static void read_alpha_string (LexState *ls, SemInfo *seminfo) {
   seminfo->ts = ts;
 }
 
+static void read_print_string (LexState *ls, SemInfo *seminfo) {
+  if (currIsNewline(ls))  /* string starts with a newline? */
+    inclinenumber(ls);  /* skip it */
+  for (;;) {
+    switch (ls->current) {
+      case EOZ:
+        save(ls, ' '); save(ls, ' ');
+				goto endloop;
+        break;  /* to avoid warnings */
+      case '<': {
+        next(ls);
+				if(ls->current == '?') {
+					next(ls);
+					goto endloop;
+				} else {
+					save(ls, '<'); 
+					save_and_next(ls);
+				}
+        break;
+      }
+      case '\n': case '\r': {
+        save(ls, '\n');
+        inclinenumber(ls);
+        if (!seminfo) luaZ_resetbuffer(ls->buff);  /* avoid wasting space */
+        break;
+      }
+      default: {
+        if (seminfo) save_and_next(ls);
+        else next(ls);
+      }
+    }
+  } endloop:
+  if (seminfo)
+    seminfo->ts = luaX_newstring(ls, luaZ_buffer(ls->buff) + 1,
+                                     luaZ_bufflen(ls->buff) - 1);
+}
 
 static int llex (LexState *ls, SemInfo *seminfo) {
   luaZ_resetbuffer(ls->buff);
@@ -497,6 +534,13 @@ static int llex (LexState *ls, SemInfo *seminfo) {
         next(ls);
         if (ls->current != ':') return ':';
         else { next(ls); return TK_DBCOLON; }
+      }
+      case '?': {
+        next(ls);
+        if (ls->current != '>') return '?';
+        else { next(ls); 
+					read_print_string(ls, seminfo);
+					return TK_PRINTSTRING; }
       }
       case '|': {
         next(ls);

@@ -1865,6 +1865,10 @@ static void statement (LexState *ls) {
       break;
     }
     */
+		case TK_PRINTSTRING: {
+			luaX_next(ls);
+			break;
+		}
     case TK_LOCAL: {  /* stat -> localstat */
       luaX_next(ls);  /* skip LOCAL */
       /*

@@ -1,2 +1,3 @@
-new f = { v | => v^2 }
-print(call(f 10))
+print('test')?>
+bla
+<?print(1)
