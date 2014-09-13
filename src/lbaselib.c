@@ -201,6 +201,13 @@ static int luaB_type (lua_State *L) {
   return 1;
 }
 
+static int luaB_call (lua_State *L) {
+  luaL_checktype(L, 1, LUA_TFUNCTION);
+	int argCount = lua_gettop(L) - 1;
+	lua_call(L, argCount, 3);
+  return 3;
+}
+
 static const luaL_Reg base_funcs[] = {
  // {"toString", luaB_tostring},
   {"assert", luaB_assert},
@@ -217,6 +224,7 @@ static const luaL_Reg base_funcs[] = {
   {"print", luaB_print},
   {"select", luaB_select},
   {"type", luaB_type},
+  {"call", luaB_call},
   /*{"xpcall", luaB_xpcall},*/
   {NULL, NULL}
 };

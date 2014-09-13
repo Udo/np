@@ -53,4 +53,10 @@ assert( l:toString() == '(: 1 2 3 4 5 )' 'list concat test' )
 fbz <<= 'test2'
 assert( fbz == 'testtest2' 'string << string must yield stringstring' )
 
+new l = (: 1 2 3 k1 = 10 )
+assert( l:keys():toString() == '(: "k1" )' 'list.keys() failed' )
+
+new f = { v | => v^2 }
+assert( call(f 10) == 100 'call() not working')
+
 print('- all tests passed');

@@ -1,8 +1,2 @@
-new fbz
-fbz <<= 'test'
-print('nil << string' fbz)
-new l = (: 1 2 3)
-l <<= (: 4 5)
-print('list concat' l)
-fbz <<= 'test2'
-print('string << string' fbz)
+new f = { v | => v^2 }
+print(call(f 10))

@@ -557,6 +557,29 @@ static int tbl_each (lua_State *L) {
   return 1;
 }
 
+// todo: this is horrible, see luaH_next for ideas on how to do it with less overhead
+static int tbl_keys (lua_State *L) {
+  luaL_checktype(L, 1, LUA_TTABLE);
+	lua_settop(L, 1); // source table at #1
+	lua_createtable(L, 0, 0); // new table at #2
+	int vTop = lua_gettop(L); // basis for reasoning about loop vars
+	int countIdx = 0;
+  
+	lua_pushnil(L);  /* first key */
+  while (lua_next(L, 1)) {
+		if (lua_type(L, vTop+1) != LUA_TNUMBER) {
+			countIdx += 1;
+			lua_pushnumber(L, countIdx);
+			lua_pushvalue(L, vTop+1);
+			lua_settable(L, 2);
+		}
+		lua_pop(L, 1);
+  }
+	
+  lua_pushvalue(L, 2); // push result
+  return 1;
+}
+
 static int tbl_find_constant (lua_State *L) {
   int i = 0;
   lua_pushnil(L);  /* first key */
@@ -805,6 +828,7 @@ static const luaL_Reg tab_funcs[] = {
   {"copy", tbl_copy},
   {"create", tbl_create},
   {"each", tbl_each},
+  {"keys", tbl_keys},
   {"expand", unpack},
   {"find", tbl_find},
   {"insert", tbl_insert},  // insert(list, item) or insert(list, pos, item)
