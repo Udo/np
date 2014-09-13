@@ -361,7 +361,8 @@ void luaV_concat (lua_State *L, int total, TMS event) {
     StkId top = L->top;
     int n = 2;  /* number of elements handled in this pass (at least 2) */
     
-		if (!(ttisstring(top-2) || ttisnumber(top-2)) || !tostring(L, top-1)) {
+		//if (!(ttisstring(top-2) || ttisnumber(top-2)) || !tostring(L, top-1)) {
+		if (ttistable(top-2)) {
       if (!call_binTM(L, top-2, top-1, top-2, event)) {
 			  // fixme?
 				lua_getglobal(L, LUA_POLICYLIBNAME);

@@ -1,3 +1,8 @@
-new q = (: a = 1 b = 'blah;')
-
-print(convert.toQueryString(q))
+new fbz
+fbz <<= 'test'
+print('nil << string' fbz)
+new l = (: 1 2 3)
+l <<= (: 4 5)
+print('list concat' l)
+fbz <<= 'test2'
+print('string << string' fbz)

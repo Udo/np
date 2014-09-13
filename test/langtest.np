@@ -44,6 +44,13 @@ root.policies.nilEvent = { | lt2.nilEventHandled = true }
 lt2.nonExistent2:someBogusCall2() -- should be going through the new nilEvent handler
 assert( lt2.nilEventHandled 'trap.nilEvent not handled' )
 
-
+new fbz
+fbz <<= 'test'
+assert( fbz == 'test' 'nil << string must yield string' )
+new l = (: 1 2 3) 
+l <<= (: 4 5)
+assert( l:toString() == '(: 1 2 3 4 5 )' 'list concat test' )
+fbz <<= 'test2'
+assert( fbz == 'testtest2' 'string << string must yield stringstring' )
 
 print('- all tests passed');
