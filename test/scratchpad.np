@@ -1,3 +1,3 @@
-print('test')?>
-bla
-<?print(1)
+new f = file.open('test/libtest.np')
+
+f:each{ l | print(#line l) }
