@@ -824,7 +824,7 @@ static int tbl_containsKeys (lua_State *L) {
 	}
   luaL_checktype(L, 1, LUA_TTABLE);
   luaL_checktype(L, 2, LUA_TTABLE);
-	Table *h2 = hvalue(L->top - 1);
+	Table *h2 = hvalue(L->top - 2);
   lua_settop(L, 2);
 
 	if(equalobj(L, L->top-1, L->top-2)) {
@@ -833,7 +833,7 @@ static int tbl_containsKeys (lua_State *L) {
 	}
 	
   lua_pushnil(L);  /* first key */
-  while (lua_next(L, 1)) {
+  while (lua_next(L, 2)) {
 		const TValue *res = luaH_get(h2, L->top - 2); 
 		if(ttisnil(res)) {
 			lua_pushboolean(L, 0);
