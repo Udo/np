@@ -65,6 +65,19 @@ print(l1:first())") ?>
   
   <br/>
 
+<? displayFunctionHead(':can', array('functionName'), array('boolean')) ?>
+
+  <p>
+  Checks whether the current list responds to events called <code>functionName</code>.
+  </p>
+
+  <?= formatCode("new l1 = (: 10 20 30 )
+print( l1:can(#reverse) )") ?>
+  
+  <?= formatOutput("true") ?>
+  
+  <br/>
+
 <? displayFunctionHead(':clear', array(), array('list')) ?>
 
   <p>
@@ -89,6 +102,21 @@ print( l )") ?>
 print( l:concat(:3 4) )") ?>
   
   <?= formatOutput("(: 1 2 3 4 )") ?>
+  
+  <br/>
+
+<? displayFunctionHead(':containsKeys', array('list2'), array('boolean')) ?>
+
+  <p>
+  Checks whether the current list contains all the keys of <code>list2</code>.
+  </p>
+
+  <?= formatCode("new l1 = (: ka=10 kb=20 )
+new l2 = (: ka=10 kb=20 kc=30 )
+new l3 = (: ka=10 )
+print( l1:containsKeys(l2) l1:containsKeys(l3) )") ?>
+  
+  <?= formatOutput("false true") ?>
   
   <br/>
 
@@ -205,6 +233,22 @@ print( l:iConcat(:3 4) )") ?>
   
   <br/>
 
+<? displayFunctionHead(':implements', array('eventList'), array('boolean')) ?>
+
+  <p>
+  Checks whether the current list implements all the events in <code>eventList</code>.
+  </p>
+
+  <?= formatCode("new l1 = (: 10 20 30 )
+print( 
+  l1:implements(list) 
+  l1:implements(: something = 'else' ) 
+  )") ?>
+  
+  <?= formatOutput("true false") ?>
+  
+  <br/>
+
 <? displayFunctionHead(':insert', array('position', 'value'), array('list')) ?>
 
   <p>
@@ -274,6 +318,19 @@ l:items{ v | print(v) }") ?>
 print( l:join(', ') )") ?>
   
   <?= formatOutput("1, 2") ?>
+  
+  <br/>
+
+<? displayFunctionHead(':keys', array(), array('list')) ?>
+
+  <p>
+  Returns a list of all the non-numeric keys used in the list.
+  </p>
+
+  <?= formatCode("new l = (: 1 2 myKey=3)
+print( l:keys() )") ?>
+  
+  <?= formatOutput("(: 'myKey' )") ?>
   
   <br/>
 
@@ -389,7 +446,7 @@ print( l:toString() )") ?>
 <!---------------------------------------------------------------->
 <h2>Library Functions</h2>
 
-<? displayFunctionHead('list.condense', array('value1', '[value2]', '[...]'), array('list')) ?>
+<? displayFunctionHead('condense', array('value1', '[value2]', '[...]'), array('list')) ?>
 
   <p>
   Condenses the parameters passed to the function into a list. This works with the variable argument list operator (...) as well.

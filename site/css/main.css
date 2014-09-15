@@ -13,10 +13,13 @@
 body { 
   color: <?= $textColor1 ?>;
   font-family: 'jaf-facitweb', 'Hevetica Neue', 'Helvetica', 'Segoe UI', 'Roboto', 'Droid Sans', Arial, sans-serif !important;
-  line-height: 150%;
+  line-height: 160%;
   text-align: center; margin: 0 0 0 0; vertical-align: middle; 
-  font-size: 15px;
 } 
+
+body, code, pre {
+  font-size: 14px;
+}
 
 code, pre, .pre {
 font-family: 'Pragmata Pro', 'Liberation Mono', 'Source Code Pro', 'Droid Sans', 'Envy Code R', Consolas, Menlo, monospace !important;  
@@ -46,7 +49,7 @@ font-family: 'Pragmata Pro', 'Liberation Mono', 'Source Code Pro', 'Droid Sans',
 }
 
 .docbody {
-  width: 640px;
+  width: 680px;
 }
 
 .col-5 a {

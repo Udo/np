@@ -15,9 +15,10 @@ ob_start();
   <div>
   
     <p>
-    The easiest way to try out np is by simply using this handy tutorial, which allows you to
-    enter and execute code right from the convenience of your own browser. This tutorial is intended
+    Enter and execute code right from the convenience of your own browser. 
+    This tutorial is intended
     for people who already know one or more other programming languages.
+    Click on the blue arrows to run any piece of example code.
     <div align="right">try it out ⇥</div>
     </p>
     
@@ -90,13 +91,13 @@ places:each { thing |
     to help you with this.
   </p>
   
-  <?= formatCode("print('Commencing FizzBuzz Sequence...')
+  <?= formatCode("
 for i = 1, 100 {
-  new fbResult 
-  if (i % 3 == 0) fbResult = 'Fizz' 
-  if (i % 5 == 0) fbResult <<= 'Buzz' 
-  if (!fbResult) fbResult = i 
-  print(fbResult)
+  new fbz 
+  if (i % 3 == 0) fbz = 'Fizz' 
+  if (i % 5 == 0) fbz <<= 'Buzz' 
+  if (!fbz) fbz = i 
+  print(fbz)
 }") ?>
   
   <h3>for Loops</h3>
@@ -106,8 +107,8 @@ for i = 1, 100 {
   counts from a number to another number, storing the result in a variable each time.
   We called this variable <code>i</code> in the example. The generic for of the for loop
   looks like this:
-    <pre>for loopVariable = fromNumber, toNumber[, optionalStepSize] {
-}</pre>
+    <pre>for loopVariable = fromNumber, toNumber 
+  doStuff()</pre>
   </p>
   
   <h3>if Statements</h3>
@@ -118,11 +119,13 @@ for i = 1, 100 {
   the code more readable. The generic form looks like this:
   </p>
 
-  <pre>if (condition1) { 
+  <pre>if (condition1) 
   thenDoSomeStuff()  
-else (condition2) 
-  elseDoOtherStuff() 
-}</pre>
+elseif (condition2) 
+  doOtherStuff() 
+else
+  elseWhatever()
+</pre>
 
   <p>
     If there is just one statement after the condition, you can omit the curly braces for terseness.
@@ -151,7 +154,7 @@ else (condition2)
   </p>
   
   <p>
-  To chain two strings together, np employs <code>..</code> (the concatenation operator).
+  To chain two strings together, np employs <code>&lt;&lt;</code> (the concatenation operator).
   </p>
   
   <p>
@@ -215,10 +218,10 @@ print(fizzBuzzer(15))") ?>
   Or you can condense all results into a list:
   </p>
   
-  <?= formatCode("new myPreciousss = list.condense(fizzBuzzer(150))
-myPreciousss:each { v |
-  print(v)
-  }") ?>
+  <?= formatCode("
+-- condense all return values into a list
+print( list.condense(fizzBuzzer(150)) )
+") ?>
 
   <p>
   Likewise, you can expand a list into several function parameters:
@@ -336,13 +339,13 @@ f()") ?>
   guessMe = { guess |
     if guess == secretNumber
       => 'Darn, you guessed it'
-    otherwise
+    else
       => 'Nope, fail haha'
   }
 }
-print(guessMe(1))
-print(guessMe(13))
-print(guessMe(42))") ?>
+print( guessMe(1) )
+print( guessMe(13) )
+print( guessMe(42) )") ?>
   
   <p>
   This example shows how easy it is to give functions and objects an internal
@@ -361,44 +364,67 @@ print(guessMe(42))") ?>
     events they can respond to. 
     There are some standard events that allow you to modify how
     a list responds to common incidents - but you can also specify
-    your own. In this sense, event handlers in np are a lot like class
-    methods in other languages.
+    your own. Event handlers in np are a lot like class
+    methods in other languages, except there are no classes involved.
+    Events are simply a way of assigning behavior to objects.
   </p>
   
   <p>
-  Let's make a Bugbear that can talk, by providing a <code>say</code> event:
+    As an example, let's introduce Bjørn the Bugbear:
   </p>
   
-  <?= formatCode("new BugbearEvents = (:
-  say = { creature text | 
-    print(creature.name 'says:' text 'BURP!') }
+  <?= formatCode("new bjorn = (: name = 'Bjørn' )
+print( 'My name is' bjorn.name )") ?>
+  
+  <p>
+    Bjørn has a name, but he lacks the ability to introduce himself.
+    Let's change that by giving him the ability to speak:
+  </p>
+
+<?= formatCode("
+new BurpTalker = (:
+  say = { me text | 
+    print( me.name << ' says: ' << text << ' BURP!' ) }
   )
-new bear = BugbearEvents:create(: name = 'Bjorn' )
-bear:say('Hello everybody!')") ?>
-
+new bjorn = BurpTalker:create(: name = 'Bjørn' )
+bjorn:say('Hi!') ") ?>
+  
   <p>
-  np also gives you a standard event called <code>init</code> which provides a neat place to initialize lists at the moment of creation: 
+  By using the <code>create</code> event, we have made a new object
+  containing the name Bjørn, and assigned the BurpTalker behavior
+  to it.
   </p>
 
+  <p>
+    Since event lists such as the BurpTalker in the example are just
+    normal lists containing functions, np allows makes it easy to mix event lists 
+    together in order to combine and manipulate capabilities.
+    You can also change the event list of an already existing object.
+    Let's see both in action:
+  </p>
+  
   <?= formatCode("
-new BugbearEvents = (:
-  say = { creature text | 
-    print(creature.name #the creature.species 
-      'says:' text 'BURP!') }
-  init = { creature | 
-    creature.species = #Bugbear }
+new BurpTalker = (:
+  say = { me text | 
+    print( me.name << ' says: ' << text << ' BURP!' ) }
   )
-new bear = BugbearEvents:create(: name = 'Bjorn' )
-bear:say('Hello everybody!')") ?>
+-- make a Bjørn
+new bjorn = (: name = 'Bjørn' )
+-- assign normal list behavior and burp behavior
+bjorn:bind( list << BurpTalker )
+-- take him for a spin
+bjorn:say('Hi!') ") ?>
 
   <p>
-  In this example, we use the <code>create</code> handler to give
-  Bjorn a species field. 
+    In the example before, Bjørn was just a BurpTalker, lacking the normal
+    capabilities of a list object. In this example, we combine the
+    standard <code>list</code> behavior with the burping to
+    achieve a more fully-featured Bugbear.
   </p>
 	
 <h3>Summary</h3>
 
-  <p>So in this tutorial, we covered a lot and illustrated it with contrived examples! 
+  <p>So in this tutorial we covered a lot and illustrated it with contrived examples! 
     You learned about basic functions, how to use functions and other syntax, how scope
     works, that lists are the basic object type in np, and how objects can respond to
     events.
@@ -414,6 +440,6 @@ $c = ob_get_clean();
 
 print(str_replace('<pre class="sh_np">', '<a class="loadsrc" title="execute this code example"
   onclick="document.getElementById(\'srcwnd\').setAttribute(\'src\', 
-    \'invoke/cgidemo.php?code=\'+escape($(this).next().text()));">⇥</a><pre class="sh_np">', $c));
+    \'invoke/cgidemo.php?code=\'+encodeURIComponent($(this).next().text()));">⇥</a><pre class="sh_np">', $c));
 
 ?>

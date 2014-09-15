@@ -81,6 +81,18 @@ root.require = nil
 $b1 = '#fcfcfc';
 $b2 = '#f8f8f8';
 
+function WriteToFile($filename, $content)
+{
+  $open = fopen($filename, 'a+');
+  fwrite($open, $content);
+  fclose($open);
+}
+
+@WriteToFile('invoke.log', date('Y-m-d H:i').chr(9).
+  $_SERVER["HTTP_CF_IPCOUNTRY"].chr(9).
+  'ip='.$_SERVER['REMOTE_ADDR'].chr(9).'ref='.$_SERVER['HTTP_REFERER'].chr(9).
+  '/'.http_build_query($_REQUEST).chr(10));
+
 ?>
 
 <pre id="out"><?= htmlspecialchars($out) ?></pre>

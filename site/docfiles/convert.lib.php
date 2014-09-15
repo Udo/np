@@ -21,6 +21,31 @@
 
 <h2>Library Functions</h2>
 
+<? displayFunctionHead('escapeHTML', array('raw'), array('escapedString')) ?>
+
+  <p>
+  Escapes a value such that HTML-relevant characters are transformed into their
+  corresponding entities. 
+  </p>
+
+  <?= formatCode("print( convert.escapeHTML('<script>alert(\"foo!\");</script>') )") ?>
+  
+  <?= formatOutput(htmlspecialchars('<script>alert(\"foo!\");</script>')) ?>
+  
+  <br/>
+  
+<? displayFunctionHead('escapeURI', array('raw'), array('escapedString')) ?>
+
+  <p>
+  Encodes a string so it becomes a validly escaped URL component. 
+  </p>
+
+  <?= formatCode("print( '?b=' << convert.escapeURI('look at that!') )") ?>
+  
+  <?= formatOutput('?b=look%20at%20that%21') ?>
+  
+  <br/>
+
 <? displayFunctionHead('format', array('formatString', 'value1', '...'), array('string')) ?>
 
   <p>
@@ -56,6 +81,19 @@ string: hello
 string with padding:      hello
 unsigned integer: 100
 hex: 64 64') ?>
+  
+  <br/>
+  
+<? displayFunctionHead('quote', array('value'), array('string')) ?>
+
+  <p>
+  Functionally identical to <code>convert.format('%q', someString)</code>,
+  the quote function quote-escapes a value.
+  </p>
+
+  <?= formatCode("print( convert.quote('\"Look at me!') )") ?>
+  
+  <?= formatOutput('"\\"Look at me!"') ?>
   
   <br/>
 
@@ -95,15 +133,17 @@ Yo!") ?>
   
   <br/>
 
-<? displayFunctionHead('type', array('value'), array('string')) ?>
+
+<? displayFunctionHead('unquote', array('string'), array('string')) ?>
 
   <p>
-  Returns the primitive type of an object. This can be either <code>nil, boolean, number, string, list, function, thread, or userdata</code>.
+  Reverses the escaping performed by <code>format.quote</code>.
   </p>
 
-  <?= formatCode("print( convert.type(1) )") ?>
+  <?= formatCode("print( convert.unquote('\"\\\"Look at me!\"') )") ?>
   
-  <?= formatOutput("number") ?>
+  <?= formatOutput('"Look at me!') ?>
   
   <br/>
+
 

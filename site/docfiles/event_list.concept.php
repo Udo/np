@@ -1,7 +1,7 @@
 <?php
 
   $info = array(
-    'title' => 'event list',
+    'title' => 'event list (under construction)',
     'type' => 'concept',
     'tags' => array(),
     'params' => array(

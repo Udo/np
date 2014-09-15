@@ -5,6 +5,7 @@ fcgi/
 .DS_Store
 *.o
 *.a
+*.log
 bin/np
 bin/npc
 build

@@ -231,7 +231,7 @@ simxle') ?>
 <!---------------------------------------------------------------->
 <h2>Library Functions</h2>
 
-<? displayFunctionHead('string.char', array('asciiValue'), array('string')) ?>
+<? displayFunctionHead('char', array('asciiValue'), array('string')) ?>
 
   <p>
   Given an ASCII code, returns the appropriate character.

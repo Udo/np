@@ -43,46 +43,16 @@
     <a href="/tutorial">tutorial</a>.
   </p>
     
-  <h3>np as a Web Platform</h3>
-  
-  <p>
-    When I'm done with the base runtime, I'd like to give np a
-    FastCGI server and library support to do web development with.
-    The idea here is, that you only have to think about each
-    current request, as opposed to more heavy-weight application
-    server frameworks such as Ruby on Rails or Tomcat where the
-    app is running the whole time. In this respect, np server
-    will be a stateless environment, which eliminates a lot
-    of code and runtime complexity, and it should also make scaling
-    out easy.
-  </p>
-  
-  <h3>It's just an experiment</h3>
-
-  <p>
-    At this point, np is nothing but an experiment that popped into my head,
-    something I liked to try. It's not complete. You can't really do useful
-    things with it yet, but it's mature enough to at least head on over to the
-    tutorial and get a feel for the language.  
-  </p>
-  
-  <h3>So what are the dependencies?</h3>
+  <h3>What are the dependencies?</h3>
 
   <p>
     I tried to use as little external frameworks and libraries as possible, and this
     is actually the second iteration of the language. The first one was written in Java,
     and while it was interesting and kind of worked, it became clear to me that I wanted
-    to switch to a more minimal environment. So this second incarnation is based on the
-    Lua runtime which is fast, small, and easy to modify. The only dependency is glibc.
-  </p>
-
-  <h3>Does the world need another language?</h3>
-
-  <p>
-    Probably not, but it's fun anyway. There are some things I wanted to explore with
-    np, many of them have to do with dynamic typing and scope. 
-  </p>
-    
+    to switch to a more minimal environment. So this <a href="/luadiff">second incarnation is written in
+    C</a>, loosely based on the
+    <a href="http://www.lua.org/">Lua runtime</a> which is fast, small, and easy to modify. The only dependency is libc.
+  </p>    
     
     </td></tr>
   </table>
