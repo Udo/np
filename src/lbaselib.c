@@ -210,7 +210,8 @@ static int luaB_call (lua_State *L) {
 
 static int luaB_first (lua_State *L) {
 	int n = lua_gettop(L);
-	for(int idx = 0; idx < n; idx++) {
+	int idx = 0;
+	for(idx = 0; idx < n; idx++) {
 		if(!ttisnil(L->top - n + idx)) {
 			lua_pushvalue(L, idx+1);
 			return 1;
