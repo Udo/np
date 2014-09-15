@@ -857,6 +857,26 @@ static int tbl_implements (lua_State *L) {
 	return tbl_containsKeys(L);
 }
 
+static int tbl_can (lua_State *L) {
+  luaL_checktype(L, 1, LUA_TTABLE);
+	lua_settop(L, 2);
+	lua_getmetatable(L, 1);
+	if(ttisnil(L->top - 1)) {
+		lua_pushboolean(L, 0);
+		return 1;
+	}
+	
+	Table *h = hvalue(L->top - 1);
+	const TValue *res = luaH_get(h, L->top - 2); 
+	if(!ttisfunction(res)) {
+		lua_pushboolean(L, 0);
+	} else {
+		lua_pushboolean(L, 1);
+	}
+	
+	return 1;
+}
+
 /* }====================================================== */
 
 
@@ -886,6 +906,7 @@ static const luaL_Reg tab_funcs[] = {
   {"reverse", tbl_reverse},
   {"containsKeys", tbl_containsKeys},
   {"implements", tbl_implements},
+  {"can", tbl_can},
   {"iReverse", tbl_ireverse},
   {"size", tbl_size},
   {"keyCount", tbl_keyCount},

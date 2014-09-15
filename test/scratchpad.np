@@ -1,5 +1,5 @@
-new l = (:)
+new t3 = 'tadaaa'
 
-new l2 = list
-
-print( l:implements(l2) )
+print(
+first( false 1 t1 t2 t3 )
+  )

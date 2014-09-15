@@ -208,6 +208,18 @@ static int luaB_call (lua_State *L) {
   return 3;
 }
 
+static int luaB_first (lua_State *L) {
+	int n = lua_gettop(L);
+	for(int idx = 0; idx < n; idx++) {
+		if(!ttisnil(L->top - n + idx)) {
+			lua_pushvalue(L, idx+1);
+			return 1;
+		}
+	}
+	lua_pushnil(L);
+  return 1;
+}
+
 static const luaL_Reg base_funcs[] = {
  // {"toString", luaB_tostring},
   {"assert", luaB_assert},
@@ -225,6 +237,7 @@ static const luaL_Reg base_funcs[] = {
   {"select", luaB_select},
   {"type", luaB_type},
   {"call", luaB_call},
+  {"first", luaB_first},
   /*{"xpcall", luaB_xpcall},*/
   {NULL, NULL}
 };
