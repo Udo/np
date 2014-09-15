@@ -445,7 +445,7 @@ static int searcher_C (lua_State *L) {
 static int searcher_Croot (lua_State *L) {
   const char *filename;
   const char *name = luaL_checkstring(L, 1);
-  const char *p = strchr(name, '.');
+  const char *p = NULL;//strchr(name, '.');
   int stat;
   if (p == NULL) return 0;  /* is root */
   lua_pushlstring(L, name, p - name);
