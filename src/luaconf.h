@@ -108,7 +108,8 @@
 		LUA_LDIR"?.np;"  \
 		LUA_LDIR"?/_lib.np;" 
 #define LUA_CPATH_DEFAULT \
-		"?.so;" LUA_CDIR"?.so;"  
+		"?.so;" \
+		LUA_CDIR"?.so;"  
 #endif			/* } */
 
 

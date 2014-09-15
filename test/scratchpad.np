@@ -1,4 +1,1 @@
-new f = { a | a = a*10 => a*2 }
-
-new n = 1
-print( f(n) n )
+new luv = require(__dir__ << '/luv')

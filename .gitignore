@@ -6,6 +6,7 @@ fcgi/
 *.o
 *.a
 *.log
+*.so
 bin/np
 bin/npc
 build

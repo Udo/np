@@ -419,7 +419,7 @@ static int searcher_Lua (lua_State *L) {
 static int loadfunc (lua_State *L, const char *filename, const char *modname) {
   const char *funcname;
   const char *mark;
-  modname = luaL_gsub(L, modname, ".", LUA_OFSEP);
+  //modname = luaL_gsub(L, modname, ".", LUA_OFSEP); // WTF?
   mark = strchr(modname, *LUA_IGMARK);
   if (mark) {
     int stat;
