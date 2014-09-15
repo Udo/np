@@ -23,7 +23,7 @@ LUAMOD_API int (luaopen_coroutine) (lua_State *L);
 #define LUA_TABLIBNAME	"list"
 LUAMOD_API int (luaopen_table) (lua_State *L);
 
-#define LUA_IOLIBNAME	"file"
+#define LUA_IOLIBNAME	"iofile"
 LUAMOD_API int (luaopen_io) (lua_State *L);
 
 #define LUA_OSLIBNAME	"os"
