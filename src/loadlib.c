@@ -391,7 +391,7 @@ static const char *findfile (lua_State *L, const char *name,
   path = lua_tostring(L, -1);
   if (path == NULL)
     luaL_error(L, LUA_QL("package.%s") " must be a string", pname);
-  return searchpath(L, name, path, ".", dirsep);
+  return searchpath(L, name, path, "/", dirsep);
 }
 
 
