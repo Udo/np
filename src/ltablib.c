@@ -20,6 +20,8 @@
 #include "lapi.h"
 #include "luaconf.h"
 #include "lobject.h"
+#include "ltable.h"
+#include "lgc.h"
 
 #define aux_getn(L,n)	(luaL_checktype(L, n, LUA_TTABLE), luaL_len(L, n))
 
@@ -814,6 +816,35 @@ static int tbl_setevents (lua_State *L) {
   return 1;
 }
 
+static int tbl_keycheck (lua_State *L) {
+  int n = lua_gettop(L);
+	if(n == 1) {
+		lua_pushboolean(L, 0);
+		return 1;
+	}
+  luaL_checktype(L, 1, LUA_TTABLE);
+  luaL_checktype(L, 2, LUA_TTABLE);
+	Table *h2 = hvalue(L->top - 1);
+  lua_settop(L, 2);
+
+	if(equalobj(L, L->top-1, L->top-2)) {
+		lua_pushboolean(L, 1);
+		return 1;
+	}
+	
+  lua_pushnil(L);  /* first key */
+  while (lua_next(L, 1)) {
+		const TValue *res = luaH_get(h2, L->top - 2); 
+		if(ttisnil(res)) {
+			lua_pushboolean(L, 0);
+			return 1;
+		}
+		lua_pop(L, 1); // pop the hash value
+  }
+	
+	lua_pushboolean(L, 1);
+  return 1;
+}
 
 
 /* }====================================================== */
@@ -843,6 +874,7 @@ static const luaL_Reg tab_funcs[] = {
   {"reduce", tbl_reduce},
   {"pop", tbl_pop},
   {"reverse", tbl_reverse},
+  {"containsKeys", tbl_keycheck},
   {"iReverse", tbl_ireverse},
   {"size", tbl_size},
   {"keyCount", tbl_keyCount},

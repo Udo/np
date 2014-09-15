@@ -59,4 +59,17 @@ assert( l:keys():toString() == '(: "k1" )' 'list.keys() failed' )
 new f = { v | => v^2 }
 assert( call(f 10) == 100 'call() not working')
 
+-- testing containsKeys
+new l1 = (: k1 = 11 k2 = 12)
+new l2 = l1
+new l3 = (: k3 = 33 )
+new l4 = (: k1 = 41 k12 = 42 k4 = 44 )
+new l5 = (: k1 = 51 k2 = 52)
+
+assert( !l1:containsKeys(l3) 'containsKeys() = false expected' )
+assert( !l1:containsKeys(l4) 'containsKeys() = false expected' )
+assert( l1:containsKeys(l5) 'containsKeys() = true expected' )
+assert( l1:containsKeys(l2) 'containsKeys() = true expected' )
+
+
 print('- all tests passed');
