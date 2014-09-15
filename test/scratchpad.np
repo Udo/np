@@ -1,10 +1,5 @@
-new l1 = (: k1 = 11 k2 = 12)
-new l2 = l1
-new l3 = (: k3 = 33 )
-new l4 = (: k1 = 41 k12 = 42 k4 = 44 )
-new l5 = (: k1 = 51 k2 = 52)
+new l = (:)
 
-print( #false l1:containsKeys(l3) )
-print( #false l1:containsKeys(l4) )
-print( #true l1:containsKeys(l5) )
-print( #true l1:containsKeys(l2) )
+new l2 = list
+
+print( l:implements(l2) )

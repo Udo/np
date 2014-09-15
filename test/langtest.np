@@ -70,6 +70,6 @@ assert( !l1:containsKeys(l3) 'containsKeys() = false expected' )
 assert( !l1:containsKeys(l4) 'containsKeys() = false expected' )
 assert( l1:containsKeys(l5) 'containsKeys() = true expected' )
 assert( l1:containsKeys(l2) 'containsKeys() = true expected' )
-
+assert( l1:implements(list) ':implements() fail' )
 
 print('- all tests passed');

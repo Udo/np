@@ -816,7 +816,7 @@ static int tbl_setevents (lua_State *L) {
   return 1;
 }
 
-static int tbl_keycheck (lua_State *L) {
+static int tbl_containsKeys (lua_State *L) {
   int n = lua_gettop(L);
 	if(n == 1) {
 		lua_pushboolean(L, 0);
@@ -846,6 +846,16 @@ static int tbl_keycheck (lua_State *L) {
   return 1;
 }
 
+static int tbl_implements (lua_State *L) {
+	lua_settop(L, 2);
+	lua_getmetatable(L, 1);
+	if(ttisnil(L->top - 1)) {
+		lua_pushboolean(L, 0);
+		return 1;
+	}
+	lua_replace(L, 1);
+	return tbl_containsKeys(L);
+}
 
 /* }====================================================== */
 
@@ -874,7 +884,8 @@ static const luaL_Reg tab_funcs[] = {
   {"reduce", tbl_reduce},
   {"pop", tbl_pop},
   {"reverse", tbl_reverse},
-  {"containsKeys", tbl_keycheck},
+  {"containsKeys", tbl_containsKeys},
+  {"implements", tbl_implements},
   {"iReverse", tbl_ireverse},
   {"size", tbl_size},
   {"keyCount", tbl_keyCount},
