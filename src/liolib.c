@@ -214,14 +214,14 @@ static LStream *newfile (lua_State *L) {
   return p;
 }
 
-
+/*
 static void opencheck (lua_State *L, const char *fname, const char *mode) {
   LStream *p = newfile(L);
   p->f = fopen(fname, mode);
   if (p->f == NULL)
     luaL_error(L, "cannot open file " LUA_QS " (%s)", fname, strerror(errno));
 }
-
+*/
 
 static int io_open (lua_State *L) {
   const char *filename = luaL_checkstring(L, 1);
@@ -237,12 +237,14 @@ static int io_open (lua_State *L) {
 /*
 ** function to close 'popen' files
 */
+/*
 static int io_pclose (lua_State *L) {
   LStream *p = tolstream(L);
   return luaL_execresult(L, lua_pclose(L, p->f));
 }
+*/
 
-
+/*
 static int io_popen (lua_State *L) {
   const char *filename = luaL_checkstring(L, 1);
   const char *mode = luaL_optstring(L, 2, "r");
@@ -251,7 +253,7 @@ static int io_popen (lua_State *L) {
   p->closef = &io_pclose;
   return (p->f == NULL) ? luaL_fileresult(L, 0, filename) : 1;
 }
-
+*/
 
 static int io_tmpfile (lua_State *L) {
   LStream *p = newfile(L);
@@ -270,23 +272,25 @@ static FILE *getiofile (lua_State *L, const char *findex) {
 }
 */
 
+/*
 static int g_iofile (lua_State *L, const char *f, const char *mode) {
   if (!lua_isnoneornil(L, 1)) {
     const char *filename = lua_tostring(L, 1);
     if (filename)
       opencheck(L, filename, mode);
     else {
-      tofile(L);  /* check that it's a valid file handle */
+      tofile(L);  // check that it's a valid file handle 
       lua_pushvalue(L, 1);
     }
     lua_setfield(L, LUA_REGISTRYINDEX, f);
   }
-  /* return current value */
+  // return current value 
   lua_getfield(L, LUA_REGISTRYINDEX, f);
   return 1;
 }
+*/
 
-
+/*
 static int io_input (lua_State *L) {
   return g_iofile(L, IO_INPUT, "r");
 }
@@ -295,7 +299,7 @@ static int io_input (lua_State *L) {
 static int io_output (lua_State *L) {
   return g_iofile(L, IO_OUTPUT, "w");
 }
-
+*/
 
 //static int io_readline (lua_State *L);
 
@@ -636,11 +640,11 @@ static int f_flush (lua_State *L) {
 static const luaL_Reg iolib[] = {
   //{"close", io_close},
   //{"flush", io_flush},
-  {"input", io_input},
+  //{"input", io_input},
   //{"lines", io_lines},
   {"open", io_open},
-  {"output", io_output},
-  {"launch", io_popen},
+  //{"output", io_output},
+  //{"launch", io_popen},
   //{"read", io_read},
   {"tmpfile", io_tmpfile},
   //{"type", io_type},
