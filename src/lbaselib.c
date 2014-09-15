@@ -221,6 +221,30 @@ static int luaB_first (lua_State *L) {
   return 1;
 }
 
+/*
+static int luaB_bindget (lua_State *L) {
+  luaL_checkany(L, 1);
+  if (!lua_getmetatable(L, 1)) {
+    lua_pushnil(L);
+    return 1;  // no metatable 
+  }
+  luaL_getmetafield(L, 1, "events");
+  return 1;  // returns either __metatable field (if present) or metatable 
+}
+
+
+static int luaB_bindset (lua_State *L) {
+  int n = lua_gettop(L);
+	if(n == 1)
+		return luaB_bindget(L);
+  if (luaL_getmetafield(L, 1, "events"))
+    return luaL_error(L, "cannot change a protected events list");
+  lua_settop(L, 2);
+  lua_setmetatable(L, 1);
+  return 1;
+}
+*/
+
 static const luaL_Reg base_funcs[] = {
  // {"toString", luaB_tostring},
   {"assert", luaB_assert},
@@ -231,6 +255,7 @@ static const luaL_Reg base_funcs[] = {
   {"items", luaB_ipairs},
   //{"loadfile", luaB_loadfile},
   {"size", luaB_rawlen},
+  //{"bind", luaB_bindset}, // looks like we won't need this
   {"length", luaB_rawalen},
   {"next", luaB_next},
   {"try", luaB_pcall},

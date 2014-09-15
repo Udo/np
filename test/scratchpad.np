@@ -1,5 +1,4 @@
-new t3 = 'tadaaa'
+new f = { a | a = a*10 => a*2 }
 
-print(
-first( false 1 t1 t2 t3 )
-  )
+new n = 1
+print( f(n) n )
