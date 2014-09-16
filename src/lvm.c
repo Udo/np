@@ -144,6 +144,15 @@ int luaV_selfop (lua_State *L, const TValue *to, TValue *key, StkId val) {
       const TValue *res = luaO_nilobject;
       if(t == to) {
         if(h->metatable) res = luaH_get(h->metatable, key);
+				if(ttisnil(res)) { // no result, try policies
+					lua_getglobal(L, LUA_POLICYLIBNAME);
+					lua_getfield(L, -1, svalue(key));
+					if(ttisfunction(L->top - 1)) {	
+						setobj2s(L, val, L->top - 1);
+						return 0;
+					}
+					L->top -= 1;
+				}
       } else {
         res = luaH_get(h, key);
       }  

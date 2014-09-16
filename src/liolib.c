@@ -629,10 +629,11 @@ static int io_flush (lua_State *L) {
 }
 */
 
+/*
 static int f_flush (lua_State *L) {
   return luaL_fileresult(L, fflush(tofile(L)) == 0, NULL);
 }
-
+*/
 
 /*
 ** functions for 'io' library
@@ -658,9 +659,9 @@ static const luaL_Reg iolib[] = {
 */
 static const luaL_Reg flib[] = {
   {"close", io_close},
-  {"flush", f_flush},
-  {"lines", f_lines},
   {"each", f_each},
+  //{"flush", f_flush},
+  {"lines", f_lines},
   {"read", f_read},
   {"seek", f_seek},
   {"setvbuf", f_setvbuf},

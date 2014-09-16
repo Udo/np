@@ -1,1 +1,3 @@
-new luv = require(__dir__ << '/luv')
+new l = (:)
+
+print( l:type() )

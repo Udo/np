@@ -282,6 +282,10 @@ static const luaL_Reg trap_lib[] = {
   {"nilEvent", trap_returnNil},
   {"nilConcat", trap_returnNil},
   {"emptyString", trap_returnEmpty},
+  {"assert", luaB_assert},
+  {"size", luaB_rawlen},
+  {"call", luaB_call},
+  {"type", luaB_type},
   {NULL, NULL}
 };
 
