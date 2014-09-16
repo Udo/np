@@ -595,9 +595,9 @@ static int f_write (lua_State *L) {
 
 static int f_seek (lua_State *L) {
   static const int mode[] = {SEEK_SET, SEEK_CUR, SEEK_END};
-  static const char *const modenames[] = {"set", "cur", "end", NULL};
+  static const char *const modenames[] = {"set", "current", "end", NULL};
   FILE *f = tofile(L);
-  int op = luaL_checkoption(L, 2, "cur", modenames);
+  int op = luaL_checkoption(L, 2, "current", modenames);
   lua_Number p3 = luaL_optnumber(L, 3, 0);
   l_seeknum offset = (l_seeknum)p3;
   luaL_argcheck(L, (lua_Number)offset == p3, 3,
@@ -664,7 +664,7 @@ static const luaL_Reg flib[] = {
   {"lines", f_lines},
   {"read", f_read},
   {"seek", f_seek},
-  {"setvbuf", f_setvbuf},
+  {"bufferMode", f_setvbuf},
   {"write", f_write},
   {"gc", f_gc},
   {"status", io_type},

@@ -1,2 +1,3 @@
 new f = iofile.open(__dir__ << '/libtest.np', #r)
-print( f:type() )
+f:seek(#current 10)
+print( f:read() )
