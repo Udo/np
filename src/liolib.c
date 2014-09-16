@@ -134,9 +134,9 @@ static int io_type (lua_State *L) {
   if (p == NULL)
     lua_pushnil(L);  /* not a file */
   else if (isclosed(p))
-    lua_pushliteral(L, "closed file");
+    lua_pushliteral(L, "closed");
   else
-    lua_pushliteral(L, "file");
+    lua_pushliteral(L, "open");
   return 1;
 }
 
@@ -667,7 +667,7 @@ static const luaL_Reg flib[] = {
   {"setvbuf", f_setvbuf},
   {"write", f_write},
   {"gc", f_gc},
-  {"type", io_type},
+  {"status", io_type},
   {"toString", f_tostring},
   {NULL, NULL}
 };

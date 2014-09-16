@@ -1,3 +1,2 @@
-new l = (:)
-
-print( l:type() )
+new f = iofile.open(__dir__ << '/libtest.np', #r)
+print( f:type() )
