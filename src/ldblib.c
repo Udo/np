@@ -150,31 +150,30 @@ static int db_getinfo (lua_State *L) {
   lua_createtable(L, 0, 2);
   if (strchr(options, 'S')) {
     settabss(L, "source", ar.source);
-    settabss(L, "short_src", ar.short_src);
-    settabsi(L, "linedefined", ar.linedefined);
-    settabsi(L, "lastlinedefined", ar.lastlinedefined);
+    settabss(L, "shortSource", ar.short_src);
+    settabsi(L, "lineDefined", ar.linedefined);
+    settabsi(L, "lastLineDefined", ar.lastlinedefined);
     settabss(L, "what", ar.what);
   }
   if (strchr(options, 'l'))
-    settabsi(L, "currentline", ar.currentline);
+    settabsi(L, "currentLine", ar.currentline);
   if (strchr(options, 'u')) {
-    settabsi(L, "nups", ar.nups);
-    settabsi(L, "nparams", ar.nparams);
-    settabsb(L, "isvararg", ar.isvararg);
+    settabsi(L, "upvalueCount", ar.nups);
+    settabsi(L, "paramCount", ar.nparams);
+    settabsb(L, "isVarArg", ar.isvararg);
   }
   if (strchr(options, 'n')) {
     settabss(L, "name", ar.name);
-    settabss(L, "namewhat", ar.namewhat);
+    settabss(L, "nameWhat", ar.namewhat);
   }
   if (strchr(options, 't'))
-    settabsb(L, "istailcall", ar.istailcall);
+    settabsb(L, "isTailCall", ar.istailcall);
   if (strchr(options, 'L'))
     treatstackoption(L, L1, "activelines");
   if (strchr(options, 'f'))
     treatstackoption(L, L1, "func");
   return 1;  /* return table */
 }
-
 
 static int db_getlocal (lua_State *L) {
   int arg;
@@ -542,25 +541,25 @@ static int luaB_dofile (lua_State *L) {
 
 static const luaL_Reg dblib[] = {
   {"debug", db_debug},
-  {"getuservalue", db_getuservalue},
-  {"gethook", db_gethook},
-  {"getinfo", db_getinfo},
-  {"getlocal", db_getlocal},
-  {"getregistry", db_getregistry},
-  {"getmetatable", db_getmetatable},
-  {"getupvalue", db_getupvalue},
-  {"upvaluejoin", db_upvaluejoin},
-  {"upvalueid", db_upvalueid},
-  {"setuservalue", db_setuservalue},
-  {"sethook", db_sethook},
-  {"setlocal", db_setlocal},
-  {"setmetatable", db_setmetatable},
+  {"getUserValue", db_getuservalue},
+  {"getHook", db_gethook},
+  {"getInfo", db_getinfo},
+  {"getLocal", db_getlocal},
+  {"getRegistry", db_getregistry},
+  {"getMetatable", db_getmetatable},
+  {"getUpvalue", db_getupvalue},
+  {"upvalueJoin", db_upvaluejoin},
+  {"upvalueId", db_upvalueid},
+  {"setUserValue", db_setuservalue},
+  {"setHook", db_sethook},
+  {"setLocal", db_setlocal},
+  {"setMetatable", db_setmetatable},
 #if defined(JH_LUA_TYPEMETA)
   {"settypemt", db_settypemt},
 #endif
-  {"setupvalue", db_setupvalue},
-  {"traceback", db_traceback},
-  {"collectgarbage", db_collectgarbage},
+  {"setUpvalue", db_setupvalue},
+  {"trace", db_traceback},
+  {"collectGarbage", db_collectgarbage},
   {"equal", db_rawequal},
   {"get", db_rawget},
   {"set", db_rawset},
