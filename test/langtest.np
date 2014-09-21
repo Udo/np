@@ -72,4 +72,10 @@ assert( l1:containsKeys(l5) 'containsKeys() = true expected' )
 assert( l1:containsKeys(l2) 'containsKeys() = true expected' )
 assert( l1:implements(list) ':implements() fail' )
 
+new f = { | => 1,2,3 }
+new l = (: f(1) )
+assert( l:toString() == '(: 1 2 3 )' 'list constructor whitespace bug?') 
+
+
+
 print('- all tests passed');
