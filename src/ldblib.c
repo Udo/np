@@ -49,7 +49,7 @@ static int db_setmetatable (lua_State *L) {
 
 #if defined(JH_LUA_TYPEMETA)
 static const char *const db_types[] = {"nil","boolean","lightuserdata",
-	"number","string","list","function","userdata","thread",NULL};
+	"number","string","list","function","userdata","coroutine",NULL};
 
 static int db_settypemt (lua_State *L) {
   int ty = luaL_checkoption(L, 1, NULL, db_types);

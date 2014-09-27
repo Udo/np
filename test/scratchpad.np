@@ -10,3 +10,6 @@ new cr = coroutine.create{ x |
 
 
 print(#status cr:status())
+print(cr:resume(10))
+print(cr:resume(20))
+print(cr:resume(30))
