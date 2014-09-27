@@ -236,7 +236,6 @@ static int luaB_mux (lua_State *L) {
   return 1;
 }
 
-/*
 static int luaB_bindget (lua_State *L) {
   luaL_checkany(L, 1);
   if (!lua_getmetatable(L, 1)) {
@@ -258,7 +257,6 @@ static int luaB_bindset (lua_State *L) {
   lua_setmetatable(L, 1);
   return 1;
 }
-*/
 
 static const luaL_Reg base_funcs[] = {
  // {"toString", luaB_tostring},
@@ -270,7 +268,7 @@ static const luaL_Reg base_funcs[] = {
   {"items", luaB_ipairs},
   //{"loadfile", luaB_loadfile},
   {"size", luaB_rawlen},
-  //{"bind", luaB_bindset}, // looks like we won't need this
+  {"bind", luaB_bindset}, // looks like we won't need this
   {"length", luaB_rawalen},
   {"next", luaB_next},
   {"try", luaB_pcall},

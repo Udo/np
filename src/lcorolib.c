@@ -85,6 +85,8 @@ static int luaB_cocreate (lua_State *L) {
   NL = lua_newthread(L);
   lua_pushvalue(L, 1);  /* move function to top */
   lua_xmove(L, NL, 1);  /* move function from L to NL */
+  //lua_getglobal(L, LUA_COLIBNAME);
+	//lua_setmetatable(L, -1);
   return 1;
 }
 
@@ -135,6 +137,16 @@ static int luaB_corunning (lua_State *L) {
   return 2;
 }
 
+static void luaB_createmetatable (lua_State *L) {
+  lua_createtable(L, 0, 1);  
+  lua_pushliteral(L, "");  
+  lua_pushvalue(L, -2);  
+	lua_settypemt(L, LUA_TTHREAD);
+  lua_pop(L, 1);  
+  lua_pushvalue(L, -2);  
+  lua_setfield(L, -2, "event");  
+  lua_pop(L, 1);  	
+}
 
 static const luaL_Reg co_funcs[] = {
   {"create", luaB_cocreate},
@@ -150,6 +162,7 @@ static const luaL_Reg co_funcs[] = {
 
 LUAMOD_API int luaopen_coroutine (lua_State *L) {
   luaL_newlib(L, co_funcs);
+	luaB_createmetatable(L);
   return 1;
 }
 

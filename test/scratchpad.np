@@ -1,5 +1,12 @@
-new f = { | => 1,2,3 }
 
-new l = (: f(1) )
-print(l)
+new cr = coroutine.create{ x |
+  while(true) {
+		x += 1
+		coroutine.yield(x)	  
+		}
+  }
+	
+--list.each(bind(cr) { v k | print(k)})
 
+
+print(#status cr:status())
