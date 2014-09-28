@@ -115,7 +115,7 @@ static int luaB_costatus (lua_State *L) {
       case LUA_OK: {
         lua_Debug ar;
         if (lua_getstack(co, 0, &ar) > 0)  /* does it have frames? */
-          lua_pushliteral(L, "normal");  /* it is running */
+          lua_pushliteral(L, "running");  /* it is running */
         else if (lua_gettop(co) == 0)
             lua_pushliteral(L, "dead");
         else
