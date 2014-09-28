@@ -150,11 +150,11 @@ static void luaB_createmetatable (lua_State *L) {
 
 static const luaL_Reg co_funcs[] = {
   {"create", luaB_cocreate},
-  {"run", luaB_coresume},
+  {"receive", luaB_coresume},
   {"running", luaB_corunning},
   {"status", luaB_costatus},
   {"wrap", luaB_cowrap},
-  {"yield", luaB_yield},
+  {"send", luaB_yield},
   {NULL, NULL}
 };
 
