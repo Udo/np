@@ -119,7 +119,7 @@ static int luaB_costatus (lua_State *L) {
         else if (lua_gettop(co) == 0)
             lua_pushliteral(L, "dead");
         else
-          lua_pushliteral(L, "suspended");  /* initial state */
+          lua_pushliteral(L, "new");  /* initial state */
         break;
       }
       default:  /* some error occurred */
