@@ -110,7 +110,7 @@ static int luaB_costatus (lua_State *L) {
   else {
     switch (lua_status(co)) {
       case LUA_YIELD:
-        lua_pushliteral(L, "suspended");
+        lua_pushliteral(L, "waiting");
         break;
       case LUA_OK: {
         lua_Debug ar;
