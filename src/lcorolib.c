@@ -24,8 +24,10 @@ static int auxresume (lua_State *L, lua_State *co, int narg) {
     return -1;  /* error flag */
   }
   if (lua_status(co) == LUA_OK && lua_gettop(co) == 0) {
-    lua_pushliteral(L, "cannot resume dead coroutine");
-    return -1;  /* error flag */
+    //lua_pushliteral(L, "cannot resume dead coroutine");
+    //return -1;
+		lua_pushnil(L);
+		return 1;  
   }
   lua_xmove(L, co, narg);
   status = lua_resume(co, L, narg);
