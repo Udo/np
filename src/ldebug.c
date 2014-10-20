@@ -540,7 +540,7 @@ l_noret luaG_aritherror (lua_State *L, const TValue *p1, const TValue *p2) {
   TValue temp;
   if (luaV_tonumber(p1, &temp) == NULL)
     p2 = p1;  /* first operand is wrong */
-  luaG_typeerror(L, p2, "perform arithmetic on");
+  luaG_typeerror(L, p2, "perform arithmetic / no applicable event handler found - on");
 }
 
 
@@ -548,9 +548,9 @@ l_noret luaG_ordererror (lua_State *L, const TValue *p1, const TValue *p2) {
   const char *t1 = objtypename(p1);
   const char *t2 = objtypename(p2);
   if (t1 == t2)
-    luaG_runerror(L, "attempt to compare two %s values", t1);
+    luaG_runerror(L, "attempt to compare two %s values (no applicable event handler was found)", t1);
   else
-    luaG_runerror(L, "attempt to compare %s with %s", t1, t2);
+    luaG_runerror(L, "attempt to compare %s with %s (no applicable event handler was found)", t1, t2);
 }
 
 
