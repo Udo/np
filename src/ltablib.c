@@ -877,6 +877,25 @@ static int tbl_can (lua_State *L) {
 	return 1;
 }
 
+static int tbl_rawget (lua_State *L) {
+  luaL_checktype(L, 1, LUA_TTABLE);
+  luaL_checkany(L, 2);
+  lua_settop(L, 2);
+  lua_rawget(L, 1);
+  return 1;
+}
+
+static int tbl_rawset (lua_State *L) {
+  luaL_checktype(L, 1, LUA_TTABLE);
+  luaL_checkany(L, 2);
+  luaL_checkany(L, 3);
+  lua_settop(L, 3);
+  lua_rawset(L, 1);
+  return 1;
+}
+
+
+
 /* }====================================================== */
 
 
@@ -912,6 +931,8 @@ static const luaL_Reg tab_funcs[] = {
   {"keyCount", tbl_keyCount},
   {"sort", tbl_sort},
   {"iSort", tbl_isort},
+  {"get", tbl_rawget},
+  {"set", tbl_rawset},
   //{"toString", tbl_toString},
   {NULL, NULL}
 };
