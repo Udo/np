@@ -692,7 +692,7 @@ LUAMOD_API int luaopen_package (lua_State *L) {
   luaL_getsubtable(L, LUA_REGISTRYINDEX, CLIBS);
   lua_createtable(L, 0, 1);  /* metatable for CLIBS */
   lua_pushcfunction(L, gctm);
-  lua_setfield(L, -2, "gc");  /* set finalizer for CLIBS table */
+  lua_setfield(L, -2, "finalize");  /* set finalizer for CLIBS table */
   lua_setmetatable(L, -2);
   /* create `package' table */
   luaL_newlib(L, pk_funcs);

@@ -1,15 +1,8 @@
-
-new cr = coroutine.create{ x |
-  while(true) {
-		x += 1
-		coroutine.yield(x)	  
-		}
-  }
-	
---list.each(bind(cr) { v k | print(k)})
+new l = (: foo = #baz )
+l:bind( list << (:
+  finalize = { l | print('finalizing...') }
+	))
 
 
-print(#status cr:status())
-print(cr:run(10))
-print(cr:run(20))
-print(cr:run(30))
+
+

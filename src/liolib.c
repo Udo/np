@@ -666,7 +666,7 @@ static const luaL_Reg flib[] = {
   {"seek", f_seek},
   {"bufferMode", f_setvbuf},
   {"write", f_write},
-  {"gc", f_gc},
+  {"finalize", f_gc},
   {"status", io_type},
   {"toString", f_tostring},
   {NULL, NULL}
