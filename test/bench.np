@@ -1,9 +1,0 @@
-new cList = (:)
-
-for a = 1, 100000 {
-	new newHash = (: test = a )
-	newHash.test2 = a*a
-	cList:insert(newHash)
-}
-
---print(cList:size())

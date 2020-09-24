@@ -1,8 +1,0 @@
-new l = (: foo = #baz )
-l:bind( list << (:
-  finalize = { l | print('finalizing...') }
-	))
-
-
-
-

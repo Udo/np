@@ -1,6 +1,0 @@
-new lib = (:
-	hello = { | print(#hello) }
-  )
-
-
-=> lib
