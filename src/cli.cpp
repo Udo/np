@@ -13,8 +13,9 @@ int main(int argc, char** argv)
 		auto token_list = tokenize(src);
 		//token_list->print(true);
 		//printf("\n");
-		auto ast = parse(token_list);
-		ast->print(true);
+		Parser p;
+		p.parse(token_list);
+		p.ast_root->print(true);
 	}
 	printf("\n");
 	return 0;
