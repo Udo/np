@@ -20,7 +20,6 @@ FLAGS="-w -Wall -$OPT_FLAG -std=c++14 -fpermissive -ffast-math"
 LIBS="-ldl -lm -lpthread"
 SRCFLAGS="-D EXEC_NAME=\"$BINF\" -D PLATFORM_NAME=\"linux\""
 
-echo "Compliling game executable..."
 time -p $COMPILER src/$BINF.cpp $SRCFLAGS $FLAGS $LIBS -o bin/$BINF.$BUILDMODE.linux.bin 
 
 ls -lh bin/ | grep $BINF

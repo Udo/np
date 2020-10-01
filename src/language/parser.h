@@ -2,11 +2,10 @@
 struct ASTNode
 {
 	ASTNode* next;
-	ASTNode* previous;
 	ASTNode* child;
 	ASTNode* parent;
 	Token* token;
-	char type;
+	char type = 'T';
 	
 	void print(bool all = false, string level = "")
 	{
@@ -15,7 +14,7 @@ struct ASTNode
 				this->type,
 				this->token->type, this->token->col, this->token->line, this->token->text.c_str());
 		else
-			printf("%s %c -\n", level.c_str(), this->type);
+			printf("%s%c :\n", level.c_str(), this->type);
 		if(this->child) this->child->print(true, level+"  ");
 		if(all && this->next) this->next->print(true, level);
 	}
@@ -24,76 +23,99 @@ struct ASTNode
 struct Parser
 {
 	ASTNode* ast_root;
-	ASTNode* ast;
 	Token* token_list;
 	Token* token;
+	
+	void consume()
+	{
+		if(token) token = token->next;
+	}
 	
 	ASTNode* parse_expression(char delim)
 	{
 		ASTNode* result = new ASTNode();
 		ASTNode* current = 0;
 		result->type = 'E';
+		if(delim == ';') result->type = 'S';
 		while(token)
 		{
+			bool advance = true;
 			ASTNode* n;
 			if(token->type == TCOMMENT)
 			{
+				consume();
 				n = 0;
 			}
 			else if(token->text[0] == delim)
 			{
-				token = token->next;
+				consume();
 				return(result);
 			}
 			else if(token->text[0] == '(')
 			{
-				token = token->next;
+				consume();
 				n = parse_expression(')');
 			}
 			else if(token->text[0] == '[')
 			{
-				token = token->next;
+				consume();
 				n = parse_expression(']');
 			}
 			else if(token->text[0] == '{')
 			{
-				token = token->next;
-				n = parse_expression('}');
+				consume();
+				n = parse_statements();
 			}
 			else
 			{
 				n = new ASTNode();
 				n->token = token;
+				consume();
 			}
 			
 			if(n)
 			{
 				if(!current) 
-				{
 					result->child = n;
-					current = n;
-				}
 				else
-				{
 					current->next = n;
-					current = n;
-				}
+				current = n;
+				current->parent = result;
 			}
-			if(token) token = token->next;
+		}
+		return(result);
+	}
+	
+	ASTNode* parse_statements()
+	{
+		ASTNode* result = new ASTNode();
+		result->type = 'L';
+		ASTNode* current = 0;
+		while(token)
+		{			
+			if(token->text[0] == '}') 
+			{
+				consume();
+				return(result);
+			}
+			else
+			{
+				auto n = parse_expression(';');
+				if(!current)
+					result->child = n;
+				else
+					current->next = n;
+				current = n;
+				current->parent = result;
+			}
 		}
 		return(result);
 	}
 	
 	void parse(Token* token_list)
 	{
-		ast_root = new ASTNode();
-		ast = ast_root;
 		token_list = token_list;
 		token = token_list;
-		while(token)
-		{			
-			ast->next = parse_expression(';');
-			ast = ast->next;
-		}
+		ast_root = parse_statements();
 	}
 };

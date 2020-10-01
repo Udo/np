@@ -1,5 +1,5 @@
 test_string : string = "I'm a test string!";
-test_string2 : string = 'Single-quoted I am';
+test_string2 : string = ('Single-quoted I am');
 
 // this is a comment
 print(test_string);
@@ -8,6 +8,7 @@ a_def : type = int (a:int, b:int);
 
 a_func : int (a:int, b:int) = { 
 	return(a*b);
-}
+};
 
+print(test_string);
 print(a_func(10, 10));
