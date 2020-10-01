@@ -2,6 +2,7 @@
 #include "language/io.h"
 #include "language/tokenizer.h"
 #include "language/parser.h"
+#include "language/treerewriter.h"
 
 string src;
 
@@ -15,6 +16,8 @@ int main(int argc, char** argv)
 		//printf("\n");
 		Parser p;
 		p.parse(token_list);
+		TreeRewriter r;
+		r.process(p.ast_root);
 		p.ast_root->print(true);
 	}
 	printf("\n");
