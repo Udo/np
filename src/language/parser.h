@@ -10,7 +10,7 @@ struct ASTNode
 	void print(bool all = false, string level = "")
 	{
 		if(this->token)
-			printf("%s\u001b[32m%c %i \u001b[34m%i:%i \u001b[33m%s\u001b[0m\n", level.c_str(),
+			printf("%s\u001b[32m%c%i \u001b[34m%i:%i \u001b[33m%s\u001b[0m\n", level.c_str(),
 				this->type,
 				this->token->type, this->token->col, this->token->line, this->token->text.c_str());
 		else
