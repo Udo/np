@@ -1,4 +1,7 @@
 test_string : string = "I'm a test string!";
+
+abc = "bla";
+
 test_string2 : string = ('Single-quoted I am');
 
 // this is a comment

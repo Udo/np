@@ -1,6 +1,16 @@
 #include <cctype>
 
-enum TokenType { TNONE, TIDENTIFIER, TPUNCT, TCOMMENT, TSTRINGLITERAL };
+enum TokenType { 
+	TNONE, TIDENTIFIER, TPUNCT, TCOMMENT, 
+	TSTRINGLITERAL, TEXPRESSION, TSTATEMENT, TBLOCK,
+	TDECLARATION, TASSIGNMENT
+};
+	
+char* TokenTypeNames[] = {
+	"None", "Ident", "Punct", "Comment", 
+	"String", "Expr", "Stmt", "Block",
+	"Decl", "Assign"
+};
 
 struct Token
 {
@@ -10,13 +20,48 @@ struct Token
 	int line;
 	string text;
 	Token* next = 0;
+	Token* child = 0;
+	Token* parent = 0;
 	char delim = 0;
 	
-	void print(bool all = false)
+	void print(bool all = false, string level = "")
 	{
-		printf("\u001b[32m%i \u001b[34m%i:%i \u001b[33m%s\u001b[0m\t", this->type, this->col, this->line, this->text.c_str());
-		if(all && this->next) this->next->print(true);
+		if(this)
+			printf("%s\u001b[32m%s \u001b[34m%i:%i \u001b[33m%s\u001b[0m\n", level.c_str(),
+				TokenTypeNames[this->type], 
+				this->col, 
+				this->line, 
+				this->text.c_str());
+		else
+			return;
+		if(this->child) this->child->print(true, level+"  ");
+		if(all && this->next) this->next->print(true, level);
 	}
+	
+	void copy_from(Token* from)
+	{
+		this->type = from->type;
+		this->start = from->start;
+		this->col = from->col;
+		this->line = from->line;
+		this->text = from->text;
+		this->delim = from->delim;
+	}
+	
+	void append_child(Token* c)
+	{
+		if(!this->child)
+		{
+			this->child = c;
+		}
+		else
+		{
+			auto tn = this->child;
+			while(tn->next) tn = tn->next;
+			tn->next = c;
+		}
+	}
+
 };
 
 Token* tokenize(string src)
