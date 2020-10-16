@@ -4,16 +4,16 @@ struct TreeRewriter
 {
 	bool modified = false;
 	s32	iteration_count = 0;
-	
+
 	bool match_part(ASTNode* n, TokenType t, string s)
 	{
 		if(!n) return(false);
-		return(n->type == t && (n->type == TIDENTIFIER || n->text == s));
+		return(n->type == t && (s == "" || n->text == s));
 	}
-	
-	bool match(ASTNode* n, 
-		TokenType t1, string s1, 
-		TokenType t2 = TNONE, string s2 = "", 
+
+	bool match(ASTNode* n,
+		TokenType t1, string s1,
+		TokenType t2 = TNONE, string s2 = "",
 		TokenType t3 = TNONE, string s3 = "")
 	{
 		if(!n) return(false);
@@ -24,7 +24,7 @@ struct TreeRewriter
 		else
 			return(match_part(n, t1, s1));
 	}
-	
+
 	void traverse(ASTNode* root)
 	{
 		ASTNode* current = root;
@@ -42,7 +42,7 @@ struct TreeRewriter
 				current->next = current->next->next->next;
 				modified = true;
 			}
-			else if(match(current, TIDENTIFIER, "", TPUNCT, ":")) // auto-typed declaration
+			if(match(current, TIDENTIFIER, "", TPUNCT, ":")) // auto-typed declaration
 			{
 				auto identifier = new ASTNode();
 				identifier->copy_from(current);
@@ -51,7 +51,7 @@ struct TreeRewriter
 				current->next = current->next->next;
 				modified = true;
 			}
-			else if(match(current, TIDENTIFIER, "", TPUNCT, "=")) // assignment
+			if(match(current, TIDENTIFIER, "", TPUNCT, "=")) // assignment
 			{
 				auto identifier = new ASTNode();
 				identifier->copy_from(current);
@@ -63,9 +63,8 @@ struct TreeRewriter
 				rval->next = 0;
 				modified = true;
 			}
-			else if(match(current, TDECLARATION, "", TPUNCT, "=")) // declaration and assignment
+			if(match(current, TDECLARATION, "", TPUNCT, "=")) // declaration and assignment
 			{
-				printf("!!!"); // FIXME
 				auto rval = current->next->next;
 				current->append_child(rval);
 				current->next = current->next->next->next;
@@ -79,7 +78,7 @@ struct TreeRewriter
 			current = current->next;
 		}
 	}
-	
+
 	void process(ASTNode* root)
 	{
 		modified = true;
@@ -91,5 +90,5 @@ struct TreeRewriter
 		}
 		printf("Iterations: %i\n", iteration_count);
 	}
-	
+
 };

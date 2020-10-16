@@ -6,7 +6,7 @@
 
 string src;
 
-int main(int argc, char** argv) 
+int main(int argc, char** argv)
 {
 	if(argc >= 2)
 	{
@@ -17,7 +17,7 @@ int main(int argc, char** argv)
 		Parser p;
 		p.parse(token_list);
 		TreeRewriter r;
-		r.process(p.ast_root);
+		//r.process(p.ast_root);
 		p.ast_root->print(true);
 	}
 	printf("\n");

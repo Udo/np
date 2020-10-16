@@ -1,15 +1,15 @@
 #include <cctype>
 
-enum TokenType { 
-	TNONE, TIDENTIFIER, TPUNCT, TCOMMENT, 
+enum TokenType {
+	TNONE, TIDENTIFIER, TPUNCT, TCOMMENT,
 	TSTRINGLITERAL, TEXPRESSION, TSTATEMENT, TBLOCK,
-	TDECLARATION, TASSIGNMENT
+	TDECLARATION, TASSIGNMENT, TTYPE,
 };
-	
+
 char* TokenTypeNames[] = {
-	"None", "Ident", "Punct", "Comment", 
+	"None", "Ident", "Punct", "Comment",
 	"String", "Expr", "Stmt", "Block",
-	"Decl", "Assign"
+	"Decl", "Assign", "Type"
 };
 
 struct Token
@@ -23,21 +23,22 @@ struct Token
 	Token* child = 0;
 	Token* parent = 0;
 	char delim = 0;
-	
+	bool is_closing = false;
+
 	void print(bool all = false, string level = "")
 	{
 		if(this)
 			printf("%s\u001b[32m%s \u001b[34m%i:%i \u001b[33m%s\u001b[0m\n", level.c_str(),
-				TokenTypeNames[this->type], 
-				this->col, 
-				this->line, 
+				TokenTypeNames[this->type],
+				this->col,
+				this->line,
 				this->text.c_str());
 		else
 			return;
 		if(this->child) this->child->print(true, level+"  ");
 		if(all && this->next) this->next->print(true, level);
 	}
-	
+
 	void copy_from(Token* from)
 	{
 		this->type = from->type;
@@ -47,7 +48,7 @@ struct Token
 		this->text = from->text;
 		this->delim = from->delim;
 	}
-	
+
 	void append_child(Token* c)
 	{
 		if(!this->child)
@@ -92,14 +93,14 @@ Token* tokenize(string src)
 		}
 		else
 		{
-			if(c == '"' || c == '\'') 
+			if(c == '"' || c == '\'')
 			{
 				delim = c;
 				c = 0;
 				cmode = TSTRINGLITERAL;
 			}
 		}
-		
+
 		col_ctr++;
 		if(c == '\n')
 		{
@@ -114,7 +115,7 @@ Token* tokenize(string src)
 			current_token = next_token;
 			current_token->start = i;
 		}
-		
+
 		if(cmode != TNONE)
 		{
 			current_token->type = cmode;
@@ -126,6 +127,15 @@ Token* tokenize(string src)
 				current_token->line = line_ctr;
 			}
 		}
+
+		if(current_token->type == TPUNCT)
+		{
+			current_token->is_closing = (current_token->text == ")" ||
+				current_token->text == "}" ||
+				current_token->text == "]" ||
+				current_token->text == ";");
+		}
+
 	}
 	return(token_list);
 }
