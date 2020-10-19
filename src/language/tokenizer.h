@@ -3,13 +3,15 @@
 enum TokenType {
 	TNONE, TIDENTIFIER, TPUNCT, TCOMMENT,
 	TSTRINGLITERAL, TEXPRESSION, TSTATEMENT, TBLOCK,
-	TDECLARATION, TASSIGNMENT, TTYPE,
+	TDECLARATION, TASSIGNMENT, TTYPE, TCALL,
+	TLIST,
 };
 
 char* TokenTypeNames[] = {
 	"None", "Ident", "Punct", "Comment",
 	"String", "Expr", "Stmt", "Block",
-	"Decl", "Assign", "Type"
+	"Decl", "Assign", "Type", "Call",
+	"List",
 };
 
 struct Token

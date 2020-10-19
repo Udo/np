@@ -64,11 +64,11 @@ struct Parser
 	ASTNode* parse_type_expression()
 	{
 		ASTNode* result = new ASTNode();
-		ASTNode* current = 0;
 		result->copy_from(token);
 		result->text = "";
 		result->type = TTYPE;
 		auto type_name = expect(TIDENTIFIER);
+		if(cancel) return(result);
 		result->append_child(type_name);
 		if(token && !token->is_closing && !(token->type == TPUNCT && token->text == "="))
 		{
@@ -77,10 +77,54 @@ struct Parser
 		return(result);
 	}
 
-	ASTNode* parse_expression(char delim = ';')
+	ASTNode* parse_assignment()
+	{
+		ASTNode* result = new ASTNode();
+		result->copy_from(token);
+		result->text = "";
+		result->type = TASSIGNMENT;
+		result->append_child(expect(TIDENTIFIER));
+		expect(TPUNCT, "=");
+		if(cancel) return(result);
+		result->append_child(parse_expression());
+		return(result);
+	}
+
+	ASTNode* parse_function_call()
+	{
+		ASTNode* result = new ASTNode();
+		result->copy_from(token);
+		result->text = "";
+		result->type = TCALL;
+		result->append_child(expect(TIDENTIFIER));
+		expect(TPUNCT, "(");
+		if(cancel) return(result);
+		result->append_child(parse_expression(')'));
+		return(result);
+	}
+	
+	ASTNode* parse_list(ASTNode* first_expr, char delim = ';', char alt_delim = ';')
 	{
 		ASTNode* result = new ASTNode();
 		ASTNode* current = 0;
+		if(cancel) return(result);
+		result->copy_from(token);
+		result->text = "";
+		result->type = TLIST;
+		result->append_child(first_expr);
+		while(token && token->type == TPUNCT && token->text == ",")
+		{
+			consume();
+			result->append_child(parse_expression(delim, alt_delim));
+		}
+		return(result);
+	}
+
+	ASTNode* parse_expression(char delim = ';', char alt_delim = ';')
+	{
+		ASTNode* result = new ASTNode();
+		ASTNode* current = 0;
+		if(cancel) return(result);
 		result->copy_from(token);
 		result->text = "";
 		result->type = TEXPRESSION;
@@ -91,7 +135,7 @@ struct Parser
 			{
 				consume();
 			}
-			else if(token->text[0] == delim)
+			else if(token->text[0] == delim || token->text[0] == alt_delim)
 			{
 				consume();
 				return(result);
@@ -116,9 +160,21 @@ struct Parser
 				consume();
 				result->append_child(parse_statements());
 			}
+			else if(token->type == TPUNCT && token->text[0] == ',')
+			{
+				return(parse_list(result, ')', ','));
+			}
+			else if(token->type == TIDENTIFIER && token_next->type == TPUNCT && token_next->text == "(")
+			{
+				result->append_child(parse_function_call());
+			}
 			else if(token->type == TIDENTIFIER && token_next->type == TPUNCT && token_next->text == ":")
 			{
 				result->append_child(parse_declaration());
+			}
+			else if(token->type == TIDENTIFIER && token_next->type == TPUNCT && token_next->text == "=")
+			{
+				result->append_child(parse_assignment());
 			}
 			else
 			{
@@ -170,7 +226,7 @@ struct Parser
 	void error(string message, Token* token, string message2 = "")
 	{
 		printf("ERROR: %s %s at line %i col %i\n", message.c_str(), message2.c_str(), token->line, token->col);
-		this->cancel = true;
+		cancel = true;
 	}
 
 };
