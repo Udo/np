@@ -144,6 +144,11 @@ struct Parser
 				result->append_child(parse_assignment());
 				return(result);
 			}
+			else if(token->is_closing)
+			{
+				error("unexpected", token, "in statement");
+				return(result);
+			}
 			else
 			{
 				result->append_child(parse_expression(";"));
