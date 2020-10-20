@@ -31,12 +31,12 @@ struct Parser
 
 	ASTNode* expect(string token_type_text, bool do_consume = true)
 	{
-		if(cancel) return(0);
+		if(!token || cancel) return(new ASTNode());
 		auto n = new ASTNode();
 		n->copy_from(token);
 		if(token_type_text != token->text)
 		{
-			error("expected", token, token_type_text);
+			error("expected "+token_type_text+" at", token);
 			return(n);
 		}
 		if(do_consume) consume();
@@ -59,19 +59,85 @@ struct Parser
 		result->location_from(token);
 		result->type = TTYPE;
 		result->append_child(expect("Identifier"));
+		if(match("("))
+		{
+			// function signature
+			consume();
+			while(token && !cancel)
+			{
+				auto param = new ASTNode();
+				param->type = TPARAM;
+				param->location_from(token);
+				result->append_child(param);
+				param->append_child(expect("Identifier"));
+				expect(":");
+				param->append_child(parse_type());
+				if(token->text == ")") 
+				{
+					consume();
+					return(result);
+				}
+				expect(",");
+			}
+		}
 		return(result);
 	}
 
-
-	ASTNode* parse_expression(string delim = "")
+	ASTNode* parse_call()
 	{
+		ASTNode* result = new ASTNode();
+		result->location_from(token);
+		result->type = TCALL;
+		result->append_child(expect("Identifier"));
+		expect("(");
+		while(token && !cancel)
+		{
+			result->append_child(parse_expression(",", ")"));
+			if(match(")"))
+			{
+				consume();
+				return(result);
+			}
+			else
+			{
+				expect(",");
+			}
+		}
+		return(result);
+	}
+
+	ASTNode* parse_expression(string delim = "None", string delim2 = "None")
+	{
+		if(token->text == "{")
+		{
+			consume();
+			auto block = parse_block("}");
+			expect("}");
+			return(block);
+		}		
 		ASTNode* result = new ASTNode();
 		result->location_from(token);
 		result->type = TEXPRESSION;
 		while(token && !cancel)
 		{
-			if(match(delim))
+			if(match(delim) || match(delim2))
 			{
+				return(result);
+			}
+			else if(token->text == "(")
+			{
+				consume();
+				result->append_child(parse_expression(")"));
+				expect(")");
+			}
+			else if(match("Identifier", "("))
+			{
+				result->append_child(parse_call());
+			}
+			else if(token->is_closing)
+			{
+				error("unexpected", token, "in expression");
+				consume();
 				return(result);
 			}
 			else
@@ -97,10 +163,10 @@ struct Parser
 		{
 			consume();
 			result->append_child(parse_expression(";"));
+			return(result);
 		}
 		if(token->text == ";")
 		{
-			consume();
 			return(result);
 		}
 		else
@@ -118,45 +184,36 @@ struct Parser
 		result->append_child(expect("Identifier"));
 		expect("=");
 		result->append_child(parse_expression(";"));
-		expect(";");
 		return(result);
 	}
 
 	ASTNode* parse_statement(string delim = ";")
 	{
-		ASTNode* result = new ASTNode();
-		result->location_from(token);
-		result->type = TSTATEMENT;
-		while(token && !cancel)
+		if(token && !cancel)
 		{
 			if(token->text == delim)
 			{
-				consume();
-				return(result);
+				return(ASTNode::MakeEmpty(token));
 			}
 			else if(match("Identifier", ":"))
 			{
-				result->append_child(parse_declaration());
-				return(result);
+				return(parse_declaration());
 			}
 			else if(match("Identifier", "="))
 			{
-				result->append_child(parse_assignment());
-				return(result);
+				return(parse_assignment());
 			}
 			else if(token->is_closing)
 			{
 				error("unexpected", token, "in statement");
-				return(result);
+				return(ASTNode::MakeEmpty(token));
 			}
 			else
 			{
-				result->append_child(parse_expression(";"));
-				expect(";");
-				return(result);
+				return(parse_expression(";"));
 			}
 		}
-		return(result);
+		return(ASTNode::MakeEmpty(token));
 	}
 
 	ASTNode* parse_block(string delim = "None")
@@ -168,16 +225,17 @@ struct Parser
 		{
 			if(token->text == delim)
 			{
-				consume();
 				return(result);
 			}
 			else if(token->is_closing)
 			{
 				error("unexpected", token, "in block");
+				return(result);
 			}
 			else
 			{
 				result->append_child(parse_statement(";"));
+				expect(";");
 			}
 		}
 		return(result);

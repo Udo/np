@@ -22,11 +22,19 @@ struct Token
 	int line;
 	string text;
 	string literal;
+	Token* prev = 0;
 	Token* next = 0;
 	Token* child = 0;
 	Token* parent = 0;
 	char delim = 0;
 	bool is_closing = false;
+
+	static Token* MakeEmpty(Token* token)
+	{
+		auto result = new Token();
+		result->location_from(token);
+		return(result);
+	}
 
 	void print(bool all = false, string level = "")
 	{
@@ -144,6 +152,7 @@ Token* tokenize(string src)
 			else
 			{
 				Token* next_token = new Token();
+				next_token->prev = current_token;
 				current_token->next = next_token;
 				current_token = next_token;
 				current_token->start = i;
