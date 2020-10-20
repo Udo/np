@@ -4,14 +4,14 @@ enum TokenType {
 	TNONE, TIDENTIFIER, TPUNCT, TCOMMENT,
 	TSTRINGLITERAL, TEXPRESSION, TSTATEMENT, TBLOCK,
 	TDECLARATION, TASSIGNMENT, TTYPE, TCALL,
-	TLIST,
+	TLIST, TSIGNATURE, TPARAM,
 };
 
 char* TokenTypeNames[] = {
 	"None", "Ident", "Punct", "Comment",
 	"String", "Expr", "Stmt", "Block",
 	"Decl", "Assign", "Type", "Call",
-	"List",
+	"List", "Signature", "Param",
 };
 
 struct Token
@@ -21,6 +21,7 @@ struct Token
 	int col;
 	int line;
 	string text;
+	string literal;
 	Token* next = 0;
 	Token* child = 0;
 	Token* parent = 0;
@@ -29,12 +30,15 @@ struct Token
 
 	void print(bool all = false, string level = "")
 	{
+		string ds = text;
+		if(literal != "")
+			ds = "\""+literal+"\"";
 		if(this)
 			printf("%s\u001b[32m%s \u001b[34m%i:%i \u001b[33m%s\u001b[0m\n", level.c_str(),
 				TokenTypeNames[this->type],
 				this->col,
 				this->line,
-				this->text.c_str());
+				ds.c_str());
 		else
 			return;
 		if(this->child) this->child->print(true, level+"  ");
@@ -48,7 +52,15 @@ struct Token
 		this->col = from->col;
 		this->line = from->line;
 		this->text = from->text;
+		this->literal = from->literal;
 		this->delim = from->delim;
+	}
+
+	void location_from(Token* from)
+	{
+		this->start = from->start;
+		this->col = from->col;
+		this->line = from->line;
 	}
 
 	void append_child(Token* c)
@@ -112,10 +124,30 @@ Token* tokenize(string src)
 
 		if((current_token->type != TNONE) && (cmode != current_token->type || cmode == TPUNCT))
 		{
-			Token* next_token = new Token();
-			current_token->next = next_token;
-			current_token = next_token;
-			current_token->start = i;
+			if(current_token->type == TSTRINGLITERAL)
+			{
+				current_token->literal = current_token->text;
+				current_token->text = "String";
+			}
+			else if(current_token->type == TIDENTIFIER)
+			{
+				current_token->literal = current_token->text;
+				current_token->text = "Identifier";
+			}
+			if(current_token->type == TCOMMENT)
+			{
+				current_token->start = i;
+				current_token->type = TNONE;
+				current_token->text = "";
+				current_token->literal = "";
+			}
+			else
+			{
+				Token* next_token = new Token();
+				current_token->next = next_token;
+				current_token = next_token;
+				current_token->start = i;
+			}
 		}
 
 		if(cmode != TNONE)
