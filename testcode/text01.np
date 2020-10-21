@@ -16,6 +16,11 @@ if(bla) {
 	print("HELLO");
 } else {
 	print("OTHERWISE");
-};
+}
 
 print(a_func(10, 10));
+
+// metaprogramming idea
+testblock := { $("HI"); };
+
+testblock(print);

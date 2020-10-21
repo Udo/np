@@ -115,7 +115,7 @@ struct Parser
 			block->literal = param_name;
 			result->append_child(block);
 			expect("}");
-			if(match("Identifier"))
+			if(match("Identifier", "{"))
 			{
 				param_name = token->literal;
 				consume();
@@ -125,8 +125,6 @@ struct Parser
 				break;
 			}
 		}
-		// fixme: there is a bug here that swallows the next identifier silently
-		// unless the call ends with a ;
 		return(result);
 	}
 
