@@ -55,24 +55,28 @@ struct Parser
 
 	ASTNode* parse_type(string delim1 = "", string delim2 = "")
 	{
-		ASTNode* result = new ASTNode();
-		result->location_from(token);
-		result->type = TTYPE;
-		result->append_child(expect("Identifier"));
+		ASTNode* result = expect("Identifier");
+		result->tags[0] = (TTYPE);
 		if(match("("))
 		{
+			result->apply_tag(TSIGNATURE);
 			// function signature
 			consume();
 			while(token && !cancel)
 			{
+				if(token->text == ")")
+				{
+					consume();
+					return(result);
+				}
 				auto param = new ASTNode();
-				param->type = TPARAM;
+				param->apply_tag(TPARAM);
 				param->location_from(token);
 				result->append_child(param);
 				param->append_child(expect("Identifier"));
 				expect(":");
 				param->append_child(parse_type());
-				if(token->text == ")") 
+				if(token->text == ")")
 				{
 					consume();
 					return(result);
@@ -83,26 +87,46 @@ struct Parser
 		return(result);
 	}
 
-	ASTNode* parse_call()
+	ASTNode* parse_call(ASTNode* callee)
 	{
 		ASTNode* result = new ASTNode();
 		result->location_from(token);
-		result->type = TCALL;
-		result->append_child(expect("Identifier"));
+		result->apply_tag(TCALL);
+		result->append_child(callee->apply_tag(TCALLEE));
 		expect("(");
 		while(token && !cancel)
 		{
-			result->append_child(parse_expression(",", ")"));
+			result->append_child(parse_expression(",", ")")->apply_tag(TPARAM));
 			if(match(")"))
 			{
 				consume();
-				return(result);
+				break;
 			}
 			else
 			{
 				expect(",");
 			}
 		}
+		string param_name = "block";
+		while(match("{"))
+		{
+			consume();
+			auto block = parse_block("}")->apply_tag(TPARAM);
+			block->literal = param_name;
+			result->append_child(block);
+			expect("}");
+			if(match("Identifier"))
+			{
+				param_name = token->literal;
+				consume();
+			}
+			else
+			{
+				break;
+			}
+		}
+		// fixme: there is a bug here that swallows the next identifier silently
+		// unless the call ends with a ;
 		return(result);
 	}
 
@@ -114,10 +138,10 @@ struct Parser
 			auto block = parse_block("}");
 			expect("}");
 			return(block);
-		}		
+		}
 		ASTNode* result = new ASTNode();
 		result->location_from(token);
-		result->type = TEXPRESSION;
+		result->apply_tag(TEXPRESSION);
 		while(token && !cancel)
 		{
 			if(match(delim) || match(delim2))
@@ -126,13 +150,28 @@ struct Parser
 			}
 			else if(token->text == "(")
 			{
-				consume();
-				result->append_child(parse_expression(")"));
-				expect(")");
+				if(result->child_count == 1 && result->child->is(TEXPRESSION))
+				{
+					// fixme: leaking a node
+					return(parse_call(result->child));
+				}
+				else
+				{
+					consume();
+					result->append_child(parse_expression(")"));
+					expect(")");
+				}
 			}
 			else if(match("Identifier", "("))
 			{
-				result->append_child(parse_call());
+				auto callee = expect("Identifier");
+				result->append_child(parse_call(callee));
+			}
+			else if(match("{"))
+			{
+				consume();
+				result->append_child(parse_block("}"));
+				expect("}");
 			}
 			else if(token->is_closing)
 			{
@@ -155,14 +194,25 @@ struct Parser
 	{
 		ASTNode* result = new ASTNode();
 		result->location_from(token);
-		result->type = TDECLARATION;
-		result->append_child(expect("Identifier"));
+		result->apply_tag(TDECLARATION);
+		result->append_child(expect("Identifier")->apply_tag(TIDENTIFIER));
 		expect(":");
-		result->append_child(parse_type("=", ";"));
+		if(match("="))
+		{
+			auto auto_type = new ASTNode();
+			auto_type->location_from(token);
+			auto_type->apply_tag(TTYPE);
+			auto_type->literal = "auto";
+			result->append_child(auto_type);
+		}
+		else
+		{
+			result->append_child(parse_type("=", ";")->apply_tag(TTYPE));
+		}
 		if(token->text == "=")
 		{
 			consume();
-			result->append_child(parse_expression(";"));
+			result->append_child(parse_expression(";")->apply_tag(TVALUE));
 			return(result);
 		}
 		if(token->text == ";")
@@ -180,10 +230,10 @@ struct Parser
 	{
 		ASTNode* result = new ASTNode();
 		result->location_from(token);
-		result->type = TASSIGNMENT;
-		result->append_child(expect("Identifier"));
+		result->apply_tag(TASSIGNMENT);
+		result->append_child(expect("Identifier")->apply_tag(TIDENTIFIER));
 		expect("=");
-		result->append_child(parse_expression(";"));
+		result->append_child(parse_expression(";")->apply_tag(TVALUE));
 		return(result);
 	}
 
@@ -220,7 +270,7 @@ struct Parser
 	{
 		ASTNode* result = new ASTNode();
 		result->location_from(token);
-		result->type = TBLOCK;
+		result->apply_tag(TBLOCK);
 		while(token && !cancel)
 		{
 			if(token->text == delim)
@@ -247,19 +297,20 @@ struct Parser
 		token_list = token_list;
 		token = token_list;
 		if(token && token->next) token_next = token->next;
-		ast_root = parse_block();
+		ast_root = (new ASTNode())->apply_tag(TUNIT);
+		ast_root->append_child(parse_block());
 	}
 
 	void error(string message, Token* token, string message2 = "")
 	{
 		if(token->literal != "")
-			printf("ERROR: %s \"%s\" at line %i col %i %s\n",
+			printf("\u001b[91mERROR: %s \"%s\" at line %i col %i %s\u001b[0m\n",
 				message.c_str(),
 				token->literal.c_str(),
 				token->line, token->col,
 				message2.c_str());
 		else
-			printf("ERROR: %s %s at line %i col %i %s\n",
+			printf("\u001b[91mERROR: %s %s at line %i col %i %s\u001b[0m\n",
 				message.c_str(),
 				token->text.c_str(),
 				token->line, token->col,

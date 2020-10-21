@@ -8,7 +8,14 @@ test_string2 : string = ('Single-quoted I am');
 print(test_string);
 
 a_func : int (a:int, b:int) = {
-	return(a*b);
+	abc := "blub";
+	return(a*sqrt(b+1)+1/(a/b));
+};
+
+if(bla) {
+	print("HELLO");
+} else {
+	print("OTHERWISE");
 };
 
 print(a_func(10, 10));
