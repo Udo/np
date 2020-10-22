@@ -6,6 +6,7 @@ enum TokenType {
 	TSTRINGLITERAL, TEXPRESSION, TBLOCK, TPARAM,
 	TDECLARATION, TASSIGNMENT, TTYPE, TCALL,
 	TCALLEE, TVALUE, TSIGNATURE, TUNIT,
+	TIF, TELSE, TTHEN,
 };
 
 char* TokenTypeNames[] = {
@@ -13,6 +14,7 @@ char* TokenTypeNames[] = {
 	"String", "Expr", "Block", "Param",
 	"Decl", "Assign", "Type", "Call",
 	"Callee", "Value", "Signature", "Unit",
+	"If", "Else", "Then",
 };
 
 struct Token;
@@ -46,8 +48,8 @@ struct Token
 	int start;
 	int col;
 	int line;
-	string text;
-	string literal;
+	string text = "";
+	string literal = "";
 	std::vector<int> tags;
 	Token* prev = 0;
 	Token* next = 0;
@@ -243,3 +245,5 @@ Token* tokenize(string src)
 	}
 	return(token_list);
 }
+
+typedef Token ASTNode;

@@ -1,6 +1,3 @@
-
-typedef Token ASTNode;
-
 struct Parser
 {
 	ASTNode* ast_root;
@@ -43,14 +40,28 @@ struct Parser
 		return(n);
 	}
 
+	bool match_token(string m, Token* t)
+	{
+		if(!t || t == neutral_token)
+			return(false);
+		if(m.substr(0, 2) == "::")
+		{
+			return(t->type == TIDENTIFIER && t->literal == m.substr(2));
+		}
+		else
+		{
+			return(m == t->text);
+		}
+	}
+
 	bool match(string m1, string m2 = "", string m3 = "")
 	{
 		if(!token || cancel) return(false);
 		if(m3 != "")
-			return(m1 == token->text && m2 == token_next->text && m3 == token_next_next->text);
+			return(match_token(m1, token) && match_token(m2, token_next) && match_token(m3, token_next_next));
 		if(m2 != "")
-			return(m1 == token->text && m2 == token_next->text);
-		return(m1 == token->text);
+			return(match_token(m1, token) && match_token(m2, token_next));
+		return(match_token(m1, token));
 	}
 
 	ASTNode* parse_type(string delim1 = "", string delim2 = "")
@@ -83,6 +94,28 @@ struct Parser
 				}
 				expect(",");
 			}
+		}
+		return(result);
+	}
+
+	ASTNode* parse_if()
+	{
+		ASTNode* result = new ASTNode();
+		result->location_from(token);
+		result->apply_tag(TIF);
+		expect("(");
+		result->append_child(parse_expression(")"));
+		expect(")");
+		auto then_block = parse_statement(";");
+		then_block->apply_tag(TTHEN);
+		result->append_child(then_block);
+		if(match(";")) consume();
+		if(match("::else"))
+		{
+			consume();
+			auto else_block = parse_statement(";");
+			else_block->apply_tag(TELSE);
+			result->append_child(else_block);
 		}
 		return(result);
 	}
@@ -142,7 +175,12 @@ struct Parser
 		result->apply_tag(TEXPRESSION);
 		while(token && !cancel)
 		{
-			if(match(delim) || match(delim2))
+			if(match("::if"))
+			{
+				consume();
+				result->append_child(parse_if());
+			}
+			else if(match(delim) || match(delim2))
 			{
 				return(result);
 			}
@@ -247,6 +285,13 @@ struct Parser
 			{
 				return(parse_declaration());
 			}
+			else if(match("{"))
+			{
+				consume();
+				auto block = parse_block("}");
+				expect("}");
+				return(block);
+			}
 			else if(match("Identifier", "="))
 			{
 				return(parse_assignment());
@@ -275,6 +320,10 @@ struct Parser
 			{
 				return(result);
 			}
+			else if(match(";"))
+			{
+				consume();
+			}
 			else if(token->is_closing)
 			{
 				error("unexpected", token, "in block");
@@ -283,7 +332,6 @@ struct Parser
 			else
 			{
 				result->append_child(parse_statement(";"));
-				expect(";");
 			}
 		}
 		return(result);

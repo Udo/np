@@ -7,16 +7,18 @@ test_string2 : string = ('Single-quoted I am');
 // this is a comment
 print(test_string);
 
+if(bla) {
+	print("HELLO");
+} else if(bla2) {
+	print("OTHERWISE");
+} else {
+	print("OTHERWISE");
+}
+
 a_func : int (a:int, b:int) = {
 	abc := "blub";
 	return(a*sqrt(b+1)+1/(a/b));
 };
-
-if(bla) {
-	print("HELLO");
-} else {
-	print("OTHERWISE");
-}
 
 print(a_func(10, 10));
 
