@@ -1,8 +1,8 @@
 #include "language/types.h"
 #include "language/io.h"
 #include "language/tokenizer.h"
-#include "language/bytecode_emitter.h"
 #include "language/parser.h"
+#include "language/bytecode_emitter.h"
 #include "language/resolver.h"
 
 string src;
@@ -33,7 +33,7 @@ int main(int argc, char** argv)
 		r.resolve_all(p.ast_root);
 		if(args["debug_ast"] != "")
 		{
-			p.ast_root->print(true);
+			p.ast_root->print();
 		}
 		else
 		{

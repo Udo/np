@@ -55,6 +55,7 @@ struct Token
 	Token* next = 0;
 	Token* child = 0;
 	Token* parent = 0;
+	
 	Scope* scope = 0;
 	int child_count = 0;
 	char delim = 0;
@@ -246,4 +247,4 @@ Token* tokenize(string src)
 	return(token_list);
 }
 
-typedef Token ASTNode;
+// typedef Token ASTNode;

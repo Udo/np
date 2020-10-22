@@ -1,6 +1,227 @@
+struct ASTNode
+{
+	
+	int col;
+	int line;
+	
+	ASTNode(Token* t)
+	{
+		col = t->col;
+		line = t->line;
+	}
+	
+	virtual void print(string indent = "")
+	{
+		printf("%s NODE\n", indent.c_str());
+	}
+	
+};
+
+struct ASTAssignment : ASTNode
+{
+	
+	string identifier;
+	ASTNode* value;
+	
+	ASTAssignment(Token* t) : ASTNode(t) {};
+	
+	void print(string indent = "")
+	{
+		printf("%s Assigment\n", indent.c_str());
+	}
+
+};
+
+struct ASTString : ASTNode
+{
+
+	string value;
+
+	ASTString(Token* t) : ASTNode(t)
+	{
+		value = t->literal;
+	}
+
+	void print(string indent = "")
+	{
+		printf("%s String '%s'\n", indent.c_str(), value.c_str());
+	}
+	
+};
+
+struct ASTIdentifier : ASTNode
+{
+
+	string identifier;
+
+	ASTIdentifier(Token* t) : ASTNode(t)
+	{
+		identifier = t->literal;
+	}
+
+	void print(string indent = "")
+	{
+		printf("%s Identifier %s\n", indent.c_str(), identifier.c_str());
+	}
+	
+};
+
+struct ASTOperator : ASTNode
+{
+
+	string op;
+
+	ASTOperator(Token* t) : ASTNode(t)
+	{
+		op = t->literal;
+	}
+	
+	void print(string indent = "")
+	{
+		printf("%s Op\n", indent.c_str());
+	}
+
+};
+
+struct ASTType : ASTNode
+{
+	
+	string identifier;
+	string name;
+	bool is_function = false;
+	ASTType* subtype = 0;
+	std::vector<ASTType*> params;
+	
+	ASTType(Token* t) : ASTNode(t) {};
+
+	void print(string indent = "")
+	{
+		printf("%s Type %s '%s' \n", indent.c_str(), identifier.c_str(), name.c_str(), is_function ? "Function" : "");
+		if(subtype) subtype->print(indent+"   Sub ");
+		for(auto s : params)
+			s->print(indent+"  ");
+	}
+
+};
+
+struct ASTDeclaration : ASTNode
+{
+
+	string identifier;
+	bool auto_type = false;
+	ASTType* type = 0;
+	ASTNode* value = 0;
+	
+	ASTDeclaration(Token* t) : ASTNode(t) {};
+
+	void print(string indent = "")
+	{
+		printf("%s Declaration %s %s\n", indent.c_str(), identifier.c_str(), auto_type ? "auto" : "");
+		if(type) type->print(indent + "   Typ ");
+		if(value) value->print(indent + "   Val ");
+	}
+
+};
+
+struct ASTExpression : ASTNode
+{
+
+	std::vector<ASTNode*> items;
+	
+	ASTExpression(Token* t) : ASTNode(t) {};
+
+	void print(string indent = "")
+	{
+		printf("%s Expression\n", indent.c_str());
+		for(auto s : items)
+			s->print(indent+"  ");
+	}
+	
+};
+
+struct ASTBlock : ASTNode
+{
+	
+	std::vector<ASTNode*> statements;
+	
+	ASTBlock(Token* t) : ASTNode(t) {};
+
+	void print(string indent = "")
+	{
+		printf("%s Block\n", indent.c_str());
+		for(auto s : statements)
+			s->print(indent+"  ");
+	}
+	
+};
+
+struct ASTIf : ASTNode
+{
+	
+	ASTNode* condition = 0;
+	ASTNode* thenblock = 0;
+	ASTNode* elseblock = 0;
+	
+	ASTIf(Token* t) : ASTNode(t) {};
+
+	void print(string indent = "")
+	{
+		printf("%s If\n", indent.c_str());
+		condition->print(indent+"   Cond ");
+		thenblock->print(indent+"   Then ");
+		elseblock->print(indent+"   Else ");
+	}
+
+};
+
+struct ASTCall : ASTNode
+{
+	
+	string identifier;
+	std::vector<ASTNode*> params;
+	std::map<string, ASTNode*> named_blocks;
+	
+	ASTCall(Token* t) : ASTNode(t) {};
+
+	void print(string indent = "")
+	{
+		printf("%s Call %s\n", indent.c_str(), identifier.c_str());
+		for(auto s : params)
+			s->print(indent+"  ");		
+	}
+
+};
+
+struct ASTFunction : ASTNode
+{
+	
+	ASTFunction(Token* t) : ASTNode(t) {};
+	
+	void print(string indent = "")
+	{
+		printf("%s Function\n", indent.c_str());
+	}
+
+};
+
+struct ASTBase : ASTNode
+{
+	
+	ASTBlock* block = 0;
+	
+	ASTBase(Token* t) : ASTNode(t) {};
+	
+	void print(string indent = "")
+	{
+		printf("%s Base\n", indent.c_str());
+		block->print(indent+"  ");
+	}
+	
+};
+
 struct Parser
 {
-	ASTNode* ast_root;
+	ASTBase* ast_root;
 	Token* token_list;
 	Token* token;
 	Token* token_next;
@@ -26,11 +247,10 @@ struct Parser
 		}
 	}
 
-	ASTNode* expect(string token_type_text, bool do_consume = true)
+	Token* expect(string token_type_text, bool do_consume = true)
 	{
-		if(!token || cancel) return(new ASTNode());
-		auto n = new ASTNode();
-		n->copy_from(token);
+		if(!token || cancel) return(new Token());
+		auto n = token;
 		if(token_type_text != token->text)
 		{
 			error("expected "+token_type_text+" at", token);
@@ -64,14 +284,14 @@ struct Parser
 		return(match_token(m1, token));
 	}
 
-	ASTNode* parse_type(string delim1 = "", string delim2 = "")
+	ASTType* parse_type(string delim1 = "", string delim2 = "")
 	{
-		ASTNode* result = expect("Identifier");
-		result->tags[0] = (TTYPE);
+		auto result = new ASTType(token);
+		result->identifier = expect("Identifier")->literal;
 		if(match("("))
 		{
-			result->apply_tag(TSIGNATURE);
 			// function signature
+			result->is_function = true;
 			consume();
 			while(token && !cancel)
 			{
@@ -80,14 +300,15 @@ struct Parser
 					consume();
 					return(result);
 				}
-				auto param = new ASTNode();
-				param->apply_tag(TPARAM);
-				param->location_from(token);
-				result->append_child(param);
-				param->append_child(expect("Identifier"));
+				auto param = new ASTType(token);
+				result->params.push_back(param);
+				param->name = expect("Identifier")->literal;
 				expect(":");
-				param->append_child(parse_type());
-				if(token->text == ")")
+				if(match("Identifier", "("))
+					param->subtype = parse_type();
+				else
+					param->identifier = expect("Identifier")->literal;
+				if(match(")"))
 				{
 					consume();
 					return(result);
@@ -98,38 +319,30 @@ struct Parser
 		return(result);
 	}
 
-	ASTNode* parse_if()
+	ASTIf* parse_if()
 	{
-		ASTNode* result = new ASTNode();
-		result->location_from(token);
-		result->apply_tag(TIF);
+		auto result = new ASTIf(token);
 		expect("(");
-		result->append_child(parse_expression(")"));
+		result->condition = parse_expression(")");
 		expect(")");
-		auto then_block = parse_statement(";");
-		then_block->apply_tag(TTHEN);
-		result->append_child(then_block);
+		result->thenblock = parse_statement(";");
 		if(match(";")) consume();
 		if(match("::else"))
 		{
 			consume();
-			auto else_block = parse_statement(";");
-			else_block->apply_tag(TELSE);
-			result->append_child(else_block);
+			result->elseblock = parse_statement(";");
 		}
 		return(result);
 	}
 
-	ASTNode* parse_call(ASTNode* callee)
+	ASTCall* parse_call(Token* callee)
 	{
-		ASTNode* result = new ASTNode();
-		result->location_from(token);
-		result->apply_tag(TCALL);
-		result->append_child(callee->apply_tag(TCALLEE));
+		auto result = new ASTCall(token);
+		result->identifier = callee->literal;
 		expect("(");
 		while(token && !cancel)
 		{
-			result->append_child(parse_expression(",", ")")->apply_tag(TPARAM));
+			result->params.push_back(parse_expression(",", ")"));
 			if(match(")"))
 			{
 				consume();
@@ -140,17 +353,15 @@ struct Parser
 				expect(",");
 			}
 		}
-		string param_name = "block";
+		string block_name = "block";
 		while(match("{"))
 		{
 			consume();
-			auto block = parse_block("}")->apply_tag(TPARAM);
-			block->literal = param_name;
-			result->append_child(block);
+			result->named_blocks[block_name] = parse_block("}");
 			expect("}");
 			if(match("Identifier", "{"))
 			{
-				param_name = token->literal;
+				block_name = token->literal;
 				consume();
 			}
 			else
@@ -163,50 +374,41 @@ struct Parser
 
 	ASTNode* parse_expression(string delim = "None", string delim2 = "None")
 	{
-		if(token->text == "{")
+		if(match("{"))
 		{
 			consume();
 			auto block = parse_block("}");
 			expect("}");
 			return(block);
 		}
-		ASTNode* result = new ASTNode();
-		result->location_from(token);
-		result->apply_tag(TEXPRESSION);
+		auto result = new ASTExpression(token);
 		while(token && !cancel)
 		{
 			if(match("::if"))
 			{
 				consume();
-				result->append_child(parse_if());
+				result->items.push_back(parse_if());
 			}
 			else if(match(delim) || match(delim2))
 			{
+				if(result->items.size() == 1)
+					return(result->items[0]);
 				return(result);
 			}
-			else if(token->text == "(")
+			else if(match("("))
 			{
-				if(result->child_count == 1 && result->child->is(TEXPRESSION))
-				{
-					// fixme: leaking a node
-					return(parse_call(result->child));
-				}
-				else
-				{
-					consume();
-					result->append_child(parse_expression(")"));
-					expect(")");
-				}
+				consume();
+				result->items.push_back(parse_expression(")"));
+				expect(")");
 			}
 			else if(match("Identifier", "("))
 			{
-				auto callee = expect("Identifier");
-				result->append_child(parse_call(callee));
+				result->items.push_back(parse_call(expect("Identifier")));
 			}
 			else if(match("{"))
 			{
 				consume();
-				result->append_child(parse_block("}"));
+				result->items.push_back(parse_block("}"));
 				expect("}");
 			}
 			else if(token->is_closing)
@@ -215,61 +417,64 @@ struct Parser
 				consume();
 				return(result);
 			}
+			else if(match("Identifier"))
+			{
+				result->items.push_back(new ASTIdentifier(token));
+				consume();
+			}
+			else if(token->type == TPUNCT)
+			{
+				result->items.push_back(new ASTOperator(token));
+				consume();
+			}
+			else if(match("String"))
+			{
+				result->items.push_back(new ASTString(token));
+				consume();
+			}
 			else
 			{
-				auto n = new ASTNode();
-				n->copy_from(token);
-				result->append_child(n);
+				error("unexpected", token, "in expression");
 				consume();
 			}
 		}
+		if(result->items.size() == 1)
+			return(result->items[0]);
 		return(result);
 	}
 
-	ASTNode* parse_declaration()
+	ASTDeclaration* parse_declaration()
 	{
-		ASTNode* result = new ASTNode();
-		result->location_from(token);
-		result->apply_tag(TDECLARATION);
-		result->append_child(expect("Identifier")->apply_tag(TIDENTIFIER));
+		auto result = new ASTDeclaration(token);
+		result->identifier = expect("Identifier")->literal;
 		expect(":");
 		if(match("="))
 		{
-			auto auto_type = new ASTNode();
-			auto_type->location_from(token);
-			auto_type->apply_tag(TTYPE);
-			auto_type->literal = "auto";
-			result->append_child(auto_type);
+			result->auto_type = true;
 		}
 		else
 		{
-			result->append_child(parse_type("=", ";")->apply_tag(TTYPE));
+			result->type = parse_type("=", ";");
 		}
-		if(token->text == "=")
+		if(match("="))
 		{
 			consume();
-			result->append_child(parse_expression(";")->apply_tag(TVALUE));
+			result->value = parse_expression(";");
 			return(result);
 		}
-		if(token->text == ";")
-		{
-			return(result);
-		}
-		else
+		if(!match(";"))
 		{
 			error("unexpected", token, "in declaration");
 		}
 		return(result);
 	}
 
-	ASTNode* parse_assignment()
+	ASTAssignment* parse_assignment()
 	{
-		ASTNode* result = new ASTNode();
-		result->location_from(token);
-		result->apply_tag(TASSIGNMENT);
-		result->append_child(expect("Identifier")->apply_tag(TIDENTIFIER));
+		auto result = new ASTAssignment(token);
+		result->identifier = expect("Identifier")->literal;
 		expect("=");
-		result->append_child(parse_expression(";")->apply_tag(TVALUE));
+		result->value = parse_expression(";");
 		return(result);
 	}
 
@@ -279,7 +484,7 @@ struct Parser
 		{
 			if(token->text == delim)
 			{
-				return(ASTNode::MakeEmpty(token));
+				return(new ASTNode(token));
 			}
 			else if(match("Identifier", ":"))
 			{
@@ -299,21 +504,19 @@ struct Parser
 			else if(token->is_closing)
 			{
 				error("unexpected", token, "in statement");
-				return(ASTNode::MakeEmpty(token));
+				return(new ASTNode(token));
 			}
 			else
 			{
 				return(parse_expression(";"));
 			}
 		}
-		return(ASTNode::MakeEmpty(token));
+		return(new ASTNode(token));
 	}
 
-	ASTNode* parse_block(string delim = "None")
+	ASTBlock* parse_block(string delim = "None")
 	{
-		ASTNode* result = new ASTNode();
-		result->location_from(token);
-		result->apply_tag(TBLOCK);
+		auto result = new ASTBlock(token);
 		while(token && !cancel)
 		{
 			if(token->text == delim)
@@ -331,7 +534,7 @@ struct Parser
 			}
 			else
 			{
-				result->append_child(parse_statement(";"));
+				result->statements.push_back(parse_statement(";"));
 			}
 		}
 		return(result);
@@ -343,8 +546,8 @@ struct Parser
 		token_list = token_list;
 		token = token_list;
 		if(token && token->next) token_next = token->next;
-		ast_root = (new ASTNode())->apply_tag(TUNIT);
-		ast_root->append_child(parse_block());
+		ast_root = new ASTBase(token);
+		ast_root->block = parse_block();
 	}
 
 	void error(string message, Token* token, string message2 = "")
