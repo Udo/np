@@ -8,6 +8,11 @@ struct BytecodeEmitter
 
 	void compile(ASTNode* node)
 	{
+		if(node->scope)
+		{
+			for(auto si : node->scope->items)
+				emit("SCOP", si.first);
+		}
 		switch(node->tags[0])
 		{
 			case(TUNIT):
@@ -16,6 +21,7 @@ struct BytecodeEmitter
 			} break;
 			case(TBLOCK):
 			{
+				emit("BLOC");
 				auto n = node->child;
 				while(n)
 				{
@@ -25,11 +31,11 @@ struct BytecodeEmitter
 			} break;
 			case(TDECLARATION):
 			{
-				emit("DECLARE", node->child->literal);
+				emit("DECL", node->child->literal);
 			} break;
 			case(TASSIGNMENT):
 			{
-				emit("ASSIGN", node->child->literal);
+				emit("ASSI", node->child->literal);
 			} break;
 			case(TEXPRESSION):
 			{
@@ -42,11 +48,11 @@ struct BytecodeEmitter
 			} break;
 			case(TIF):
 			{
-
+				emit("IFCL");
 			} break;
 			case(TCALL):
 			{
-
+				emit("CALL");
 			} break;
 		}
 	}
