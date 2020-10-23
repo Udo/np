@@ -1,33 +1,34 @@
 struct ASTNode
 {
-	
+
 	int col;
 	int line;
-	
+
 	ASTNode(Token* t)
 	{
 		col = t->col;
 		line = t->line;
 	}
-	
+
 	virtual void print(string indent = "")
 	{
 		printf("%s NODE\n", indent.c_str());
 	}
-	
+
 };
 
 struct ASTAssignment : ASTNode
 {
-	
+
 	string identifier;
 	ASTNode* value;
-	
+
 	ASTAssignment(Token* t) : ASTNode(t) {};
-	
+
 	void print(string indent = "")
 	{
-		printf("%s Assigment\n", indent.c_str());
+		printf("\u001b[33m%s\u001b[0m Assigment \u001b[34m%s\u001b[0m\n", indent.c_str(), identifier.c_str());
+		value->print(indent+"   Val ");
 	}
 
 };
@@ -44,9 +45,9 @@ struct ASTString : ASTNode
 
 	void print(string indent = "")
 	{
-		printf("%s String '%s'\n", indent.c_str(), value.c_str());
+		printf("\u001b[33m%s\u001b[0m String '\u001b[34m%s\u001b[0m'\n", indent.c_str(), value.c_str());
 	}
-	
+
 };
 
 struct ASTIdentifier : ASTNode
@@ -61,9 +62,9 @@ struct ASTIdentifier : ASTNode
 
 	void print(string indent = "")
 	{
-		printf("%s Identifier %s\n", indent.c_str(), identifier.c_str());
+		printf("\u001b[33m%s\u001b[0m Identifier \u001b[34m%s\u001b[0m\n", indent.c_str(), identifier.c_str());
 	}
-	
+
 };
 
 struct ASTOperator : ASTNode
@@ -73,30 +74,30 @@ struct ASTOperator : ASTNode
 
 	ASTOperator(Token* t) : ASTNode(t)
 	{
-		op = t->literal;
+		op = t->text;
 	}
-	
+
 	void print(string indent = "")
 	{
-		printf("%s Op\n", indent.c_str());
+		printf("\u001b[33m%s\u001b[0m Op \u001b[34m%s\u001b[0m\n", indent.c_str(), op.c_str());
 	}
 
 };
 
 struct ASTType : ASTNode
 {
-	
+
 	string identifier;
 	string name;
 	bool is_function = false;
 	ASTType* subtype = 0;
 	std::vector<ASTType*> params;
-	
+
 	ASTType(Token* t) : ASTNode(t) {};
 
 	void print(string indent = "")
 	{
-		printf("%s Type %s '%s' \n", indent.c_str(), identifier.c_str(), name.c_str(), is_function ? "Function" : "");
+		printf("\u001b[33m%s\u001b[0m Type \u001b[34m%s\u001b[0m '%s' \n", indent.c_str(), identifier.c_str(), name.c_str(), is_function ? "Function" : "");
 		if(subtype) subtype->print(indent+"   Sub ");
 		for(auto s : params)
 			s->print(indent+"  ");
@@ -111,12 +112,12 @@ struct ASTDeclaration : ASTNode
 	bool auto_type = false;
 	ASTType* type = 0;
 	ASTNode* value = 0;
-	
+
 	ASTDeclaration(Token* t) : ASTNode(t) {};
 
 	void print(string indent = "")
 	{
-		printf("%s Declaration %s %s\n", indent.c_str(), identifier.c_str(), auto_type ? "auto" : "");
+		printf("\u001b[33m%s\u001b[0m Declaration \u001b[34m%s\u001b[0m %s\n", indent.c_str(), identifier.c_str(), auto_type ? "auto" : "");
 		if(type) type->print(indent + "   Typ ");
 		if(value) value->print(indent + "   Val ");
 	}
@@ -127,46 +128,46 @@ struct ASTExpression : ASTNode
 {
 
 	std::vector<ASTNode*> items;
-	
+
 	ASTExpression(Token* t) : ASTNode(t) {};
 
 	void print(string indent = "")
 	{
-		printf("%s Expression\n", indent.c_str());
+		printf("\u001b[33m%s\u001b[0m Expression\n", indent.c_str());
 		for(auto s : items)
 			s->print(indent+"  ");
 	}
-	
+
 };
 
 struct ASTBlock : ASTNode
 {
-	
+
 	std::vector<ASTNode*> statements;
-	
+
 	ASTBlock(Token* t) : ASTNode(t) {};
 
 	void print(string indent = "")
 	{
-		printf("%s Block\n", indent.c_str());
+		printf("\u001b[33m%s\u001b[0m Block\n", indent.c_str());
 		for(auto s : statements)
 			s->print(indent+"  ");
 	}
-	
+
 };
 
 struct ASTIf : ASTNode
 {
-	
+
 	ASTNode* condition = 0;
 	ASTNode* thenblock = 0;
 	ASTNode* elseblock = 0;
-	
+
 	ASTIf(Token* t) : ASTNode(t) {};
 
 	void print(string indent = "")
 	{
-		printf("%s If\n", indent.c_str());
+		printf("\u001b[33m%s\u001b[0m If\n", indent.c_str());
 		condition->print(indent+"   Cond ");
 		thenblock->print(indent+"   Then ");
 		elseblock->print(indent+"   Else ");
@@ -176,47 +177,47 @@ struct ASTIf : ASTNode
 
 struct ASTCall : ASTNode
 {
-	
+
 	string identifier;
 	std::vector<ASTNode*> params;
 	std::map<string, ASTNode*> named_blocks;
-	
+
 	ASTCall(Token* t) : ASTNode(t) {};
 
 	void print(string indent = "")
 	{
-		printf("%s Call %s\n", indent.c_str(), identifier.c_str());
+		printf("\u001b[33m%s\u001b[0m Call \u001b[34m%s\u001b[0m\n", indent.c_str(), identifier.c_str());
 		for(auto s : params)
-			s->print(indent+"  ");		
+			s->print(indent+"  ");
 	}
 
 };
 
 struct ASTFunction : ASTNode
 {
-	
+
 	ASTFunction(Token* t) : ASTNode(t) {};
-	
+
 	void print(string indent = "")
 	{
-		printf("%s Function\n", indent.c_str());
+		printf("\u001b[33m%s\u001b[0m Function\n", indent.c_str());
 	}
 
 };
 
 struct ASTBase : ASTNode
 {
-	
-	ASTBlock* block = 0;
-	
+
+	ASTNode* code = 0;
+
 	ASTBase(Token* t) : ASTNode(t) {};
-	
+
 	void print(string indent = "")
 	{
-		printf("%s Base\n", indent.c_str());
-		block->print(indent+"  ");
+		printf("\u001b[33m%s\u001b[0m Base\n", indent.c_str());
+		code->print(indent+"  ");
 	}
-	
+
 };
 
 struct Parser
@@ -514,13 +515,15 @@ struct Parser
 		return(new ASTNode(token));
 	}
 
-	ASTBlock* parse_block(string delim = "None")
+	ASTNode* parse_block(string delim = "None")
 	{
 		auto result = new ASTBlock(token);
 		while(token && !cancel)
 		{
 			if(token->text == delim)
 			{
+				if(result->statements.size() == 1)
+					return(result->statements[0]);
 				return(result);
 			}
 			else if(match(";"))
@@ -537,6 +540,8 @@ struct Parser
 				result->statements.push_back(parse_statement(";"));
 			}
 		}
+		if(result->statements.size() == 1)
+			return(result->statements[0]);
 		return(result);
 	}
 
@@ -547,7 +552,7 @@ struct Parser
 		token = token_list;
 		if(token && token->next) token_next = token->next;
 		ast_root = new ASTBase(token);
-		ast_root->block = parse_block();
+		ast_root->code = parse_block();
 	}
 
 	void error(string message, Token* token, string message2 = "")
